@@ -1,0 +1,19 @@
+#CACHE FILES
+#---------------------------------------
+application/cache/*
+!application/cache/index.html
+!application/cache/.htaccess
+
+#LOG FILES
+#---------------------------------------
+application/logs/*
+!application/logs/index.html
+!application/logs/.htaccess
+
+#IDE FILES
+#---------------------------------------
+.idea
+
+#COMPOSER FOLDER
+#---------------------------------------
+/vendor

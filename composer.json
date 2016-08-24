@@ -1,0 +1,15 @@
+{
+    "name": "djalmocruzjr/biblivirti-api",
+    "description": "API de servicos do projeto Biblivirti",
+    "type": "project",
+    "authors": [
+        {
+            "name": "djalmocruzjr",
+            "email": "djalmo.cruz@gmail.com"
+        }
+    ],
+    "require": {
+        "twbs/bootstrap": "^3.3",
+        "components/jquery": "^3.1"
+    }
+}
