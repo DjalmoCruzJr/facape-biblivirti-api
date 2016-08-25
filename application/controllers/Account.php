@@ -67,7 +67,7 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['errors'] = $this->account_bo->get_errors();
         } else {
-            $user = $this->user_model->find_by_fields($data);
+            $user = $this->user_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']));
             // Verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -116,7 +116,7 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['errors'] = $this->account_bo->get_errors();
         } else {
-            $user = $this->user_model->find_by_fields($data);
+            $user = $this->user_model->find_by_uscfbid($data['uscfbid']);
             // Verifica se houve flaha na execucao do model
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -168,8 +168,8 @@ class Account extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($id)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Houve um erro ao tentar cadasttrar o ususario! Tente novamente.\n
-                                     Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                $response['response_message'] = "Houve um erro ao tentar cadastrar o ususario! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
             } else {
                 $response['response_code'] = RESPONSE_CODE_OK;
                 $response['response_message'] = "Usuário cadastrado com  sucesso!";
@@ -205,7 +205,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['errors'] = $this->account_bo->get_errors();
         } else {
-            $user = $this->user_model->find_by_fields($data);
+            $user = $this->user_model->find_by_uscmail($data['uscmail']);
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;

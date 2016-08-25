@@ -66,25 +66,25 @@ class Account_bo {
 
         // Validando o campo USCMAIL (email)
         if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
-            $this->errors['uscmail'] = 'O campo E-MAIL é obrigatório!';
+            $this->errors['uscmail'] = 'O E-MAIL é obrigatório!';
             $status = FALSE;
         } else if (!filter_var($this->data['uscmail'], FILTER_VALIDATE_EMAIL)) {
             $this->errors['uscmail'] = 'Informe um E-MAIL válido!';
             $status = FALSE;
         } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
-            $this->errors['uscmail'] = 'O campo E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 
         // Validando o campo USCSENH (senha)
         if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
-            $this->errors['uscsenh'] = 'O campo SENHA é obrigatório!';
+            $this->errors['uscsenh'] = 'O SENHA é obrigatório!';
             $status = FALSE;
         } else if (strpos($this->data['uscsenh'], ' ') > 0) {
-            $this->errors['uscsenh'] = 'O campo SENHA não pode conter espaço(s) em branco(s)!';
+            $this->errors['uscsenh'] = 'O SENHA não pode conter espaço(s) em branco(s)!';
             $status = FALSE;
         } else if (strlen($this->data['uscsenh']) > USCSENH_MAX_LENGTH) {
-            $this->errors['uscsenh'] = 'O campo SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['uscsenh'] = 'O SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 
@@ -100,11 +100,11 @@ class Account_bo {
         $status = TRUE;
 
         // Validando o campo USCFBID (ID do Facebook)*
-        if (!isset($data['uscfbid']) || empty(trim($data['uscfbid']))) {
-            $errors['uscfbid'] = 'O FacebookID é obrigatório!';
+        if (!isset($this->data['uscfbid']) || empty(trim($this->data['uscfbid']))) {
+            $this->errors['uscfbid'] = 'O FACEBOOKID é obrigatório!';
             $status = FALSE;
-        } else if (strlen($data['uscfbid']) > USCFBID_MAX_LENGTH) {
-            $errors['uscfbid'] = 'O FacebookID deve conter no máximo ' . USCFBID_MAX_LENGTH . ' caracter(es)!';
+        } else if (strlen($this->data['uscfbid']) > USCFBID_MAX_LENGTH) {
+            $this->errors['uscfbid'] = 'O FACEBOOKID deve conter no máximo ' . USCFBID_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 
@@ -121,13 +121,13 @@ class Account_bo {
 
         // Validando o campo USCMAIL (email)
         if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
-            $this->errors['uscmail'] = 'O campo E-MAILl é obrigatório!';
+            $this->errors['uscmail'] = 'O E-MAILl é obrigatório!';
             $status = FALSE;
         } else if (!filter_var($this->data['uscmail'], FILTER_VALIDATE_EMAIL)) {
             $this->errors['uscmail'] = 'Informe um E-MAIL válido!';
             $status = FALSE;
         } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
-            $this->errors['uscmail'] = 'O campo E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         } else if (!is_null($this->CI->user_model->find_by_fields(['uscmail' => $this->data['uscmail']]))) {
             $this->errors['uscmail'] = 'Já existe um usuário cadastrado com esse endereço de e-mail!';
@@ -136,13 +136,13 @@ class Account_bo {
 
         // Validando o campo USCLOGN (login)
         if (!isset($this->data['usclogn']) || empty(trim($this->data['usclogn']))) {
-            $this->errors['usclogn'] = 'O campo LOGIN é obrigatório!';
+            $this->errors['usclogn'] = 'O LOGIN é obrigatório!';
             $status = FALSE;
         } else if (strpos($this->data['usclogn'], ' ') > 0) {
-            $this->errors['usclogn'] = 'O campo LOGIN não pode conter espaço(s) em branco(s)!';
+            $this->errors['usclogn'] = 'O LOGIN não pode conter espaço(s) em branco(s)!';
             $status = FALSE;
         } else if (strlen($this->data['usclogn']) > USCLOGN_MAX_LENGTH) {
-            $this->errors['usclogn'] = 'O campo LOGIN deve conter no máximo ' . USCLOGN_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['usclogn'] = 'O LOGIN deve conter no máximo ' . USCLOGN_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         } else if (!is_null($this->CI->user_model->find_by_fields(['usclogn' => $this->data['usclogn']]))) {
             $this->errors['usclogn'] = 'Já existe um usuário cadastrado com esse login!';
@@ -151,13 +151,13 @@ class Account_bo {
 
         // Validando o campo USCSENH (senha)
         if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
-            $this->errors['uscsenh'] = 'O campo SENHA é obrigatório!';
+            $this->errors['uscsenh'] = 'A SENHA é obrigatório!';
             $status = FALSE;
         } else if (strpos($this->data['uscsenh'], ' ') > 0) {
-            $this->errors['uscsenh'] = 'O campo SENHA não pode conter espaço(s) em branco(s)!';
+            $this->errors['uscsenh'] = 'A SENHA não pode conter espaço(s) em branco(s)!';
             $status = FALSE;
         } else if (strlen($this->data['uscsenh']) > USCSENH_MAX_LENGTH) {
-            $this->errors['uscsenh'] = 'O campo SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['uscsenh'] = 'A SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 
@@ -186,13 +186,13 @@ class Account_bo {
 
         // Validando o campo USCMAIL (email)
         if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
-            $this->errors['uscmail'] = 'O campo E-MAIL é obrigatório!';
+            $this->errors['uscmail'] = 'O E-MAIL é obrigatório!';
             $status = FALSE;
         } else if (!filter_var($this->data['uscmail'], FILTER_VALIDATE_EMAIL)) {
             $this->errors['uscmail'] = 'Informe um E-MAIL válido!';
             $status = FALSE;
         } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
-            $this->errors['uscmail'] = 'O campo E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 

@@ -60,12 +60,20 @@ $route['translate_uri_dashes'] = FALSE;
 /**
  * DOCS CONTROLLER
  */
-$route['docs'] = 'docs/index';
+$route['api/docs'] = 'docs/index';
 
 /**
  * ACCOUNT ROUTES
  */
-$route['account/login']['post'] = 'account/login';
-$route['account/login/facebook']['post'] = 'account/login_facebook';
-$route['account/register']['post'] = 'account/register';
-$route['account/recover']['post'] = 'account/recover';
+$route['api/account/login']['post'] = 'account/login';
+$route['api/account/login/facebook']['post'] = 'account/login_facebook';
+$route['api/account/register']['post'] = 'account/register';
+$route['api/account/recover']['post'] = 'account/recover';
+
+/**
+ * GROUP ROUTES
+ */
+$route['api/group/list']['post'] = 'group/list_all';
+$route['api/group/add']['post'] = 'group/add_edit';
+$route['api/group/edit']['post'] = 'group/add_edit';
+$route['api/group/delete']['post'] = 'group/delete';

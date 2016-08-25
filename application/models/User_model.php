@@ -16,31 +16,60 @@ class User_model extends CI_Model {
      * Metodo para salvar um usuario.
      */
     public  function save($data) {
-        $this->db->insert('USUARIO', $data);
+        $this->db->insert('usuario', $data);
         return $this->db->insert_id();
     }
 
     /**
-     * @param $fields
-     * @return midex
+     * @param $uscmail
+     * @param $uscsenh
+     * @return mixed
      *
-     * Metodo para buscar um usuario pelo campos passados como parametros.
-     * Os campos devem compor um array no seguinte formato:
-     *  [
-     *      "field_name" => "fields_value",
-     *      "field_name" => "fields_value",
-     *       ...
-     *  ]
-     *
+     * Metodo para buscar um usuario pelo <i>uscmail</i> (e-amil) e <i>uscsenh</i> (senha).
      */
-    public function find_by_fields($fields) {
-        $this->db->where($fields);
-        $query = $this->db->get('USUARIO');
+    public function find_by_uscmail_and_uscsenh($uscmail, $uscsenh) {
+        $this->db->where(['uscmail' => $uscmail, 'uscsenh' => $uscsenh]);
+        $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
-            return $query->result();
+            $user = $query->result();
+            unset($user->uscsenh);
+            return $user;
         }
         return null;
     }
 
+    /**
+     * @param $uscfbid
+     * @return mixed
+     *
+     * Metodo para buscar um usuario pelo <i>uscfbid</i> (FacebookID).
+     */
+    public function find_by_uscfbid($uscfbid) {
+        $this->db->where(['uscfbid' => $uscfbid]);
+        $query = $this->db->get('usuario');
+        if($query->num_rows() > 0) {
+            $user = $query->result();
+            unset($user->uscsenh);
+            return $user;
+        }
+        return null;
+    }
+
+    /**
+     * @param $uscmail
+     * @return mixed
+     *
+     * Metodo para buscar um usuario pelo <i>uscmail</i> (e-mail).
+     */
+    public function find_by_uscmail($uscmail) {
+        $this->db->where(['uscmail' => $uscmail]);
+        $query = $this->db->get('usuario');
+        if($query->num_rows() > 0) {
+            $user = $query->result();
+            unset($user->uscsenh);
+            return $user;
+        }
+        return null;
+    }
 
 }

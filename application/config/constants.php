@@ -118,3 +118,39 @@ define('USCMAIL_MAX_LENGTH', 50);
 define('USCLOGN_MAX_LENGTH', 50);
 define('USCSENH_MAX_LENGTH', 50);
 define('USCFBID_MAX_LENGTH', 100);
+
+/**---------------------------------------
+ * GRUPO FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela GRUPO
+ *
+ */
+define('GRCNOME_MAX_LENGTH', 50);
+define('GRCTIPO_MAX_LENGTH', 1);
+define('GRCTIPO_ABERTO', 'A');
+define('GRCTIPO_FECHADO', 'F');
+
+/**---------------------------------------
+ * UPLOAD PATHS
+ * ---------------------------------------
+ *
+ * Constantes que definm o caminho do diretorio de armazenamento de upload de arquivos do sistema
+ *
+ */
+define('UPLOAD_PATH', '_upload/');
+define('UPLOAD_FILES_PATH', UPLOAD_PATH . 'files/');
+define('UPLOAD_IMAGES_PATH', UPLOAD_PATH . 'images/');
+define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
+
+/**---------------------------------------
+ * MEDIA PATHS
+ * ---------------------------------------
+ *
+ * Constantes que definm o caminho do diretorio de armazenamento de medias do sistema
+ *
+ */
+define('MEDIA_PATH', '_media/');
+define('MEDIA_FILES_PATH', MEDIA_PATH . 'files/');
+define('MEDIA_IMAGES_PATH', MEDIA_PATH . 'images/');
+define('MEDIA_VIDEOS_PATH', MEDIA_PATH . 'videos/');

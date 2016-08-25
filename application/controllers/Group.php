@@ -10,15 +10,38 @@
 class Group extends CI_Controller {
 
     /**
-     * @url: api/group/all
+     * @var array
+     *
+     * Armazena os dados de resposta das requisicoes.
+     */
+    private $response;
+
+    /**
+     * Group constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+
+        // Initing variables
+        $this->response = [];
+
+        // Loading models
+        $this->load->model("group_model");
+
+        // Loading libraries
+        $this->load->library('group_bo');
+    }
+
+    /**
+     * @url: api/group/list
      * @param int usnid
-     * @return json
+     * @return JSON
      *
      * Metodo para listar todos os grupos de um determinado usuario.
      * Recebe o parametro <i>usnid</i> atraves de <i>POST</i> e retorna um <i>JSON</i> no seguinte formato:
      * {
-     *      "request_code" : "Codigo da requsicao",
-     *      "request_message" : "Mensagem da requsicao",
+     *      "response_code" : "Codigo da requsicao",
+     *      "response_message" : "Mensagem da requsicao",
      *      "groups" : [
      *          {
      *              "grnid": "ID do grupo",
@@ -39,11 +62,36 @@ class Group extends CI_Controller {
      *                  "uscstat" : "Status do usuario",
      *                  "usdcadt" : "Data de cadastro do usuario"
      *              }
-     *          }
+     *          },
      *      ]
      * }
      */
-    public function list_all() {}
+    public function list_all() {
+        $this->response = [];
+        $data = $this->input->post();
+        $this->group_bo->set_data($data);
+
+        // Verifica se os dados nao foram validados
+        if ($this->group_bo->validate_list_all() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['errors'] = $this->group_bo->get_errors();
+        } else {
+            $groups = $this->group_model->find_by_usnid($data['usnid']);
+            // verifica se houve falha na execucao do model
+            if (is_null($groups)) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Nenhum grupo foi encontrado. VERIFIQUE!";
+            } else {
+                $response['response_code'] = RESPONSE_CODE_OK;
+                $response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
+                $response['groups'] = $groups;
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
 
     /**
      * @url: api/group/add
@@ -77,7 +125,39 @@ class Group extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function add_edit() {}
+    public function add_edit() {
+        $this->response = [];
+        $data = $this->input->post();
+        $this->group_bo->set_data($data);
+
+        // Verifica se os dados nao foram validados
+        if ($this->group_bo->validate_add_edit() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['errors'] = $this->group_bo->get_errors();
+        } else {
+            $id = $this->group_model->save($data);
+            // verifica se houve falha na execucao do model
+            if (is_null($id)) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Houve um erro ao tentar salvar as informações do grupo! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            } else {
+                if($id !== 0) {
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Grupo cadastrado com sucesso!";
+                    $response['grnid'] = $id;
+                } else {
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Grupo atualizado com sucesso!";
+                    $response['grnid'] = $id;
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
 
     /**
      * @url: api/group/delete
@@ -91,7 +171,9 @@ class Group extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function delete() {}
+    public function delete() {
+
+    }
 
     /**
      * @url: api/group/info
@@ -105,6 +187,8 @@ class Group extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function info() {}
+    public function info() {
+
+    }
 
 }
