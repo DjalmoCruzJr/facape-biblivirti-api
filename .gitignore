@@ -17,3 +17,7 @@ application/logs/*
 #COMPOSER FOLDER
 #---------------------------------------
 /vendor
+
+#OTHERS FILES
+#---------------------------------------
+**.bak

@@ -36,6 +36,7 @@ class Account_bo {
 
         // Loading models
         $this->CI->load->model('user_model');
+        $this->CI->load->model('recover_model');
     }
 
     /**
@@ -129,7 +130,7 @@ class Account_bo {
         } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
             $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
-        } else if (!is_null($this->CI->user_model->find_by_fields(['uscmail' => $this->data['uscmail']]))) {
+        } else if (!is_null($this->CI->user_model->find_by_uscmail($this->data['uscmail']))) {
             $this->errors['uscmail'] = 'Já existe um usuário cadastrado com esse endereço de e-mail!';
             $status = FALSE;
         }
@@ -144,7 +145,7 @@ class Account_bo {
         } else if (strlen($this->data['usclogn']) > USCLOGN_MAX_LENGTH) {
             $this->errors['usclogn'] = 'O LOGIN deve conter no máximo ' . USCLOGN_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
-        } else if (!is_null($this->CI->user_model->find_by_fields(['usclogn' => $this->data['usclogn']]))) {
+        } else if (!is_null($this->CI->user_model->find_by_usclogn($this->data['usclogn']))) {
             $this->errors['usclogn'] = 'Já existe um usuário cadastrado com esse login!';
             $status = FALSE;
         }
@@ -193,6 +194,23 @@ class Account_bo {
             $status = FALSE;
         } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
             $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>redefine</i> do controller <i>Account</i>.
+     */
+    public function validate_redefine() {
+        $status = TRUE;
+
+        // Validando o campo RSCTOKN (token)
+        if (!isset($this->data['rsctokn']) || empty(trim($this->data['rsctokn']))) {
+            $this->errors['rsctokn'] = 'O TOKEN DE REDEFINIÇÃO é obrigatório!';
             $status = FALSE;
         }
 

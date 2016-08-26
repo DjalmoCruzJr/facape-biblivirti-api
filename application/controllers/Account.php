@@ -192,6 +192,15 @@ class Account extends CI_Controller {
      * {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem da resposta",
+     *      "user" : {
+     *          "usnid" : "ID do usuario",
+     *          "uscnome" : "Nome do usuario",
+     *          "uscmail" : "E-mail do usuario",
+     *          "usclogn" : "Login do usuario",
+     *          "uscfoto" : "Caminho da foto do usuario",
+     *          "uscstat" : "Status do usuario",
+     *          "usdcadt" : "Data de cadastro do usuario"
+     *      }
      * }
      */
     public function recover() {
@@ -209,12 +218,69 @@ class Account extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "O e-mail informado não encontrado. VERIFIQUE!\n";
+                $response['response_message'] = "O e-mail informado não foi encontrado. VERIFIQUE!\n";
             } else {
+                $token['rsnidus'] = $user->usnid;
+                $token['rsctokn'] = $this->biblivirti_hash->token($user->uscmail); // Gera token de redefinicao de senha
+                $id = $this->recover_model->save($token);
+                // Verifica se houve falha na execucao do model
+                if (is_null($id)) {
+                    $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $response['response_message'] = "Houve um erro ao tentar recuperar senha de acesso! Tente novamente.\n";
+                    $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                } else {
+                    // Enviar o email com o link de redefinicao de senha
+                    // Confirmar o envio do email com o link de redefinicao de senha
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "E-mail confirmado com sucesso!\n";
+                    $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-mail!";
+                    $response['user'] = $user;
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: api/account/recover
+     * @param string uscmail
+     * @return JSON
+     *
+     * Metodo para recuperar o acesso um usuario.
+     * Recebe o(s) parametro(s) <i>uscmail</i> atraves de <i>POST</i>
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     * }
+     */
+    public function redefine() {
+        $this->response = [];
+        $data = $this->input->post();
+        $this->account_bo->set_data($data);
+
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_redefine() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['errors'] = $this->account_bo->get_errors();
+        } else {
+            $token = $this->recover_model->find_by_rsctokn($data['rsctokn']);
+            if(is_null($token)) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "TOKEN DE REDEFINIÇÃO inválido!";
+            } else {
+                $user = $this->user_model->find_by_usnid($token->rsnidus);
+                $token->rscstat = RSCSTAT_INATIVO;
+                $this->recover_model->save($token);
+                $data['user'] = $user;
+                $data['intent_category'] = INTENT_CATEGORY_ACCOUNT;
+                $data['intent_action'] = INTENT_ACTION_ACCOUNT_REDEFINE;
                 $response['response_code'] = RESPONSE_CODE_OK;
-                $response['response_message'] = "E-amil confirmado com sucesso!\n";
-                $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-mail!";
-                $response['user'] = $user;
+                $response['response_message'] = "Senha redefinida com sucesso!";
+                $response['data'] = $data;
             }
         }
 

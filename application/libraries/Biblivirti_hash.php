@@ -16,4 +16,11 @@ class Biblivirti_hash {
         return md5(BIBLIVIRTI_HASH_KEY . $password);
     }
 
+    public function token($mail) {
+        if(!isset($mail)) {
+            return null;
+        }
+        return md5(BIBLIVIRTI_HASH_KEY.$mail.strtotime('now'));
+    }
+
 }

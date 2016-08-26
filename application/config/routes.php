@@ -69,6 +69,7 @@ $route['api/account/login']['post'] = 'account/login';
 $route['api/account/login/facebook']['post'] = 'account/login_facebook';
 $route['api/account/register']['post'] = 'account/register';
 $route['api/account/recover']['post'] = 'account/recover';
+$route['api/account/redefine']['post'] = 'account/redefine';
 
 /**
  * GROUP ROUTES

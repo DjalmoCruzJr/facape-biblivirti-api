@@ -21,6 +21,23 @@ class User_model extends CI_Model {
     }
 
     /**
+     * @param $usnid
+     * @return mixed
+     *
+     * Metodo para buscar um usuario pelo <i>usnid</i> (ID do usuario).
+     */
+    public function find_by_usnid($usnid) {
+        $this->db->where(['usnid' => $usnid]);
+        $query = $this->db->get('usuario');
+        if($query->num_rows() > 0) {
+            $user = $query->result();
+            unset($user->uscsenh);
+            return $user;
+        }
+        return null;
+    }
+
+    /**
      * @param $uscmail
      * @param $uscsenh
      * @return mixed
@@ -71,5 +88,18 @@ class User_model extends CI_Model {
         }
         return null;
     }
+
+    public function find_by_usclogn($usclogn) {
+        $this->db->where(['usclogn' => $usclogn]);
+        $query = $this->db->get('usuario');
+        if($query->num_rows() > 0) {
+            $user = $query->result();
+            unset($user->uscsenh);
+            return $user;
+        }
+        return null;
+    }
+
+
 
 }

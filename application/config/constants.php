@@ -132,10 +132,20 @@ define('GRCTIPO_ABERTO', 'A');
 define('GRCTIPO_FECHADO', 'F');
 
 /**---------------------------------------
+ * RECUPERARSENHA FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela GRUPO
+ *
+ */
+define('RSCSTAT_ATIVO', 'A');
+define('RSCSTAT_INATIVO', 'F');
+
+/**---------------------------------------
  * UPLOAD PATHS
  * ---------------------------------------
  *
- * Constantes que definm o caminho do diretorio de armazenamento de upload de arquivos do sistema
+ * Constantes que definem o caminho do diretorio de armazenamento de upload de arquivos do sistema
  *
  */
 define('UPLOAD_PATH', '_upload/');
@@ -147,10 +157,20 @@ define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
  * MEDIA PATHS
  * ---------------------------------------
  *
- * Constantes que definm o caminho do diretorio de armazenamento de medias do sistema
+ * Constantes que definem o caminho do diretorio de armazenamento de medias do sistema
  *
  */
 define('MEDIA_PATH', '_media/');
 define('MEDIA_FILES_PATH', MEDIA_PATH . 'files/');
 define('MEDIA_IMAGES_PATH', MEDIA_PATH . 'images/');
 define('MEDIA_VIDEOS_PATH', MEDIA_PATH . 'videos/');
+
+/**---------------------------------------
+ * INTENT CATEGORIES and ACTIONS
+ * ---------------------------------------
+ *
+ * Constantes que definem as categorias e suas acoes para intencoes a serem enviadas para o app.
+ *
+ */
+define('INTENT_CATEGORY_ACCOUNT', 'org.sysmob.biblivirti.intent.category.ACCOUNT');
+define('INTENT_ACTION_ACCOUNT_REDEFINE', 'org.sysmob.biblivirti.intent.ACTION.ACCOUNT_REDEFINE');
