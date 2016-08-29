@@ -30,8 +30,8 @@ class User_model extends CI_Model {
         $this->db->where(['usnid' => $usnid]);
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
-            $user = $query->result();
-            unset($user->uscsenh);
+            $user = $query->result()[0];
+            unset($user->USCSENH);
             return $user;
         }
         return null;
@@ -48,8 +48,8 @@ class User_model extends CI_Model {
         $this->db->where(['uscmail' => $uscmail, 'uscsenh' => $uscsenh]);
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
-            $user = $query->result();
-            unset($user->uscsenh);
+            $user = $query->result()[0];
+            unset($user->USCSENH);
             return $user;
         }
         return null;
@@ -65,8 +65,8 @@ class User_model extends CI_Model {
         $this->db->where(['uscfbid' => $uscfbid]);
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
-            $user = $query->result();
-            unset($user->uscsenh);
+            $user = $query->result()[0];
+            unset($user->USCSENH);
             return $user;
         }
         return null;
@@ -82,8 +82,8 @@ class User_model extends CI_Model {
         $this->db->where(['uscmail' => $uscmail]);
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
-            $user = $query->result();
-            unset($user->uscsenh);
+            $user = $query->result()[0];
+            unset($user->USCSENH);
             return $user;
         }
         return null;
@@ -93,8 +93,8 @@ class User_model extends CI_Model {
         $this->db->where(['usclogn' => $usclogn]);
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
-            $user = $query->result();
-            unset($user->uscsenh);
+            $user = $query->result()[0];
+            unset($user->USCSENH);
             return $user;
         }
         return null;

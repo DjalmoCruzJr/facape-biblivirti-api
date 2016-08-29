@@ -139,7 +139,7 @@ define('GRCTIPO_FECHADO', 'F');
  *
  */
 define('RSCSTAT_ATIVO', 'A');
-define('RSCSTAT_INATIVO', 'F');
+define('RSCSTAT_INATIVO', 'I');
 
 /**---------------------------------------
  * UPLOAD PATHS
@@ -154,16 +154,18 @@ define('UPLOAD_IMAGES_PATH', UPLOAD_PATH . 'images/');
 define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
 
 /**---------------------------------------
- * MEDIA PATHS
+ * ASSETS PATHS
  * ---------------------------------------
  *
- * Constantes que definem o caminho do diretorio de armazenamento de medias do sistema
- *
+ * Constantes que definem o caminho do diretorio de recursos (css, js, imagens, etc) utilizados pelo sistema.
  */
-define('MEDIA_PATH', '_media/');
-define('MEDIA_FILES_PATH', MEDIA_PATH . 'files/');
-define('MEDIA_IMAGES_PATH', MEDIA_PATH . 'images/');
-define('MEDIA_VIDEOS_PATH', MEDIA_PATH . 'videos/');
+define('ASSETS_PATH', 'assets/');
+define('ASSETS_CSS_PATH', ASSETS_PATH . 'css/');
+define('ASSETS_JS_PATH', ASSETS_PATH . 'js/');
+define('ASSETS_FONTS_PATH', ASSETS_PATH . 'fonts/');
+define('ASSETS_FILES_PATH', ASSETS_PATH . 'files/');
+define('ASSETS_IMAGES_PATH', ASSETS_PATH . 'images/');
+define('ASSETS_MEDIAS_PATH', ASSETS_PATH . 'medias/');
 
 /**---------------------------------------
  * INTENT CATEGORIES and ACTIONS
@@ -173,4 +175,4 @@ define('MEDIA_VIDEOS_PATH', MEDIA_PATH . 'videos/');
  *
  */
 define('INTENT_CATEGORY_ACCOUNT', 'org.sysmob.biblivirti.intent.category.ACCOUNT');
-define('INTENT_ACTION_ACCOUNT_REDEFINE', 'org.sysmob.biblivirti.intent.ACTION.ACCOUNT_REDEFINE');
+define('INTENT_ACTION_ACCOUNT_PASSWORD_RESET', 'org.sysmob.biblivirti.intent.ACTION.ACCOUNT_PASSWORD_RESET');

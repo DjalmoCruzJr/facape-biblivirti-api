@@ -29,16 +29,31 @@ class Recover_model extends CI_Model {
     }
 
     /**
-     * @param $rsnid
+     * @param $rsctokn
      * @return bool
      *
-     * Metodo para deletar um token de redefinicao de sennha.
+     * Metodo para buscar um token de redefinicao de senha pelo <i>rsctokn</i>.
      */
     public function find_by_rsctokn($rsctokn) {
         $this->db->where(['rsctokn' => $rsctokn]);
         $query = $this->db->get('recuperarsenha');
         if($query->num_rows() > 0) {
-            return $query->result();
+            return $query->result()[0];
+        }
+        return null;
+    }
+
+    /**
+     * @param $rsnidus
+     * @return bool
+     *
+     * Metodo para deletar um token de redefinicao de senha pelo <i>rsnidus</i>.
+     */
+    public function find_by_rsnidus($rsnidus) {
+        $this->db->where(['rsnidus' => $rsnidus]);
+        $query = $this->db->get('recuperarsenha');
+        if($query->num_rows() > 0) {
+            return $query->result()[0];
         }
         return null;
     }

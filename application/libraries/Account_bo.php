@@ -196,16 +196,15 @@ class Account_bo {
             $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
-
         return $status;
     }
 
     /**
      * @return bool
      *
-     * Metodo para validar os dados inentes ao processo de <i>redefine</i> do controller <i>Account</i>.
+     * Metodo para validar os dados inentes ao processo de <i>password_reset</i> do controller <i>Account</i>.
      */
-    public function validate_redefine() {
+    public function validate_password_reset() {
         $status = TRUE;
 
         // Validando o campo RSCTOKN (token)

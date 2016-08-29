@@ -53,28 +53,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * BASIC CONFIGS
  */
-$route['default_controller'] = 'docs';
-$route['404_override'] = 'docs/index';
+$route['default_controller'] = 'account';
+$route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 /**
- * DOCS CONTROLLER
+ * API ACCOUNT ROUTES
  */
-$route['api/docs'] = 'docs/index';
+$route['API/account/login']['post'] = 'api/account/login';
+$route['API/account/login/facebook']['post'] = 'api/account/login_facebook';
+$route['API/account/register']['post'] = 'api/account/register';
+$route['API/account/recover']['post'] = 'api/account/recover';
+$route['API/account/password/reset']['get'] = 'api/account/password_reset';
 
 /**
- * ACCOUNT ROUTES
+ * API GROUP ROUTES
  */
-$route['api/account/login']['post'] = 'account/login';
-$route['api/account/login/facebook']['post'] = 'account/login_facebook';
-$route['api/account/register']['post'] = 'account/register';
-$route['api/account/recover']['post'] = 'account/recover';
-$route['api/account/redefine']['post'] = 'account/redefine';
-
-/**
- * GROUP ROUTES
- */
-$route['api/group/list']['post'] = 'group/list_all';
-$route['api/group/add']['post'] = 'group/add_edit';
-$route['api/group/edit']['post'] = 'group/add_edit';
-$route['api/group/delete']['post'] = 'group/delete';
+$route['API/group/list']['post'] = 'api/group/list_all';
+$route['API/group/add']['post'] = 'api/group/add_edit';
+$route['API/group/edit']['post'] = 'api/group/add_edit';
+$route['API/group/delete']['post'] = 'api/group/delete';
