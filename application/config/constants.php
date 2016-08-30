@@ -118,6 +118,8 @@ define('USCMAIL_MAX_LENGTH', 50);
 define('USCLOGN_MAX_LENGTH', 50);
 define('USCSENH_MAX_LENGTH', 50);
 define('USCFBID_MAX_LENGTH', 100);
+define('USCSTAT_ATIVO', 'A');
+define('USCSTAT_INATIVO', 'I');
 
 /**---------------------------------------
  * GRUPO FIELDS RULES

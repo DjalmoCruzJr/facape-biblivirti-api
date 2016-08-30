@@ -3,7 +3,7 @@
 /**
  * @author djalmocruzjr (djalmo.cruz@gmail.com)
  * @version 1.0
- * @since 28/08/2016
+ * @since 22/08/2016
  *
  * Controller para gerenciar acesso aos dados de <b>Grupos</b>
  */
@@ -33,7 +33,7 @@ class Group extends CI_Controller {
     }
 
     /**
-     * @url: api/group/list
+     * @url: API/group/list
      * @param int usnid
      * @return JSON
      *
@@ -42,7 +42,7 @@ class Group extends CI_Controller {
      * {
      *      "response_code" : "Codigo da requsicao",
      *      "response_message" : "Mensagem da requsicao",
-     *      "groups" : [
+     *      "response_data" : [
      *          {
      *              "grnid": "ID do grupo",
      *              "grcnome" : "Nome do grupo",
@@ -67,15 +67,15 @@ class Group extends CI_Controller {
      * }
      */
     public function list_all() {
-        $this->response = [];
-        $data = $this->input->post();
-        $this->group_bo->set_data($data);
+        $data['usnid'] = $this->input->post('usnid');
 
+        $this->response = [];
+        $this->group_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_list_all() === FALSE) {
             $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $response['errors'] = $this->group_bo->get_errors();
+            $response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $groups = $this->group_model->find_by_usnid($data['usnid']);
             // verifica se houve falha na execucao do model
@@ -85,7 +85,7 @@ class Group extends CI_Controller {
             } else {
                 $response['response_code'] = RESPONSE_CODE_OK;
                 $response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
-                $response['groups'] = $groups;
+                $response['response_data'] = $groups;
             }
         }
 

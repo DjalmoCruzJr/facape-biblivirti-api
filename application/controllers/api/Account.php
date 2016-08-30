@@ -46,13 +46,14 @@ class Account extends CI_Controller {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem de resposta",
      *      "response_data" : {
-     *          "USNID" : "ID do usuario",
-     *          "USCNOME" : "Nome do usuario",
-     *          "uscmail" : "E-mail do usuario",
-     *          "USCLOGN" : "Login do usuario",
-     *          "USCFOTO" : "Caminho da foto do usuario",
-     *          "USCSTAT" : "Status do usuario",
-     *          "USDCADT" : "Data de cadastro do usuario"
+     *         "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E-mail do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
      *      }
      * }
      */
@@ -96,13 +97,14 @@ class Account extends CI_Controller {
      *      "request_code" : "Codigo da requsicao",
      *      "request_message" : "Mensagem da requsicao",
      *      "response_data" : {
-     *          "USNID" : "ID do usuario",
-     *          "USCNOME" : "Nome do usuario",
-     *          "USCMAIL" : "E-mail do usuario",
-     *          "USCLOGN" : "Login do usuario",
-     *          "USCFOTO" : "Caminho da foto do usuario",
-     *          "USCSTAT" : "Status do usuario",
-     *          "USDCADT" : "Data de cadastro do usuario"
+     *          "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E-mail do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
      *      }
      * }
      */
@@ -148,7 +150,7 @@ class Account extends CI_Controller {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
-     *          "USNID" : "ID do usuario inserido"
+     *          "usnid" : "ID do usuario inserido"
      *      }
      * }
      */
@@ -197,13 +199,14 @@ class Account extends CI_Controller {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
-     *          "USNID" : "ID do usuario",
-     *          "USCNOME" : "Nome do usuario",
-     *          "USCMAIL" : "E-mail do usuario",
-     *          "USCLOGN" : "Login do usuario",
-     *          "USCFOTO" : "Caminho da foto do usuario",
-     *          "USCSTAT" : "Status do usuario",
-     *          "USDCADT" : "Data de cadastro do usuario"
+     *          "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E-mail do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
      *      }
      * }
      */
@@ -224,8 +227,11 @@ class Account extends CI_Controller {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "O e-mail informado não foi encontrado. VERIFIQUE!\n";
             } else {
-                $token['rsnidus'] = $user->USNID;
-                $token['rsctokn'] = $this->biblivirti_hash->token($user->USCMAIL); // Gera token de redefinicao de senha
+                // Desabilita todos os tokens de redefinicao anteriores para o usuario em questao
+                $this->recover_model->unable_all_tokens_by_rsnidus($user->usnid);
+
+                $token['rsnidus'] = $user->usnid;
+                $token['rsctokn'] = $this->biblivirti_hash->token($user->uscmail); // Gera token de redefinicao de senha
                 $id = $this->recover_model->save($token);
                 // Verifica se houve falha na execucao do model
                 if ($id === 0) {
@@ -260,13 +266,14 @@ class Account extends CI_Controller {
      *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
      *          "user"  : {
-     *              "USNID" : "ID do usuario",
-     *              "USCNOME" : "Nome do usuario",
-     *              "USCMAIL" : "E-mail do usuario",
-     *              "USCLOGN" : "Login do usuario",
-     *              "USCFOTO" : "Caminho da foto do usuario",
-     *              "USCSTAT" : "Status do usuario",
-     *              "USDCADT" : "Data de cadastro do usuario"
+     *              "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E-mail do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
      *          },
      *          "intent_category" : "Nome da intent category",
      *          "intent_action" : "Nome da intent action"
@@ -289,12 +296,12 @@ class Account extends CI_Controller {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "TOKEN DE REDEFINIÇÃO inválido!";
             } else {
-                $user = $this->user_model->find_by_usnid($token->RSNIDUS);
-                $token->RSCSTAT = RSCSTAT_INATIVO;
-                $token2['rsnid'] = $token->RSNID;
-                $token2['rsnidus'] = $token->RSNIDUS;
-                $token2['rsctokn'] = $token->RSCTOKN;
-                $token2['rscstat'] = $token->RSCSTAT;
+                $user = $this->user_model->find_by_usnid($token->rsnidus);
+                $token->rscstat = RSCSTAT_INATIVO;
+                $token2['rsnid'] = $token->rsnid;
+                $token2['rsnidus'] = $token->rsnidus;
+                $token2['rsctokn'] = $token->rsctokn;
+                $token2['rscstat'] = $token->rscstat;
                 $this->recover_model->save($token2);
 
                 $data = [];

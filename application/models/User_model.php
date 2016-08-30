@@ -31,7 +31,7 @@ class User_model extends CI_Model {
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
             $user = $query->result()[0];
-            unset($user->USCSENH);
+            unset($user->uscsenh);
             return $user;
         }
         return null;
@@ -49,7 +49,7 @@ class User_model extends CI_Model {
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
             $user = $query->result()[0];
-            unset($user->USCSENH);
+            unset($user->uscsenh);
             return $user;
         }
         return null;
@@ -66,7 +66,7 @@ class User_model extends CI_Model {
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
             $user = $query->result()[0];
-            unset($user->USCSENH);
+            unset($user->uscsenh);
             return $user;
         }
         return null;
@@ -83,7 +83,7 @@ class User_model extends CI_Model {
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
             $user = $query->result()[0];
-            unset($user->USCSENH);
+            unset($user->uscsenh);
             return $user;
         }
         return null;
@@ -94,7 +94,7 @@ class User_model extends CI_Model {
         $query = $this->db->get('usuario');
         if($query->num_rows() > 0) {
             $user = $query->result()[0];
-            unset($user->USCSENH);
+            unset($user->uscsenh);
             return $user;
         }
         return null;

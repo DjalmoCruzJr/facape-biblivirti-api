@@ -166,9 +166,6 @@ class Account_bo {
         if (!isset($this->data['uscsenh2']) || empty(trim($this->data['uscsenh2']))) {
             $this->errors['uscsenh2'] = 'O campo CONFIRMAR SENHA é obrigatório!';
             $status = FALSE;
-        } else if (strpos($this->data['uscsenh'], ' ') > 0) {
-            $this->errors['uscsenh2'] = 'O campo CONFIRMAR SENHA não pode conter espaço(s) em branco(s)!';
-            $status = FALSE;
         } else if (strcmp($this->data['uscsenh'], $this->data['uscsenh2']) != 0) {
             $this->errors['uscsenh2'] = 'As senhas não conferem!';
             $status = FALSE;

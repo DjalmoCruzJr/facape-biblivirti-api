@@ -47,15 +47,12 @@ class Recover_model extends CI_Model {
      * @param $rsnidus
      * @return bool
      *
-     * Metodo para deletar um token de redefinicao de senha pelo <i>rsnidus</i>.
+     * Metodo para desabilitar todos os tokens de redefinicao de senha pelo <i>$rsnidus</i>.
      */
-    public function find_by_rsnidus($rsnidus) {
+    public function unable_all_tokens_by_rsnidus($rsnidus) {
         $this->db->where(['rsnidus' => $rsnidus]);
-        $query = $this->db->get('recuperarsenha');
-        if($query->num_rows() > 0) {
-            return $query->result()[0];
-        }
-        return null;
+        $query = $this->db->update('recuperarsenha', ['rscstat' => RSCSTAT_INATIVO]);
+        return $this->db->insert_id();
     }
 
 }
