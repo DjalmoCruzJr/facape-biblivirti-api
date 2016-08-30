@@ -11,25 +11,30 @@ class Group_model extends CI_Model {
 
     /**
      * @param $data
-     * @return mixed
+     * @return int
      *
      * Metodo para salvar um grupo.
      */
     public function save($data) {
         // Verifica se o ID do Grupo nao foi informado
         if (!isset($data['grnid'])) {
+            $usnid = $data['usnid'];
+            unset($data['usnid']);
             $this->db->insert('grupo', $data);
+            $grnid = $this->db->insert_id();
+            $this->subscribe($grnid, $usnid, true);
+            return $grnid;
         } else {
             $grnid = $data['grnid'];
             unset($data['grnid']);
             $this->db->where(['grnid' => $grnid]);
             $this->db->update('grupo', $data);
+            return $this->db->affected_rows();
         }
-        return $this->db->insert_id();
     }
 
     /**
-     * @param $fields
+     * @param $usnid
      * @return mixed
      *
      *  Metodo para buscar todos os grupos de um determinado usuario.
@@ -55,6 +60,21 @@ class Group_model extends CI_Model {
     }
 
     /**
+     * @param $grnid
+     * @return mixed
+     *
+     *  Metodo para buscar um grupo pelo campo <i>grnid</i> (ID do grupo).
+     */
+    public function find_by_grnid($grnid) {
+        $this->db->where(['grnid' => $grnid]);
+        $query = $this->db->get('grupo');
+        if ($query->num_rows() > 0) {
+            return $query->result()[0];
+        }
+        return null;
+    }
+
+    /**
      * @param $grnidai
      * @return mixed
      *
@@ -64,7 +84,7 @@ class Group_model extends CI_Model {
         $this->db->where(['ainid' => $grnidai]);
         $query = $this->db->get('areainteresse');
         if ($query->num_rows() > 0) {
-            return $query->result();
+            return $query->result()[0];
         }
         return null;
     }
@@ -82,9 +102,37 @@ class Group_model extends CI_Model {
         $this->db->where(['gunidgr' => $grnid, 'guladm' => true]);
         $query = $this->db->get();
         if ($query->num_rows() > 0) {
-            return $query->result();
+            return $query->result()[0];
         }
         return null;
+    }
+
+    /**
+     * @param $grnid
+     * @return bool
+     *
+     * Metodo para deletar um determinado grupo.
+     */
+    public function delete($grnid) {
+        $this->db->where(['grnid' => $grnid]);
+        $this->db->delete('grupo');
+        return $this->db->affected_rows() !== 0 ? true : false;
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     *
+     * Metodo para salvar um grupo.
+     */
+    public function subscribe($grnid, $usnid, $guladm = false) {
+        $data = [
+            'gunidgr' => $grnid,
+            'gunidus' => $usnid,
+            'guladm' => $guladm,
+        ];
+        $this->db->insert('grupousuario', $data);
+        return $this->db->affected_rows() !== 0 ? true : false;
     }
 
 }

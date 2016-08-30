@@ -70,6 +70,6 @@ $route['API/account/password/reset']['get'] = 'api/account/password_reset';
  * API GROUP ROUTES
  */
 $route['API/group/list']['post'] = 'api/group/list_all';
-$route['API/group/add']['post'] = 'api/group/add_edit';
-$route['API/group/edit']['post'] = 'api/group/add_edit';
+$route['API/group/add']['post'] = 'api/group/add';
+$route['API/group/edit']['post'] = 'api/group/edit';
 $route['API/group/delete']['post'] = 'api/group/delete';
