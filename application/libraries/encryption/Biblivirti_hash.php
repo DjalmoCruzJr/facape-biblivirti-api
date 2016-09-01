@@ -10,17 +10,17 @@
 class Biblivirti_hash {
 
     public function make($password) {
-        if(!isset($password)) {
+        if (!isset($password)) {
             return null;
         }
         return md5(BIBLIVIRTI_HASH_KEY . $password);
     }
 
     public function token($mail) {
-        if(!isset($mail)) {
+        if (!isset($mail)) {
             return null;
         }
-        return md5(BIBLIVIRTI_HASH_KEY.$mail.strtotime('now'));
+        return md5(BIBLIVIRTI_HASH_KEY . $mail . strtotime('now'));
     }
 
 }

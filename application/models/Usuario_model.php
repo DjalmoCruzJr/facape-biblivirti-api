@@ -7,17 +7,22 @@
  *
  * Model da tabela <b>USUARIO</b>
  */
-class User_model extends CI_Model {
+class Usuario_model extends CI_Model {
 
     /**
      * @param $data
      * @return mixed
      *
-     * Metodo para salvar um usuario.
+     * Metodo para salvar um ou atualizar um  usuario.
      */
-    public  function save($data) {
-        $this->db->insert('usuario', $data);
-        return $this->db->insert_id();
+    public function save($data) {
+        if (!isset($data['usnid'])) {
+            return $this->db->insert('usuario', $data) ? $this->db->insert_id() : null;
+        } else {
+            $usnid = $data['usnid'];
+            unset($data['usnid']);
+            return $this->db->update('usuario', $data);
+        }
     }
 
     /**
@@ -29,12 +34,7 @@ class User_model extends CI_Model {
     public function find_by_usnid($usnid) {
         $this->db->where(['usnid' => $usnid]);
         $query = $this->db->get('usuario');
-        if($query->num_rows() > 0) {
-            $user = $query->result()[0];
-            unset($user->uscsenh);
-            return $user;
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
     /**
@@ -47,12 +47,7 @@ class User_model extends CI_Model {
     public function find_by_uscmail_and_uscsenh($uscmail, $uscsenh) {
         $this->db->where(['uscmail' => $uscmail, 'uscsenh' => $uscsenh]);
         $query = $this->db->get('usuario');
-        if($query->num_rows() > 0) {
-            $user = $query->result()[0];
-            unset($user->uscsenh);
-            return $user;
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
     /**
@@ -64,12 +59,7 @@ class User_model extends CI_Model {
     public function find_by_uscfbid($uscfbid) {
         $this->db->where(['uscfbid' => $uscfbid]);
         $query = $this->db->get('usuario');
-        if($query->num_rows() > 0) {
-            $user = $query->result()[0];
-            unset($user->uscsenh);
-            return $user;
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
     /**
@@ -81,25 +71,19 @@ class User_model extends CI_Model {
     public function find_by_uscmail($uscmail) {
         $this->db->where(['uscmail' => $uscmail]);
         $query = $this->db->get('usuario');
-        if($query->num_rows() > 0) {
-            $user = $query->result()[0];
-            unset($user->uscsenh);
-            return $user;
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
+    /**
+     * @param $usclogn
+     * @return mixed
+     *
+     * Metodo para buscar um usuario pelo <i>usclogn</i> (login).
+     */
     public function find_by_usclogn($usclogn) {
         $this->db->where(['usclogn' => $usclogn]);
         $query = $this->db->get('usuario');
-        if($query->num_rows() > 0) {
-            $user = $query->result()[0];
-            unset($user->uscsenh);
-            return $user;
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
-
-
 
 }

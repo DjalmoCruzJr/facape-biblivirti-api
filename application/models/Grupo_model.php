@@ -7,7 +7,17 @@
  *
  * Model da tabela <b>GRUPO</b>
  */
-class Group_model extends CI_Model {
+class Grupo_model extends CI_Model {
+    /**
+     * Grupo_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+
+        // Loading model
+        $this->load->model('areainteresse_model');
+    }
+
 
     /**
      * @param $data
@@ -20,7 +30,9 @@ class Group_model extends CI_Model {
         if (!isset($data['grnid'])) {
             $usnid = $data['usnid'];
             unset($data['usnid']);
-            $this->db->insert('grupo', $data);
+            if ($this->db->insert('grupo', $data) === false) {
+                return null;
+            }
             $grnid = $this->db->insert_id();
             $this->subscribe($grnid, $usnid, true);
             return $grnid;
@@ -29,7 +41,7 @@ class Group_model extends CI_Model {
             unset($data['grnid']);
             $this->db->where(['grnid' => $grnid]);
             $this->db->update('grupo', $data);
-            return $this->db->affected_rows();
+            return ($this->db->affected_rows() !== 0);
         }
     }
 
@@ -39,7 +51,7 @@ class Group_model extends CI_Model {
      *
      *  Metodo para buscar todos os grupos de um determinado usuario.
      */
-    public function find_by_usnid($usnid) {
+    public function find_groups_by_user($usnid) {
         $this->db->select('grnid, grcnome, grcfoto, grctipo, grdcadt, grnidai');
         $this->db->from('grupousuario');
         $this->db->join('grupo', 'gunidgr = grnid');
@@ -50,8 +62,8 @@ class Group_model extends CI_Model {
         if ($query->num_rows() > 0) {
             $groups = $query->result();
             foreach ($groups as $group) {
-                $group->area_of_interest = $this->find_group_area_of_interest($group->grnidai);
-                $group->admin = $this->find_group_admin($group->grnid);
+                $group->area_of_interest = $this->areainteresse_model->find_by_ainid($group->grnidai);
+                $group->admin = $this->find_admin($group->grnid);
                 unset($group->grnidai);
             }
             return $groups;
@@ -68,25 +80,7 @@ class Group_model extends CI_Model {
     public function find_by_grnid($grnid) {
         $this->db->where(['grnid' => $grnid]);
         $query = $this->db->get('grupo');
-        if ($query->num_rows() > 0) {
-            return $query->result()[0];
-        }
-        return null;
-    }
-
-    /**
-     * @param $grnidai
-     * @return mixed
-     *
-     * Metodo para buscar a area de interesse de um determinado grupo.
-     */
-    public function find_group_area_of_interest($grnidai) {
-        $this->db->where(['ainid' => $grnidai]);
-        $query = $this->db->get('areainteresse');
-        if ($query->num_rows() > 0) {
-            return $query->result()[0];
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
     /**
@@ -95,16 +89,13 @@ class Group_model extends CI_Model {
      *
      * Metodo para buscar o administrador de um determinado grupo.
      */
-    public function find_group_admin($grnid) {
+    public function find_admin($grnid) {
         $this->db->select('usnid, uscnome, uscmail, usclogn, uscfoto, uscstat, usdcadt');
         $this->db->from('grupousuario');
         $this->db->join('usuario', 'gunidus = usnid', 'inner');
         $this->db->where(['gunidgr' => $grnid, 'guladm' => true]);
         $query = $this->db->get();
-        if ($query->num_rows() > 0) {
-            return $query->result()[0];
-        }
-        return null;
+        return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
     /**
@@ -116,23 +107,24 @@ class Group_model extends CI_Model {
     public function delete($grnid) {
         $this->db->where(['grnid' => $grnid]);
         $this->db->delete('grupo');
-        return $this->db->affected_rows() !== 0 ? true : false;
+        return ($this->db->affected_rows() !== 0);
     }
 
     /**
      * @param $data
      * @return bool
      *
-     * Metodo para salvar um grupo.
+     * Metodo para associar um usuario a um grupo.
      */
-    public function subscribe($grnid, $usnid, $guladm = false) {
+    public function subscribe($grnid, $usnid, $guladm = false, $gucstat = GUCSTAT_ATIVO) {
         $data = [
             'gunidgr' => $grnid,
             'gunidus' => $usnid,
             'guladm' => $guladm,
+            'gucstat' => $gucstat
         ];
         $this->db->insert('grupousuario', $data);
-        return $this->db->affected_rows() !== 0 ? true : false;
+        return ($this->db->affected_rows() !== 0);
     }
 
 }

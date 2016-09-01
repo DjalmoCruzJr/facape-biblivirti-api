@@ -134,26 +134,45 @@ define('GRCTIPO_ABERTO', 'A');
 define('GRCTIPO_FECHADO', 'F');
 
 /**---------------------------------------
+ * GRUPOUSUARIO FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela GRUPOUSUARIO
+ *
+ */
+define('GUCSTAT_ATIVO', 'A');
+define('GUCSTAT_INATIVO', 'I');
+
+/**---------------------------------------
  * RECUPERARSENHA FIELDS RULES
  * ---------------------------------------
  *
- * Constantes que definem as regras de negocio dos campos da tabela GRUPO
+ * Constantes que definem as regras de negocio dos campos da tabela RECUPERARSENHA
  *
  */
 define('RSCSTAT_ATIVO', 'A');
 define('RSCSTAT_INATIVO', 'I');
 
 /**---------------------------------------
- * UPLOAD PATHS
+ * MATERIAL FIELDS RULES
  * ---------------------------------------
  *
- * Constantes que definem o caminho do diretorio de armazenamento de upload de arquivos do sistema
+ * Constantes que definem as regras de negocio dos campos da tabela MATERIAL
  *
  */
-define('UPLOAD_PATH', '_upload/');
-define('UPLOAD_FILES_PATH', UPLOAD_PATH . 'files/');
-define('UPLOAD_IMAGES_PATH', UPLOAD_PATH . 'images/');
-define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
+define('MACTIPO_VIDEO', 'V');
+define('MACTIPO_JOGO', 'J');
+define('MACTIPO_SIMULADO', 'S');
+define('MACTIPO_EXERCICIO', 'E');
+define('MACTIPO_FORMULA', 'F');
+define('MACTIPO_LIVRO', 'L');
+define('MACTIPO_APRESENTACAO', 'A');
+define('MACSTAT_ATIVO', 'A');
+define('MACSTAT_INATIVO', 'I');
+define('MACNIVL_BASICO', 'B');
+define('MACNIVL_INTERMEDIARIO', 'I');
+define('MACNIVL_AVANCADO', 'A');
+define('MACNIVL_PROFISSIONAL', 'P');
 
 /**---------------------------------------
  * ASSETS PATHS
@@ -163,11 +182,23 @@ define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
  */
 define('ASSETS_PATH', 'assets/');
 define('ASSETS_CSS_PATH', ASSETS_PATH . 'css/');
-define('ASSETS_JS_PATH', ASSETS_PATH . 'js/');
-define('ASSETS_FONTS_PATH', ASSETS_PATH . 'fonts/');
 define('ASSETS_FILES_PATH', ASSETS_PATH . 'files/');
+define('ASSETS_FONTS_PATH', ASSETS_PATH . 'fonts/');
 define('ASSETS_IMAGES_PATH', ASSETS_PATH . 'images/');
+define('ASSETS_JS_PATH', ASSETS_PATH . 'js/');
 define('ASSETS_MEDIAS_PATH', ASSETS_PATH . 'medias/');
+
+/**---------------------------------------
+ * UPLOAD PATHS
+ * ---------------------------------------
+ *
+ * Constantes que definem o caminho do diretorio de armazenamento de upload de arquivos do sistema
+ *
+ */
+define('UPLOAD_PATH', ASSETS_CSS_PATH . 'upload/');
+define('UPLOAD_FILES_PATH', UPLOAD_PATH . 'files/');
+define('UPLOAD_IMAGES_PATH', UPLOAD_PATH . 'images/');
+define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
 
 /**---------------------------------------
  * INTENT CATEGORIES and ACTIONS

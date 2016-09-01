@@ -32,10 +32,7 @@ class Group_bo {
         // Loading variables
         $this->data = [];
         $this->errors = [];
-        $this->CI =& get_instance();
-
-        // Loading models
-        $this->CI->load->model('user_model');
+        $this->CI = &get_instance();
     }
 
     /**
@@ -113,7 +110,8 @@ class Group_bo {
             $this->errors['grctipo'] = 'O TIPO DE GRUPO é obrigatório!';
             $status = FALSE;
         } else if (!is_string($this->data['grctipo']) || strlen($this->data['grctipo']) !== 1 ||
-            !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)) {
+            !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)
+        ) {
             $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String ("A" ou "F")!';
             $status = FALSE;
         }
@@ -161,7 +159,8 @@ class Group_bo {
             $this->errors['grctipo'] = 'O TIPO DE GRUPO é obrigatório!';
             $status = FALSE;
         } else if (!is_string($this->data['grctipo']) || strlen($this->data['grctipo']) !== 1 ||
-            !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)) {
+            !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)
+        ) {
             $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String ("A" ou "F")!';
             $status = FALSE;
         }
