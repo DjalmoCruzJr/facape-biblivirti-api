@@ -34,4 +34,21 @@ class Material_model extends CI_Model {
         return ($query->num_rows() > 0) ? $query->result() : null;
     }
 
+    /**
+     * @param $grnid
+     * @return mixed
+     *
+     * Metodo para buscar os materiais relacionado com um determinado grupo passado pelo parametro grnid(ID do grupo).
+     */
+    public function find_by_grnid($grnid, $limite = 1000, $offset = 0) {
+        $this->db->select('manid, macdesc, mactipo, malanex, macurl, macnivl, macstat, madcadt, madaldt');
+        $this->db->from('material');
+        $this->db->join('grupomaterial', 'gmnidma = manid', 'inner');
+        $this->db->join('grupo', 'gmnidgr = grnid', 'inner');
+        $this->db->where(['grnid' => $grnid]);
+        $this->db->order_by('madcadt, macdesc', 'DESC');
+        $query = $this->db->get();
+        return ($query->num_rows() > 0) ? $query->result() : null;
+    }
+
 }
