@@ -81,7 +81,7 @@ class Group extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($groups)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Nenhum grupo foi encontrado. VERIFIQUE!";
+                $response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 $response['response_code'] = RESPONSE_CODE_OK;
                 $response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
@@ -178,7 +178,7 @@ class Group extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($group)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Grupo não encontrado. VERIFIQUE!";
+                $response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 $this->group_model->save($data);
                 $response['response_message'] = "Grupo atualizado com sucesso!";
@@ -220,7 +220,7 @@ class Group extends CI_Controller {
             // Verifica o grupo foi encontrado
             if (is_null($group)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Grupo não encontrado. VERIFIQUE!";
+                $response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 $admin = $this->group_model->find_group_admin($data['grnid']);
                 // Verifica se o usuario eh administrador do grupo

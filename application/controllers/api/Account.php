@@ -74,11 +74,11 @@ class Account extends CI_Controller {
             // Verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Usuário não encontrado. VERIFIQUE!";
+                $this->response['response_message'] = "Nenhum usuário encontrado.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
                 $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Usuário não encontrado. VERIFIQUE!";
+                $this->response['response_message'] = "Usuário encontrado com sucesso!";
                 $this->response['response_data'] = $user;
             }
         }
@@ -125,11 +125,11 @@ class Account extends CI_Controller {
             // Verifica se houve flaha na execucao do model
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Usuário não encontrado. VERIFIQUE!";
+                $this->response['response_message'] = "Nenhum usuário encontrado.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
                 $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Usuário não encontrado. VERIFIQUE!";
+                $this->response['response_message'] = "Usuário encontrado com sucesso!";
                 $this->response['response_data'] = $user;
             }
         }
@@ -202,7 +202,7 @@ class Account extends CI_Controller {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
-     *          "usnid" : "ID do usuario",
+     *              "usnid" : "ID do usuario",
      *              "uscnome" : "Nome do usuario",
      *              "uscmail" : "E-mail do usuario",
      *              "usclogn" : "Login do usuario",
@@ -228,7 +228,7 @@ class Account extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "O e-mail informado não foi encontrado. VERIFIQUE!\n";
+                $response['response_message'] = "E-mail não encontrado.";
             } else {
                 // Desabilita todos os tokens de redefinicao anteriores para o usuario em questao
                 $this->recuperarsenha_model->disable_all_tokens_by_rsnidus($user->usnid);
@@ -300,7 +300,7 @@ class Account extends CI_Controller {
             $token = $this->recuperarsenha_model->find_by_rsctokn($data['rsctokn']);
             if (is_null($token)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "TOKEN DE REDEFINIÇÃO inválido!";
+                $response['response_message'] = "Token de redefinição inválido!";
             } else {
                 $user = $this->usuario_model->find_by_usnid($token->rsnidus);
                 unset($user->uscsenh); // Remove a senha do obeto de retorno
