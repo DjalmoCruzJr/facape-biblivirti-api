@@ -112,7 +112,8 @@ class Group_bo {
         } else if (!is_string($this->data['grctipo']) || strlen($this->data['grctipo']) !== 1 ||
             !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)
         ) {
-            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String ("A" ou "F")!';
+            $tipos = GRCTIPO_ABERTO . ',' . GRCTIPO_FECHADO;
+            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
             $status = FALSE;
         }
 
@@ -161,7 +162,8 @@ class Group_bo {
         } else if (!is_string($this->data['grctipo']) || strlen($this->data['grctipo']) !== 1 ||
             !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)
         ) {
-            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String ("A" ou "F")!';
+            $tipos = GRCTIPO_ABERTO . ',' . GRCTIPO_FECHADO;
+            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
             $status = FALSE;
         }
 

@@ -8,6 +8,29 @@
  * Model da tabela <b>MATERIAL</b>
  */
 class Material_model extends CI_Model {
+    /**
+     * Material_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+
+        // Loading models
+        $this->load->model('comentario_model');
+        $this->load->model('historicoacesso_model');
+    }
+
+
+    /**
+     * @param $manid
+     * @return mixed
+     *
+     * Metodo para salvar ou atualizar uma Material.
+     */
+    public function save($data) {
+        var_dump($data);
+        exit;
+    }
+
 
     /**
      * @param $manid
@@ -48,7 +71,15 @@ class Material_model extends CI_Model {
         $this->db->where(['grnid' => $grnid]);
         $this->db->order_by('madcadt, macdesc', 'DESC');
         $query = $this->db->get();
-        return ($query->num_rows() > 0) ? $query->result() : null;
+        if ($query->num_rows() > 0) {
+            $materials = $query->result();
+            foreach ($materials as $material) {
+                $material->manqtdce = $this->comentario_model->find_count_by_manid($material->manid);
+                $material->manqtdha = $this->historicoacesso_model->find_count_by_hanidma($material->manid);
+            }
+            return $materials;
+        }
+        return null;
     }
 
 }

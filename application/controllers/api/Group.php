@@ -26,10 +26,10 @@ class Group extends CI_Controller {
         $this->response = [];
 
         // Loading models
-        $this->load->model("group_model");
+        $this->load->model("grupo_model");
 
         // Loading libraries
-        $this->load->library('group_bo');
+        $this->load->library('business/group_bo');
     }
 
     /**

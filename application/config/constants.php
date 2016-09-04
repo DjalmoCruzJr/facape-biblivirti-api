@@ -160,13 +160,15 @@ define('RSCSTAT_INATIVO', 'I');
  * Constantes que definem as regras de negocio dos campos da tabela MATERIAL
  *
  */
-define('MACTIPO_VIDEO', 'V');
-define('MACTIPO_JOGO', 'J');
-define('MACTIPO_SIMULADO', 'S');
+define('MACDESC_MAX_LENGTH', 100);
+define('MACURL_MAX_LENGTH', 255);
+define('MACTIPO_APRESENTACAO', 'A');
 define('MACTIPO_EXERCICIO', 'E');
 define('MACTIPO_FORMULA', 'F');
+define('MACTIPO_JOGO', 'J');
 define('MACTIPO_LIVRO', 'L');
-define('MACTIPO_APRESENTACAO', 'A');
+define('MACTIPO_SIMULADO', 'S');
+define('MACTIPO_VIDEO', 'V');
 define('MACSTAT_ATIVO', 'A');
 define('MACSTAT_INATIVO', 'I');
 define('MACNIVL_BASICO', 'B');

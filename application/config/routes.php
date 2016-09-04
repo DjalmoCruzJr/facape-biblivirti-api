@@ -78,3 +78,4 @@ $route['API/group/delete']['post'] = 'api/group/delete';
  * API MATERIAL ROUTES
  */
 $route['API/material/list']['post'] = 'api/material/list_all';
+$route['API/material/add']['post'] = 'api/material/add';
