@@ -16,6 +16,7 @@ class Grupo_model extends CI_Model {
 
         // Loading model
         $this->load->model('areainteresse_model');
+        $this->load->model('grupousuario_model');
     }
 
 
@@ -123,8 +124,7 @@ class Grupo_model extends CI_Model {
             'guladm' => $guladm,
             'gucstat' => $gucstat
         ];
-        $this->db->insert('grupousuario', $data);
-        return ($this->db->affected_rows() !== 0);
+        return $this->db->grupousuario_model->save($data);
     }
 
 }

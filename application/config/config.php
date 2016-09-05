@@ -342,7 +342,7 @@ $config['encryption_key'] = '';
 |
 | 'sess_match_ip'
 |
-|	Whether to match the user's IP address when reading the session data.
+|	Whether to match the user's IP address when reading the session input.
 |
 | 'sess_time_to_update'
 |
@@ -350,8 +350,8 @@ $config['encryption_key'] = '';
 |
 | 'sess_regenerate_destroy'
 |
-|	Whether to destroy session data associated with the old session ID
-|	when auto-regenerating the session ID. When set to FALSE, the data
+|	Whether to destroy session input associated with the old session ID
+|	when auto-regenerating the session ID. When set to FALSE, the input
 |	will be later deleted by the garbage collector.
 |
 | Other session cookie settings are shared with the rest of the application,
@@ -392,7 +392,7 @@ $config['cookie_httponly'] = FALSE;
 | Standardize newlines
 |--------------------------------------------------------------------------
 |
-| Determines whether to standardize newline characters in input data,
+| Determines whether to standardize newline characters in input input,
 | meaning to replace \r\n, \r, \n occurrences with the PHP_EOL value.
 |
 | This is particularly useful for portability between UNIX-based OSes,
@@ -407,7 +407,7 @@ $config['standardize_newlines'] = FALSE;
 |--------------------------------------------------------------------------
 |
 | Determines whether the XSS filter is always active when GET, POST or
-| COOKIE data is encountered
+| COOKIE input is encountered
 |
 | WARNING: This feature is DEPRECATED and currently available only
 |          for backwards compatibility purposes!
@@ -420,7 +420,7 @@ $config['global_xss_filtering'] = FALSE;
 | Cross Site Request Forgery
 |--------------------------------------------------------------------------
 | Enables a CSRF cookie token to be set. When set to TRUE, token will be
-| checked on a submitted form. If you are accepting user data, it is strongly
+| checked on a submitted form. If you are accepting user input, it is strongly
 | recommended CSRF protection be enabled.
 |
 | 'csrf_token_name' = The token name

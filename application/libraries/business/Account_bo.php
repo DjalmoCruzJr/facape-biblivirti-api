@@ -48,6 +48,15 @@ class Account_bo {
     }
 
     /**
+     * @param array $data
+     *
+     * Metodo para retornar os dados apos serem validados.
+     */
+    public function get_data() {
+        return $this->data;
+    }
+
+    /**
      * @return array
      *
      * Metodo para retornar os erros inerentes ao processo de validacao.

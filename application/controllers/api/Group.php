@@ -77,6 +77,7 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $groups = $this->group_model->find_by_usnid($data['usnid']);
             // verifica se houve falha na execucao do model
             if (is_null($groups)) {
@@ -126,6 +127,7 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $id = $this->group_model->save($data);
             // verifica se houve falha na execucao do model
             if ($id === 0) {
@@ -174,6 +176,7 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $group = $this->group_model->find_by_id($data['grnid']);
             // verifica se houve falha na execucao do model
             if (is_null($group)) {
@@ -216,6 +219,7 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $group = $this->group_model->find_by_grnid($data['grnid']);
             // Verifica o grupo foi encontrado
             if (is_null($group)) {
@@ -258,7 +262,7 @@ class Group extends CI_Controller {
      * }
      */
     public function info() {
-
+        // Falta implementar
     }
 
 }

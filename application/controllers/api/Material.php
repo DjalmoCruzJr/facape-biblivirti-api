@@ -30,6 +30,7 @@ class Material extends CI_Controller {
 
         // Loading libraries
         $this->load->library('business/material_bo');
+        $this->load->library('input/biblivirti_input');
     }
 
     /**
@@ -64,11 +65,12 @@ class Material extends CI_Controller {
         $this->response = [];
         $this->material_bo->set_data($data);
         // Verifica se os dados nao foram validados
-        if ($this->material_bo->validate_list_all() === FALSE) {
+        if ($this->material_bo->validate_list_all() === false) {
             $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $materials = $this->material_model->find_by_grnid($data['grnid']);
             // Verifica se houve falha na execucao do model
             if (is_null($materials)) {
@@ -87,19 +89,26 @@ class Material extends CI_Controller {
 
     /**
      * @url: API/material/add
-     * @param int grnid
-     * @param string macdesc
-     * @param string mactipo
-     * @param bool malanex
-     * @param string macurl
-     * @param string macnivl
-     * @param string macstat
+     * @param string JSON
      * @return JSON
      *
      * Metodo para cadastrar um novo material.
-     * Recebe o(s) parametro(s) <i>grnid</i>, <i>macdesc</i>, <i>mactipo</i>, <i>malanex</i>, <i>macurl</i>,
-     * <i>macnivl</i> e <i>macstat</i> atraves de <i>POST</i> e retorna um <i>JSON</i>
-     * no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid" : "ID do grupo",
+     *      "macdesc" : "Descricao do material",
+     *      "mactipo" : "Tipo do material",
+     *      "malanex" : "Define se o material eh um anexo",
+     *      "macurl" : "URL do material",
+     *      "macnivl" : "Nivel do material",
+     *      "macstat" : "Status do material",
+     *      "contents" : [
+     *          {
+     *              "conid" : "ID do conteudo relacionado"
+     *          },
+     *      ]
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem de resposta",
@@ -109,23 +118,17 @@ class Material extends CI_Controller {
      * }
      */
     public function add() {
-        $data['grnid'] = $this->input->post('grnid');
-        $data['macdesc'] = $this->input->post('macdesc');
-        $data['mactipo'] = $this->input->post('mactipo');
-        $data['malanex'] = $this->input->post('malanex');
-        $data['macurl'] = $this->input->post('macurl');
-        $data['macnivl'] = $this->input->post('macnivl');
-        $data['macstat'] = $this->input->post('macstat');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->material_bo->set_data($data);
         // Verifica se os dados nao foram validados
-        if ($this->material_bo->validate_add() === FALSE) {
+        if ($this->material_bo->validate_add() === false) {
             $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
-            $data['malanex'] = ($data['malanex'] === '1'); // Converte o valor de string para booleano
+            $data = $this->material_bo->get_data();
             $manid = $this->material_model->save($data);
             // Verifica se houve falha na execucao do model
             if (is_null($manid)) {

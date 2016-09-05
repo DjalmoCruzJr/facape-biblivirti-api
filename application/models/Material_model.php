@@ -17,6 +17,8 @@ class Material_model extends CI_Model {
         // Loading models
         $this->load->model('comentario_model');
         $this->load->model('historicoacesso_model');
+        $this->load->model('grupomaterial_model');
+        $this->load->model('conteudomaterial_model');
     }
 
 
@@ -27,10 +29,32 @@ class Material_model extends CI_Model {
      * Metodo para salvar ou atualizar uma Material.
      */
     public function save($data) {
-        var_dump($data);
-        exit;
+        if (!isset($data['manid'])) {
+            $grnid = $data['grnid'];
+            unset($data['grnid']);
+            if ($data['mactipo'] !== MACTIPO_SIMULADO) {
+                $contens = $data['contents'];
+                unset($data['contents']);
+                if ($this->db->insert('material', $data) === true) {
+                    $manid = $this->db->insert_id();
+                    $this->grupomaterial_model->save(['gmnidgr' => $grnid, 'gmnidma' => $manid]);
+                    foreach ($contens as $content) {
+                        $this->conteudomaterial_model->save(['cmnidco' => $content['conid'], 'cmnidma' => $manid]);
+                    }
+                    return $manid;
+                }
+            } else {
+                if ($this->db->insert('material', $data) === true) {
+                    $manid = $this->db->insert_id();
+                    $this->grupomaterial_model->save(['gmnidgr' => $grnid, 'gmnidma' => $manid]);
+                    return $manid;
+                }
+            }
+            return null;
+        } else {
+           // Atualização
+        }
     }
-
 
     /**
      * @param $manid

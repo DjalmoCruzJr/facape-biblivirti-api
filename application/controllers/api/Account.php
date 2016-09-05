@@ -70,6 +70,7 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $user = $this->usuario_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']));
             // Verifica se houve falha na execucao do model
             if (is_null($user)) {
@@ -121,6 +122,7 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $user = $this->usuario_model->find_by_uscfbid($data['uscfbid']);
             // Verifica se houve flaha na execucao do model
             if (is_null($user)) {
@@ -171,6 +173,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
             $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
             $id = $this->usuario_model->save($data);
@@ -224,6 +227,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $user = $this->usuario_model->find_by_uscmail($data['uscmail']);
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
@@ -297,6 +301,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
+            $data = $this->material_bo->get_data();
             $token = $this->recuperarsenha_model->find_by_rsctokn($data['rsctokn']);
             if (is_null($token)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
