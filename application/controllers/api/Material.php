@@ -39,8 +39,11 @@ class Material extends CI_Controller {
      * @return JSON
      *
      * Metodo para buscar todos os materiais relacionados com um determinado grupo.
-     * Recebe o(s) parametro(s) <i>grnid</i> atraves de <i>POST</i> e retorna um <i>JSON</i>
-     * no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid" : "ID do grupo",
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem de resposta",
@@ -49,7 +52,7 @@ class Material extends CI_Controller {
      *              "macdesc" : "Descricao do usuario",
      *              "mactipo" : "Tipo de material",
      *              "macurl" : "URL do material",
-     *              "macnivl" : "Nivel do material (somenta para materiais do tipo 'S')",
+     *              "macnivl" : "Nivel do material",
      *              "macstat" : "Status do material",
      *              "madcadt" : "Data de cadastro do material",
      *              "madaldt" : "Data de atualizacao do material"
@@ -60,7 +63,9 @@ class Material extends CI_Controller {
      * }
      */
     public function list_all() {
-        $data['grnid'] = $this->input->post('grnid');
+        /*$data['grnid'] = $this->input->post('grnid');*/
+
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->material_bo->set_data($data);

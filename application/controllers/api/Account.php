@@ -32,35 +32,39 @@ class Account extends CI_Controller {
         // Loading libraries
         $this->load->library('encryption/biblivirti_hash');
         $this->load->library('business/account_bo');
+        $this->load->library('input/biblivirti_input');
     }
 
     /**
      * @url: API/account/login
-     * @param string uscmail
-     * @param string uscsenh
+     * @param string JSON
      * @return JSON
      *
      * Metodo para autenticar um usuario.
-     * Recebe o(s) parametro(s) <i>uscmail</i> e <i>uscsenh</i> atraves de <i>POST</i> e retorna um <i>JSON</i>
-     * no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "uscmail" : "E-mail do usuario",
+     *      "uscsenh" : "Senha do usuario"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem de resposta",
      *      "response_data" : {
-     *         "usnid" : "ID do usuario",
-     *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E-mail do usuario",
-     *              "usclogn" : "Login do usuario",
-     *              "uscfoto" : "Caminho da foto do usuario",
-     *              "uscstat" : "Status do usuario",
-     *              "tsdcadt" : "Data de cadastro do usuario",
-     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          "usnid" : "ID do usuario",
+     *          "uscfbid" : "FacebookID do usuario",
+     *          "uscnome" : "Nome do usuario",
+     *          "uscmail" : "E-mail do usuario",
+     *          "usclogn" : "Login do usuario",
+     *          "uscfoto" : "Caminho da foto do usuario",
+     *          "uscstat" : "Status do usuario",
+     *          "tsdcadt" : "Data de cadastro do usuario",
+     *          "usdaldt" : "Data de atualizacao do usuario"
      *      }
      * }
      */
     public function login() {
-        $data['uscmail'] = $this->input->post('uscmail');
-        $data['uscsenh'] = $this->input->post('uscsenh');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->account_bo->set_data($data);
@@ -70,7 +74,7 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
+            $data = $this->account_bo->get_data();
             $user = $this->usuario_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']));
             // Verifica se houve falha na execucao do model
             if (is_null($user)) {
@@ -90,29 +94,33 @@ class Account extends CI_Controller {
 
     /**
      * @url: API/account/login/facebook
-     * @param string uscfbid
+     * @param string JSON
      * @return JSON
      *
      * Metodo para autenticar um usuario no facebook.
-     * Recebe o(s) parametro(s) <i>uscmail</i> e <i>uscsenh</i> atraves de <i>POST</i> e retorna um <i>JSON</i>
-     * no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "uscfbid" : "FacebookID do usuario"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "request_code" : "Codigo da requsicao",
      *      "request_message" : "Mensagem da requsicao",
      *      "response_data" : {
      *          "usnid" : "ID do usuario",
-     *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E-mail do usuario",
-     *              "usclogn" : "Login do usuario",
-     *              "uscfoto" : "Caminho da foto do usuario",
-     *              "uscstat" : "Status do usuario",
-     *              "tsdcadt" : "Data de cadastro do usuario",
-     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          "uscfbid" : "FacebookID do usuario",
+     *          "uscnome" : "Nome do usuario",
+     *          "uscmail" : "E-mail do usuario",
+     *          "usclogn" : "Login do usuario",
+     *          "uscfoto" : "Caminho da foto do usuario",
+     *          "uscstat" : "Status do usuario",
+     *          "tsdcadt" : "Data de cadastro do usuario",
+     *          "usdaldt" : "Data de atualizacao do usuario"
      *      }
      * }
      */
     public function login_facebook() {
-        $data['uscfbid'] = $this->input->post('uscfbid');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->account_bo->set_data($data);
@@ -122,7 +130,7 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
+            $data = $this->account_bo->get_data();
             $user = $this->usuario_model->find_by_uscfbid($data['uscfbid']);
             // Verifica se houve flaha na execucao do model
             if (is_null($user)) {
@@ -142,14 +150,17 @@ class Account extends CI_Controller {
 
     /**
      * @url: API/account/register
-     * @param string uscmail
-     * @param string usclogn
-     * @param string uscsenh
-     * @param string uscsenh2
+     * @param string JSON
      * @return JSON
      *
      * Metodo para cadastrar um novo usuario.
-     * Recebe o(s) parametro(s) <i>uscmail</i>, <i>usclogn</i>, <i>uscsenh</i> e <i>uscsenh2</i> atraves de <i>POST</i>
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "uscmail": "E-mail do usuario",
+     *      "usclogn": "Login do usuario",
+     *      "uscsenh": "Senha do usuario",
+     *      "uscsenh2": "Confirmacao de senha"
+     * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
@@ -160,10 +171,7 @@ class Account extends CI_Controller {
      * }
      */
     public function register() {
-        $data['uscmail'] = $this->input->post('uscmail');
-        $data['usclogn'] = $this->input->post('usclogn');
-        $data['uscsenh'] = $this->input->post('uscsenh');
-        $data['uscsenh2'] = $this->input->post('uscsenh2');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->account_bo->set_data($data);
@@ -173,7 +181,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
+            $data = $this->account_bo->get_data();
             unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
             $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
             $id = $this->usuario_model->save($data);
@@ -195,29 +203,32 @@ class Account extends CI_Controller {
 
     /**
      * @url: API/account/recover
-     * @param string uscmail
+     * @param string JSON
      * @return JSON
      *
      * Metodo para recuperar o acesso um usuario.
-     * Recebe o(s) parametro(s) <i>uscmail</i> atraves de <i>POST</i>
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "uscmail": "E-mail do usuario"
+     * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
-     *              "usnid" : "ID do usuario",
-     *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E-mail do usuario",
-     *              "usclogn" : "Login do usuario",
-     *              "uscfoto" : "Caminho da foto do usuario",
-     *              "uscstat" : "Status do usuario",
-     *              "tsdcadt" : "Data de cadastro do usuario",
-     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          "usnid" : "ID do usuario",
+     *          "uscnome" : "Nome do usuario",
+     *          "uscmail" : "E-mail do usuario",
+     *          "usclogn" : "Login do usuario",
+     *          "uscfoto" : "Caminho da foto do usuario",
+     *          "uscstat" : "Status do usuario",
+     *          "tsdcadt" : "Data de cadastro do usuario",
+     *          "usdaldt" : "Data de atualizacao do usuario"
      *      }
      * }
      */
     public function recover() {
-        $data['uscmail'] = $this->input->post('uscmail');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->account_bo->set_data($data);
@@ -227,7 +238,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
+            $data = $this->account_bo->get_data();
             $user = $this->usuario_model->find_by_uscmail($data['uscmail']);
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
@@ -301,7 +312,7 @@ class Account extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
+            $data = $this->account_bo->get_data();
             $token = $this->recuperarsenha_model->find_by_rsctokn($data['rsctokn']);
             if (is_null($token)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;

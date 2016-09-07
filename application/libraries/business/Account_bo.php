@@ -73,6 +73,12 @@ class Account_bo {
     public function validate_login() {
         $status = TRUE;
 
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
         // Validando o campo USCMAIL (email)
         if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
             $this->errors['uscmail'] = 'O E-MAIL é obrigatório!';
@@ -108,6 +114,12 @@ class Account_bo {
     public function validate_login_facebook() {
         $status = TRUE;
 
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
         // Validando o campo USCFBID (ID do Facebook)*
         if (!isset($this->data['uscfbid']) || empty(trim($this->data['uscfbid']))) {
             $this->errors['uscfbid'] = 'O FACEBOOKID é obrigatório!';
@@ -130,6 +142,12 @@ class Account_bo {
      */
     public function validate_register() {
         $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
 
         // Validando o campo USCMAIL (email)
         if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
@@ -192,6 +210,12 @@ class Account_bo {
      */
     public function validate_recover() {
         $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
 
         // Validando o campo USCMAIL (email)
         if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {

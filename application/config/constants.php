@@ -210,4 +210,4 @@ define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
  *
  */
 define('INTENT_CATEGORY_ACCOUNT', 'org.sysmob.biblivirti.intent.category.ACCOUNT');
-define('INTENT_ACTION_ACCOUNT_PASSWORD_RESET', 'org.sysmob.biblivirti.intent.ACTION.ACCOUNT_PASSWORD_RESET');
+define('INTENT_ACTION_ACCOUNT_PASSWORD_RESET', 'org.sysmob.biblivirti.intent.action.ACCOUNT_PASSWORD_RESET');

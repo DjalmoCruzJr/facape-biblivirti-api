@@ -30,15 +30,20 @@ class Group extends CI_Controller {
 
         // Loading libraries
         $this->load->library('business/group_bo');
+        $this->load->library('input/biblivirti_input');
     }
 
     /**
      * @url: API/group/list
-     * @param int usnid
+     * @param string JSON
      * @return JSON
      *
      * Metodo para listar todos os grupos de um determinado usuario.
-     * Recebe o parametro <i>usnid</i> atraves de <i>POST</i> e retorna um <i>JSON</i> no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid": "ID do usuario"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da requsicao",
      *      "response_message" : "Mensagem da requsicao",
@@ -55,6 +60,7 @@ class Group extends CI_Controller {
      *              },
      *              "admin" : {
      *                  "usnid" : "ID do usuario",
+     *                  "uscfbid" : "FacebookID do usuario",
      *                  "uscnome" : "Nome do usuario",
      *                  "uscmail" : "E-mail do usuario",
      *                  "usclogn" : "Login do usuario",
@@ -67,7 +73,7 @@ class Group extends CI_Controller {
      * }
      */
     public function list_all() {
-        $data['usnid'] = $this->input->post('usnid');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->group_bo->set_data($data);
@@ -77,8 +83,8 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
-            $groups = $this->group_model->find_by_usnid($data['usnid']);
+            $data = $this->group_bo->get_data();
+            $groups = $this->grupo_model->find_by_usnid($data['usnid']);
             // verifica se houve falha na execucao do model
             if (is_null($groups)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -96,14 +102,17 @@ class Group extends CI_Controller {
 
     /**
      * @url: api/group/add
-     * @param string grcfoto
-     * @param string grcnome
-     * @param string grnidai
-     * @param string grctipo
+     * @param string JSON
      * @return JSON
      *
      * Metodo para salva um novo grupo.
-     * Recebe os parametros <i>grcfoto</i>, <i>grcnome</i>, <i>grnidai</i> e <i>grctipo</i> atraves de <i>POST</i>
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grcnome": "Nome do grupo",
+     *      "grnidai": "ID da area de interesse do grupo",
+     *      "usnid": "ID do usuario (admin do grupo)",
+     *      "grctipo": "Tipo do grupo"
+     * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "request_code" : "Codigo da requsicao",
@@ -114,10 +123,7 @@ class Group extends CI_Controller {
      * }
      */
     public function add() {
-        $data['grcnome'] = $this->input->post('grcnome');
-        $data['grctipo'] = $this->input->post('grctipo');
-        $data['grnidai'] = $this->input->post('grnidai');
-        $data['usnid'] = $this->input->post('usnid');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->group_bo->set_data($data);
@@ -127,8 +133,8 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
-            $id = $this->group_model->save($data);
+            $data = $this->group_bo->get_data();
+            $id = $this->grupo_model->save($data);
             // verifica se houve falha na execucao do model
             if ($id === 0) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -147,26 +153,26 @@ class Group extends CI_Controller {
 
     /**
      * @url: api/group/edit
-     * @param string grnid
-     * @param string grcfoto
-     * @param string grcnome
-     * @param string grnidai
-     * @param string grctipo
+     * @param string JSON
      * @return JSON
      *
      * Metodo para editar um grupo.
-     * Recebe os parametros <i>grnid</i>, <i>grcfoto</i>, <i>grcnome</i>, <i>grnidai</i> e <i>grctipo</i> atraves
-     * de <i>POST</i> e retorna um <i>JSON</i> no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid": "ID do grupo",
+     *      "grcnome": "Nome do grupo",
+     *      "grnidai": "ID da area de interesse do grupo",
+     *      "usnid": "ID do usuario (admin do grupo)",
+     *      "grctipo": "Tipo do grupo"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "request_code" : "Codigo da requsicao",
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
     public function edit() {
-        $data['grnid'] = $this->input->post('grnid');
-        $data['grcnome'] = $this->input->post('grcnome');
-        $data['grctipo'] = $this->input->post('grctipo');
-        $data['grnidai'] = $this->input->post('grnidai');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->group_bo->set_data($data);
@@ -176,14 +182,14 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
-            $group = $this->group_model->find_by_id($data['grnid']);
+            $data = $this->group_bo->get_data();
+            $group = $this->grupo_model->find_by_grnid($data['grnid']);
             // verifica se houve falha na execucao do model
             if (is_null($group)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "Nenhum grupo encontrado.";
             } else {
-                $this->group_model->save($data);
+                $this->grupo_model->save($data);
                 $response['response_message'] = "Grupo atualizado com sucesso!";
                 $response['response_data'] = ['grnid' => $data['grnid']];
             }
@@ -201,15 +207,18 @@ class Group extends CI_Controller {
      * @return JSON
      *
      * Metodo para detetar um grupo.
-     * Recebe o(s) parametro(s) <i>grnid</i> e <i>usnid</i> atraves de <i>POST</i> e retorna um <i>JSON</i> no seguinte formato:
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "request_code" : "Codigo da requsicao",
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
     public function delete() {
-        $data['grnid'] = $this->input->post('grnid');
-        $data['usnid'] = $this->input->post('usnid');
+        $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
         $this->group_bo->set_data($data);
@@ -219,28 +228,22 @@ class Group extends CI_Controller {
             $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
             $response['response_errors'] = $this->group_bo->get_errors();
         } else {
-            $data = $this->material_bo->get_data();
-            $group = $this->group_model->find_by_grnid($data['grnid']);
+            $data = $this->group_bo->get_data();
             // Verifica o grupo foi encontrado
-            if (is_null($group)) {
-                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Nenhum grupo encontrado.";
+            $admin = $this->grupo_model->find_admin($data['grnid']);
+            // Verifica se o usuario eh administrador do grupo
+            if ($admin->usnid !== $data['usnid']) {
+                $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $response['response_message'] = "Erro ao tentar excluir o grupo!\n";
+                $response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
             } else {
-                $admin = $this->group_model->find_group_admin($data['grnid']);
-                // Verifica se o usuario eh administrador do grupo
-                if ($admin->usnid !== $data['usnid']) {
-                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
-                    $response['response_message'] = "Erro ao tentar excluir as informações do grupo!\n";
-                    $response['response_message'] .= "Somente o administrador do grupo poderá excluí-lo!";
+                if (!$this->grupo_model->delete($data['grnid'])) {
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
+                    $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                 } else {
-                    if ($this->group_model->delete($data['grnid']) === false) {
-                        $response['response_code'] = RESPONSE_CODE_OK;
-                        $response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
-                        $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
-                    } else {
-                        $response['response_code'] = RESPONSE_CODE_OK;
-                        $response['response_message'] = "Grupo excluído com sucesso!";
-                    }
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Grupo excluído com sucesso!";
                 }
             }
         }

@@ -40,9 +40,9 @@ class Grupo_model extends CI_Model {
         } else {
             $grnid = $data['grnid'];
             unset($data['grnid']);
+            unset($data['usnid']);
             $this->db->where(['grnid' => $grnid]);
-            $this->db->update('grupo', $data);
-            return ($this->db->affected_rows() !== 0);
+            return $this->db->update('grupo', $data);
         }
     }
 
@@ -52,7 +52,7 @@ class Grupo_model extends CI_Model {
      *
      *  Metodo para buscar todos os grupos de um determinado usuario.
      */
-    public function find_groups_by_user($usnid) {
+    public function find_by_usnid($usnid) {
         $this->db->select('grnid, grcnome, grcfoto, grctipo, grdcadt, grnidai');
         $this->db->from('grupousuario');
         $this->db->join('grupo', 'gunidgr = grnid');
@@ -91,7 +91,7 @@ class Grupo_model extends CI_Model {
      * Metodo para buscar o administrador de um determinado grupo.
      */
     public function find_admin($grnid) {
-        $this->db->select('usnid, uscnome, uscmail, usclogn, uscfoto, uscstat, usdcadt');
+        $this->db->select('usnid, uscfbid, uscnome, uscmail, usclogn, uscfoto, uscstat, usdcadt');
         $this->db->from('grupousuario');
         $this->db->join('usuario', 'gunidus = usnid', 'inner');
         $this->db->where(['gunidgr' => $grnid, 'guladm' => true]);
@@ -124,7 +124,7 @@ class Grupo_model extends CI_Model {
             'guladm' => $guladm,
             'gucstat' => $gucstat
         ];
-        return $this->db->grupousuario_model->save($data);
+        return $this->grupousuario_model->save($data);
     }
 
 }

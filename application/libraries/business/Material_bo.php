@@ -36,6 +36,7 @@ class Material_bo {
 
         // Loading models
         $this->CI->load->model('material_model');
+        $this->CI->load->model('grupo_model');
     }
 
     /**
@@ -73,12 +74,21 @@ class Material_bo {
     public function validate_list_all() {
         $status = TRUE;
 
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
         // Validando o campo GRNID (ID do Grupo)
         if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
             $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
             $status = false;
         } else if (!is_numeric($this->data['grnid'])) {
             $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
             $status = false;
         }
 
@@ -105,6 +115,9 @@ class Material_bo {
             $status = false;
         } else if (!is_numeric($this->data['grnid'])) {
             $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
             $status = false;
         }
 
@@ -134,7 +147,7 @@ class Material_bo {
 
         // Validando o campo MALANEX (Se o material eh um anexo)
         if ($this->data['mactipo'] !== MACTIPO_SIMULADO) {
-            if (!is_numeric($this->data['malanex'])) {
+            if (isset($this->data['malanex'])&& !is_numeric($this->data['malanex'])) {
                 $this->errors['malanex'] = 'Este campo deve conter um valor booleano (1 - TRUE, 0 - false)!';
                 $status = false;
             }
@@ -216,6 +229,5 @@ class Material_bo {
 
         return $status;
     }
-
 
 }
