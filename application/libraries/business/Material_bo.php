@@ -37,6 +37,8 @@ class Material_bo {
         // Loading models
         $this->CI->load->model('material_model');
         $this->CI->load->model('grupo_model');
+        $this->CI->load->model('questao_model');
+        $this->CI->load->model('conteudo_model');
     }
 
     /**
@@ -134,97 +136,111 @@ class Material_bo {
         if (!isset($this->data['mactipo']) || empty(trim($this->data['mactipo']))) {
             $this->errors['mactipo'] = 'O TIPO DE MATERIAL é obrigatório!';
             $status = false;
-        } else if (!is_string($this->data['mactipo']) || strlen($this->data['mactipo']) !== 1 ||
-            !(strcmp($this->data['mactipo'], MACTIPO_APRESENTACAO) == 0 | strcmp($this->data['mactipo'], MACTIPO_EXERCICIO) == 0 |
-                strcmp($this->data['mactipo'], MACTIPO_FORMULA) == 0 | strcmp($this->data['mactipo'], MACTIPO_JOGO) == 0 |
-                strcmp($this->data['mactipo'], MACTIPO_LIVRO) == 0 | strcmp($this->data['mactipo'], MACTIPO_SIMULADO) == 0 |
-                strcmp($this->data['mactipo'], MACTIPO_VIDEO) == 0)
-        ) {
-            $tipos = MACTIPO_APRESENTACAO . ',' . MACTIPO_EXERCICIO . ',' . MACTIPO_FORMULA . ',' . MACTIPO_JOGO . ',' . MACTIPO_LIVRO . ',' . MACTIPO_SIMULADO . ',' . MACTIPO_VIDEO;
-            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
-            $status = false;
-        }
-
-        // Validando o campo MALANEX (Se o material eh um anexo)
-        if ($this->data['mactipo'] !== MACTIPO_SIMULADO) {
-            if (isset($this->data['malanex'])&& !is_numeric($this->data['malanex'])) {
-                $this->errors['malanex'] = 'Este campo deve conter um valor booleano (1 - TRUE, 0 - false)!';
-                $status = false;
-            }
-            // Converte o valor string para booleano
-            $this->data['malanex'] = $this->data['malanex'] === '1';
         } else {
-            $this->data['malanex'] = false;
-        }
-
-        // Validando o campo MACURL (URL do material)
-        if ($this->data['mactipo'] !== MACTIPO_SIMULADO) {
-            if (!isset($this->data['macurl']) || empty(trim($this->data['macurl']))) {
-                $this->errors['macurl'] = 'A URL DO MATERIAL é obrigatória!';
-                $status = false;
-            } else if ($this->data['malanex'] === false) { // verifica se o material não eh um anexo
-                if (!filter_var($this->data['macurl'], FILTER_VALIDATE_URL)) {
-                    $this->errors['macurl'] = 'Informe uma URL válida!';
-                    $status = false;
-                }
-            } else if (strpos($this->data['macurl'], ' ') > 0) {
-                $this->errors['macurl'] = 'A URL DO MATERIAL não pode conter espaço(s) em branco(s)!';
-                $status = FALSE;
-            } else if (strlen($this->data['macurl']) > MACDESC_MAX_LENGTH) {
-                $this->errors['macurl'] = 'A URL DO MATERIAL deve conter no máximo ' . MACURL_MAX_LENGTH . ' caracter(es)!';
-                $status = false;
-            }
-        } else {
-            unset($this->data['macurl']);
-        }
-
-        // Validando o campo MACNIVL (Nivel de material)
-        if ($this->data['mactipo'] === MACTIPO_SIMULADO) {
-            if (!isset($this->data['macnivl']) || empty(trim($this->data['macnivl']))) {
-                $this->errors['macnivl'] = 'O NÍVEL DE MATERIAL é obrigatório!';
-                $status = false;
-            } else if (!is_string($this->data['macnivl']) || strlen($this->data['macnivl']) !== 1 ||
-                !(strcmp($this->data['macnivl'], MACNIVL_BASICO) == 0 | strcmp($this->data['macnivl'], MACNIVL_INTERMEDIARIO) == 0 |
-                    strcmp($this->data['macnivl'], MACNIVL_AVANCADO) == 0 | strcmp($this->data['macnivl'], MACNIVL_PROFISSIONAL) == 0)
+            // Verifica se o tipo de material foi preenchido com valores validos
+            if (!is_string($this->data['mactipo']) || strlen($this->data['mactipo']) !== 1 ||
+                !(strcmp($this->data['mactipo'], MACTIPO_APRESENTACAO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_EXERCICIO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_FORMULA) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_JOGO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_LIVRO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_SIMULADO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_VIDEO) === 0)
             ) {
-                $tipos = MACNIVL_BASICO . ',' . MACNIVL_INTERMEDIARIO . ',' . MACNIVL_AVANCADO . ',' . MACNIVL_PROFISSIONAL;
-                $this->errors['macnivl'] = 'O NÍVEL DE MATERIAL deve ser um valor do tipo String (' . $tipos . ')!';
-                $status = false;
-            }
-        } else {
-            unset($this->data['macnivl']);
-        }
-
-        // Validando o campo MACSTAT (Status de material)
-        if (!isset($this->data['macstat']) || empty(trim($this->data['macstat']))) {
-            $this->errors['macstat'] = 'O STATUS DE MATERIAL é obrigatório!';
-            $status = false;
-        } else if (!is_string($this->data['macstat']) || strlen($this->data['macstat']) !== 1 ||
-            !(strcmp($this->data['macstat'], MACSTAT_ATIVO) == 0 | strcmp($this->data['macstat'], MACSTAT_INATIVO) == 0)
-        ) {
-            $tipos = MACSTAT_ATIVO . ',' . MACSTAT_INATIVO;
-            $this->errors['macstat'] = 'O STATUS DE MATERIAL deve ser um valor do tipo String (' . $tipos . ')!';
-            $status = false;
-        }
-
-        // Validando o campo contents (Conteudos relacioandos com o material)
-        if ($this->data['mactipo'] !== MACTIPO_SIMULADO) {
-            if (!isset($this->data['contents']) || empty($this->data['contents'])) {
-                $this->errors['contents'] = 'O MATERIAL deve está relacionado com pelo menos 1 conteúdo!';
+                $tipos = MACTIPO_APRESENTACAO . ',' . MACTIPO_EXERCICIO . ',' . MACTIPO_FORMULA . ',' . MACTIPO_JOGO . ',' . MACTIPO_LIVRO . ',' . MACTIPO_SIMULADO . ',' . MACTIPO_VIDEO;
+                $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
                 $status = false;
             } else {
-                foreach ($this->data['contents'] as $content) {
-                    if (!isset($content['conid']) || empty(trim($content['conid']))) {
-                        $this->errors['contents']['conid'] = 'O ID CONTEÚDO RELACIONADO é obrigatório!';
+                // Verifica se o material eh um SIMULADO
+                if ($this->data['mactipo'] === MACTIPO_SIMULADO) {
+                    // Validando o campo MACNIVL (Nivel do Material - SIMULADO)
+                    if (!isset($this->data['macnivl']) || empty($this->data['macnivl'])) {
+                        $this->errors['macnivl'] = 'O NÍVEL DO MATERIAL é obrigatório!';
                         $status = false;
-                    } else if (!is_numeric($content['conid'])) {
-                        $this->errors['contents']['conid'] = 'O ID CONTEÚDO RELACIONADO deve ser um valor inteiro!';
+                    } else if (!is_string($this->data['macnivl']) || strlen($this->data['macnivl']) !== 1 ||
+                        !(strcmp($this->data['macnivl'], MACNIVL_BASICO) === 0
+                            | strcmp($this->data['macnivl'], MACNIVL_INTERMEDIARIO) === 0
+                            | strcmp($this->data['macnivl'], MACNIVL_AVANCADO) === 0
+                            | strcmp($this->data['macnivl'], MACNIVL_PROFISSIONAL) === 0
+                        )
+                    ) {
+                        $tipos = MACNIVL_BASICO . ',' . MACNIVL_INTERMEDIARIO . ',' . MACNIVL_AVANCADO . ',' . MACNIVL_PROFISSIONAL;
+                        $this->errors['macnivl'] = 'O NÍVEL DO MATERIAL deve ser um valor do tipo String (' . $tipos . ')!';
                         $status = false;
                     }
+
+                    // Validando o campo questions (Questoes do Simulado)
+                    if (!isset($this->data['questions']) || !is_array($this->data['questions']) || empty($this->data['questions'])) {
+                        $this->errors['questions'] = 'Um simulado deve conter pelo menos 1 questão!';
+                        $status = false;
+                    } else {
+                        // Validando as questoes do simulado
+                        $i = 0;
+                        foreach ($this->data['questions'] as $question) {
+                            $i++;
+                            if (!isset($question['qenid']) || empty($question['qenid'])) {
+                                $this->errors['questions']['qenid' . $i] = 'O ID DA QUESTÃO é obrigatório!';
+                                $status = false;
+                            } else if (!is_numeric($question['qenid'])) {
+                                $this->errors['questions']['qenid' . $i] = 'O ID DA QUESTÃO deve ser o um valor inteiro!';
+                                $status = false;
+                            } else if (is_null($this->CI->questao_model->find_by_qenid($question['qenid']))) {
+                                $this->errors['questions']['qenid' . $i] = 'O ID DA QUESTÃO inválido!';
+                                $status = false;
+                            }
+
+                        }
+                    }
+
+                    unset($this->data['malanex']); // Remove o campo MALANEX ja que se trata de um SIMULADO
+                    unset($this->data['macurl']); // Remove o campo MACURL ja que se trata de um SIMULADO
+                } else {
+                    // Validando o campo MALANEX (Define se o material eh um anexo ou nao)
+                    if (!isset($this->data['malanex']) || !is_bool($this->data['malanex'])) {
+                        $this->errors['malanex'] = 'Este campo deve conter valores booleanos (true, false)!';
+                        $status = false;
+                    }
+
+                    // Validando o campo MACURL (URL do material)
+                    if (!isset($this->data['macurl']) || empty($this->data['macurl'])) {
+                        $this->errors['macurl'] = 'A URL DO MATERIAL é obrigatória!';
+                        $status = false;
+                    } else {
+                        //Verifica se o material eh um LINK
+                        if ($this->data['malanex'] === false) {
+                            // Validando o campo MACURL (URL do material - LINK)
+                            if (!filter_var($this->data['macurl'], FILTER_VALIDATE_URL)) {
+                                $this->errors['macurl'] = 'Informe uma URL DO MATERIAL válida!';
+                                $status = false;
+                            }
+                        }
+                    }
+
+                    // Validando o campo contents (Conteudos relacionados com o material)
+                    if (!isset($this->data['contents']) || !is_array($this->data['contents']) || empty($this->data['contents'])) {
+                        $this->errors['contents'] = 'O material deve conter pelo menos 1 conteudo relacionado!';
+                        $status = false;
+                    } else {
+                        // Validando os conteudos relacionados do material
+                        $i = 0;
+                        foreach ($this->data['contents'] as $content) {
+                            $i++;
+                            if (!isset($content['conid']) || empty($content['conid'])) {
+                                $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO é obrigatório!';
+                                $status = false;
+                            } else if (!is_numeric($content['conid'])) {
+                                $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO deve ser o um valor inteiro!';
+                                $status = false;
+                            } else if (is_null($this->CI->conteudo_model->find_by_conid($content['conid']))) {
+                                $this->errors['contents']['conid' . $i] = 'ID DO CONTEÚDO  inválido!';
+                                $status = false;
+                            }
+                        }
+                    }
+
+                    unset($this->data['macnivl']); // Remove o campo MACNIVL ja que NAO se trata de um SIMULADO
                 }
             }
-        } else {
-            unset($this->data['contents']);
         }
 
         return $status;

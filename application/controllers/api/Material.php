@@ -134,6 +134,8 @@ class Material extends CI_Controller {
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
             $data = $this->material_bo->get_data();
+            var_dump($data);
+            exit;
             $manid = $this->material_model->save($data);
             // Verifica se houve falha na execucao do model
             if (is_null($manid)) {

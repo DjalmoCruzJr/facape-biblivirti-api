@@ -19,8 +19,8 @@ class Material_model extends CI_Model {
         $this->load->model('historicoacesso_model');
         $this->load->model('grupomaterial_model');
         $this->load->model('conteudomaterial_model');
+        $this->load->model('questaosimulado_model');
     }
-
 
     /**
      * @param $manid
@@ -32,27 +32,32 @@ class Material_model extends CI_Model {
         if (!isset($data['manid'])) {
             $grnid = $data['grnid'];
             unset($data['grnid']);
-            if ($data['mactipo'] !== MACTIPO_SIMULADO) {
+            if ($data['mactipo'] !== MACTIPO_SIMULADO) { // O material NAO eh um SIMULADO
                 $contens = $data['contents'];
                 unset($data['contents']);
                 if ($this->db->insert('material', $data) === true) {
                     $manid = $this->db->insert_id();
                     $this->grupomaterial_model->save(['gmnidgr' => $grnid, 'gmnidma' => $manid]);
                     foreach ($contens as $content) {
-                        $this->conteudomaterial_model->save(['cmnidco' => $content['conid'], 'cmnidma' => $manid]);
+                        $this->conteudomaterial_model->save(['cmnidma' => $manid, 'cmnidco' => $content['conid']]);
                     }
                     return $manid;
                 }
-            } else {
+            } else { // O material EH um SIMULADO
+                $questions = $data['questions'];
+                unset($data['questions']);
                 if ($this->db->insert('material', $data) === true) {
                     $manid = $this->db->insert_id();
                     $this->grupomaterial_model->save(['gmnidgr' => $grnid, 'gmnidma' => $manid]);
+                    foreach ($questions as $question) {
+                        $this->questaosimulado_model->save(['qsnidma' => $manid, 'qsnidqe' => $question['qenid']]);
+                    }
                     return $manid;
                 }
             }
             return null;
         } else {
-           // Atualização
+            // Atualização
         }
     }
 
