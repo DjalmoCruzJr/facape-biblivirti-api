@@ -147,4 +147,15 @@ class Material_model extends CI_Model {
         return null;
     }
 
+    /**
+     * @param $manid
+     * @return bool
+     *
+     * Metodo para deletar um determinado material.
+     */
+    public function delete($manid) {
+        $this->db->where(['manid' => $manid]);
+        return $this->db->delete('material');
+    }
+
 }

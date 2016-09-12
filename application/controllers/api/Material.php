@@ -159,7 +159,7 @@ class Material extends CI_Controller {
      * @param string JSON
      * @return JSON
      *
-     * Metodo para cadastrar um novo material.
+     * Metodo para atualizar um material.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
      *      "grnid" : "ID do grupo",
@@ -210,6 +210,60 @@ class Material extends CI_Controller {
                 $this->material_model->save($data);
                 $response['response_message'] = "Material atualizado com sucesso!";
                 $response['response_data'] = ['manid' => $data['manid']];
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
+
+    /**
+     * @url: API/material/delete
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para deletar um material.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid" : "ID do usuario",
+     *      "grnid" : "ID do grupo",
+     *      "manid" : "ID do material"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "request_code" : "Codigo da requsicao",
+     *      "request_message" : "Mensagem da requsicao",
+     * }
+     */
+    public function delete() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->material_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->material_bo->validate_delete() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->material_bo->get_errors();
+        } else {
+            $data = $this->material_bo->get_data();
+            // Verifica o grupo foi encontrado
+            $admin = $this->grupo_model->find_admin($data['grnid']);
+            // Verifica se o usuario nao eh administrador do grupo
+            if ($admin->usnid != $data['usnid']) {
+                $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $response['response_message'] = "Erro ao tentar excluir o material!\n";
+                $response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
+            } else {
+                if (!$this->material_model->delete($data['manid'])) {
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Houve um erro ao tentar excluir as informações do material!\nTente novamente!";
+                    $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
+                } else {
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Material excluído com sucesso!";
+                }
             }
         }
 

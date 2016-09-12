@@ -39,6 +39,7 @@ class Material_bo {
         $this->CI->load->model('grupo_model');
         $this->CI->load->model('questao_model');
         $this->CI->load->model('conteudo_model');
+        $this->CI->load->model('usuario_model');
     }
 
     /**
@@ -399,6 +400,59 @@ class Material_bo {
                     unset($this->data['macnivl']); // Remove o campo MACNIVL ja que NAO se trata de um SIMULADO
                 }
             }
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>delete</i> do controller <i>Material</i>.
+     */
+    public function validate_delete() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>usnid</i> (ID do Usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if(is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>grnid</i> (ID do Grupo)
+        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
+            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if(is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>manid</i> (ID do material)
+        if (!isset($this->data['manid']) || empty(trim($this->data['manid']))) {
+            $this->errors['manid'] = 'O ID DO MATERIAL é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['manid'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if(is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
+            $this->errors['manid'] = 'ID DO MATERIAL inválido!';
+            $status = FALSE;
         }
 
         return $status;

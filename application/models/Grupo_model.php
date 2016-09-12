@@ -107,8 +107,7 @@ class Grupo_model extends CI_Model {
      */
     public function delete($grnid) {
         $this->db->where(['grnid' => $grnid]);
-        $this->db->delete('grupo');
-        return ($this->db->affected_rows() !== 0);
+        return $this->db->delete('grupo');
     }
 
     /**

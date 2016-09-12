@@ -209,7 +209,7 @@ class Group extends CI_Controller {
      * Metodo para detetar um grupo.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *
+     *      "grnid" : "ID do grupo"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
@@ -232,7 +232,7 @@ class Group extends CI_Controller {
             // Verifica o grupo foi encontrado
             $admin = $this->grupo_model->find_admin($data['grnid']);
             // Verifica se o usuario eh administrador do grupo
-            if ($admin->usnid !== $data['usnid']) {
+            if ($admin->usnid != $data['usnid']) {
                 $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $response['response_message'] = "Erro ao tentar excluir o grupo!\n";
                 $response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
