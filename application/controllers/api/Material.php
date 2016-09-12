@@ -63,8 +63,6 @@ class Material extends CI_Controller {
      * }
      */
     public function list_all() {
-        /*$data['grnid'] = $this->input->post('grnid');*/
-
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -105,11 +103,16 @@ class Material extends CI_Controller {
      *      "mactipo" : "Tipo do material",
      *      "malanex" : "Define se o material eh um anexo",
      *      "macurl" : "URL do material",
-     *      "macnivl" : "Nivel do material",
+     *      "macnivl" : "Nivel do material (Somente se mactipo = S - SIMULADO)",
      *      "macstat" : "Status do material",
-     *      "contents" : [
+     *      "contents" : [ (array de conteudos relacionados com o material - NAO SIMULADO)
      *          {
      *              "conid" : "ID do conteudo relacionado"
+     *          },
+     *      ],
+     *      "questions" : [ (array - Somente se mactipo = S - SIMULADO)
+     *          {
+     *              "qenid" : "ID da questao"
      *          },
      *      ]
      * }
@@ -134,8 +137,6 @@ class Material extends CI_Controller {
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
             $data = $this->material_bo->get_data();
-            var_dump($data);
-            exit;
             $manid = $this->material_model->save($data);
             // Verifica se houve falha na execucao do model
             if (is_null($manid)) {
@@ -151,6 +152,69 @@ class Material extends CI_Controller {
 
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/material/edit
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para cadastrar um novo material.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid" : "ID do grupo",
+     *      "macdesc" : "Descricao do material",
+     *      "mactipo" : "Tipo do material",
+     *      "malanex" : "Define se o material eh um anexo",
+     *      "macurl" : "URL do material",
+     *      "macnivl" : "Nivel do material (Somente se mactipo = S - SIMULADO)",
+     *      "macstat" : "Status do material",
+     *      "contents" : [ (array - Somente se mactipo != S - SIMULADO)
+     *          {
+     *              "conid" : "ID do conteudo relacionado"
+     *          },
+     *      ],
+     *      "questions" : [ (array - Somente se mactipo = S - SIMULADO)
+     *          {
+     *              "qenid" : "ID da questao"
+     *          },
+     *      ]
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta",
+     *      "response_data" : {
+     *          "manid" : "ID do material",
+     *      }
+     * }
+     */
+    public function edit() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->material_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->material_bo->validate_edit() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->material_bo->get_errors();
+        } else {
+            $data = $this->material_bo->get_data();
+            $material = $this->material_model->find_by_manid($data['manid']);
+            // verifica se houve falha na execucao do model
+            if (is_null($material)) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Nenhum material encontrado.";
+            } else {
+                $this->material_model->save($data);
+                $response['response_message'] = "Material atualizado com sucesso!";
+                $response['response_data'] = ['manid' => $data['manid']];
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
     }
 
 }

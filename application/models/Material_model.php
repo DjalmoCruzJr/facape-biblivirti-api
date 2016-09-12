@@ -29,7 +29,7 @@ class Material_model extends CI_Model {
      * Metodo para salvar ou atualizar uma Material.
      */
     public function save($data) {
-        if (!isset($data['manid'])) {
+        if (!isset($data['manid'])) { // INSERCAO
             $grnid = $data['grnid'];
             unset($data['grnid']);
             if ($data['mactipo'] !== MACTIPO_SIMULADO) { // O material NAO eh um SIMULADO
@@ -56,8 +56,33 @@ class Material_model extends CI_Model {
                 }
             }
             return null;
-        } else {
-            // Atualização
+        } else { // ATUALIZACAO
+            $grnid = $data['grnid'];
+            unset($data['grnid']);
+            $manid = $data['manid'];
+            unset($data['manid']);
+            if ($data['mactipo'] !== MACTIPO_SIMULADO) { // O material NAO eh um SIMULADO
+                $contens = $data['contents'];
+                unset($data['contents']);
+                $this->conteudomaterial_model->delete_by_manid($manid);
+                $this->db->where(['manid' => $manid]);
+                $this->db->update('material', $data);
+                foreach ($contens as $content) {
+                    $this->conteudomaterial_model->save(['cmnidma' => $manid, 'cmnidco' => $content['conid']]);
+                }
+                return $manid;
+            } else { // O material EH um SIMULADO
+                $questions = $data['questions'];
+                unset($data['questions']);
+                $this->questaosimulado_model->delete_by_manid($manid);
+                $this->db->where(['manid' => $manid]);
+                $this->db->update('material', $data);
+                foreach ($questions as $question) {
+                    $this->questaosimulado_model->save(['qsnidma' => $manid, 'qsnidqe' => $question['qenid']]);
+                }
+                return $manid;
+            }
+            return false;
         }
     }
 
@@ -70,7 +95,18 @@ class Material_model extends CI_Model {
     public function find_by_manid($manid) {
         $this->db->where(['manid' => $manid]);
         $query = $this->db->get('material');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
+        if ($query->num_rows() > 0) {
+            $material = $query->result()[0];
+            if ($material->mactipo === MACTIPO_SIMULADO) {
+                unset($material->macurl); // Remove o campo macurl (URL do material - NAO SIMULADO)
+                $material->questions = $this->questaosimulado_model->find_questions_by_manid($material->manid);
+            } else {
+                unset($material->macnivl); // Remove o campo macnivl (Nivel do material - SIMULADO)
+                $material->constents = $this->conteudomaterial_model->find_contents_by_manid($material->manid);
+            }
+            return $material;
+        }
+        return null;
     }
 
     /**
