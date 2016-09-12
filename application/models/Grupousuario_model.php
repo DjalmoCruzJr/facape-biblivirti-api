@@ -9,6 +9,13 @@
  */
 class Grupousuario_model extends CI_Model {
 
+	/**
+     * Grupousuario_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+
     /**
      * @param $data
      * @return mixed

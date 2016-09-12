@@ -16,7 +16,6 @@ class Questaosimulado_model extends CI_Model {
         parent::__construct();
     }
 
-
     /**
      * @param $data
      * @return mixed

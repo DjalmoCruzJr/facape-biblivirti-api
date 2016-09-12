@@ -9,6 +9,13 @@
  */
 class Historicoacesso_model extends CI_Model {
 
+	/**
+     * Historicoacesso_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+
     /**
      * @param $hanidma
      * @return mixed

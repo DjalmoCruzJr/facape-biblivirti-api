@@ -9,6 +9,13 @@
  */
 class Areainteresse_model extends CI_Model {
 
+	/**
+     * Areainteresse_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+	}
+
     /**
      * @param $ainid
      * @return mixed

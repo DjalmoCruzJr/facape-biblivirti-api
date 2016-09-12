@@ -9,6 +9,13 @@
  */
 class Comentario_model extends CI_Model {
 
+	/**
+     * Comentario_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+	}
+
     /**
      * @param $cenid
      * @return mixed

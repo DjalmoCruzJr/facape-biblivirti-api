@@ -9,6 +9,13 @@
  */
 class Usuario_model extends CI_Model {
 
+	/**
+     * Usuario_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+
     /**
      * @param $data
      * @return mixed

@@ -9,6 +9,13 @@
  */
 class Questao_model extends CI_Model {
 
+	/**
+     * Questao_model constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+
     /**
      * @param $qenid
      * @return mixed
