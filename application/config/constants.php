@@ -177,6 +177,15 @@ define('MACNIVL_AVANCADO', 'A');
 define('MACNIVL_PROFISSIONAL', 'P');
 
 /**---------------------------------------
+ * CONTEUDO FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela MATERIAL
+ *
+ */
+define('COCDESC_MAX_LENGTH', 100);
+
+/**---------------------------------------
  * ASSETS PATHS
  * ---------------------------------------
  *

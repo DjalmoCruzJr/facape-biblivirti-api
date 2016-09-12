@@ -28,16 +28,16 @@ class Grupo_model extends CI_Model {
      */
     public function save($data) {
         // Verifica se o ID do Grupo nao foi informado
-        if (!isset($data['grnid'])) {
+        if (!isset($data['grnid'])) { // INSERCAO
             $usnid = $data['usnid'];
             unset($data['usnid']);
             if ($this->db->insert('grupo', $data) === false) {
                 return null;
             }
             $grnid = $this->db->insert_id();
-            $this->subscribe($grnid, $usnid, true);
+            $this->add_user($grnid, $usnid, true);
             return $grnid;
-        } else {
+        } else { // ATUALIZACAO
             $grnid = $data['grnid'];
             unset($data['grnid']);
             unset($data['usnid']);
@@ -114,9 +114,9 @@ class Grupo_model extends CI_Model {
      * @param $data
      * @return bool
      *
-     * Metodo para associar um usuario a um grupo.
+     * Metodo para adicionar um usuario a um grupo.
      */
-    public function subscribe($grnid, $usnid, $guladm = false, $gucstat = GUCSTAT_ATIVO) {
+    public function add_user($grnid, $usnid, $guladm = false, $gucstat = GUCSTAT_ATIVO) {
         $data = [
             'gunidgr' => $grnid,
             'gunidus' => $usnid,

@@ -14,6 +14,41 @@ class Conteudo_model extends CI_Model {
      */
     public function __construct() {
         parent::__construct();
+
+        // Loading model
+        $this->load->model('grupoconteudo_model');
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     *
+     * Metodo para salvar ou atualizar um conteudo.
+     */
+    public function save($data) {
+        // Verifica se o ID do Conteudo nao foi informado
+        if (!isset($data['conid'])) { // INSERCAO
+            $grnid = $data['grnid'];
+            unset($data['grnid']);
+            if ($this->db->insert('conteudo', $data) === true) {
+                $conid = $this->db->insert_id();
+                $this->grupoconteudo_model->save(['gcnidgr' => $grnid, 'gcnidco' => $conid]);
+                return $conid;
+            }
+            return null;
+        } else { // ATUALIZACAO
+            $grnid = $data['grnid'];
+            unset($data['grnid']);
+            $conid = $data['conid'];
+            unset($data['conid']);
+            $this->db->where(['conid' => $conid]);
+            if ($this->db->update('conteudo', $data) === true) {
+                $this->grupoconteudo_model->delete_by_grnid($grnid);
+                $this->grupoconteudo_model->save(['gcnidgr' => $grnid, 'gcnidco' => $conid]);
+                return true;
+            }
+            return false;
+        }
     }
 
     /**
@@ -42,6 +77,16 @@ class Conteudo_model extends CI_Model {
         $this->db->where(['grnid' => $grnid]);
         $this->db->order_by('conid ASC', 'cocdesc ASC');
         $query = $this->db->get();
+        return ($query->num_rows() > 0) ? $query->result() : null;
+    }
+
+    public function find_by_cocdesc($cocdesc, $equals = false) {
+        if ($equals === true) {
+            $this->db->where(['cocdesc' => $cocdesc]);
+        } else {
+            $this->db->like(['cocdesc' => $cocdesc]);
+        }
+        $query = $this->db->get('conteudo');
         return ($query->num_rows() > 0) ? $query->result() : null;
     }
 

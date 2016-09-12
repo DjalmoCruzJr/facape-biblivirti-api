@@ -167,8 +167,11 @@ class Group extends CI_Controller {
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
-     *      "request_code" : "Codigo da requsicao",
-     *      "request_message" : "Mensagem da requsicao",
+     *      "response_code" : "Codigo da requsicao",
+     *      "response_message" : "Mensagem da requsicao",
+     *      "response_data" : {
+     *          "grnid" : "ID do grupo"
+     *      }
      * }
      */
     public function edit() {

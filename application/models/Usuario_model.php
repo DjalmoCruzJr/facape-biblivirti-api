@@ -21,6 +21,7 @@ class Usuario_model extends CI_Model {
         } else {
             $usnid = $data['usnid'];
             unset($data['usnid']);
+            $this->db->where(['usnid' => $usnid]);
             return $this->db->update('usuario', $data);
         }
     }
