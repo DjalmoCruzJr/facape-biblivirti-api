@@ -248,5 +248,21 @@ class Account_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>email_confirmation</i> do controller <i>Account</i>.
+     */
+    public function validate_email_confirmation() {
+        $status = TRUE;
+
+        // Validando o campo CACTOKN (token)
+        if (!isset($this->data['cactokn']) || empty(trim($this->data['cactokn']))) {
+            $this->errors['cactokn'] = 'O TOKEN DE CONFIRMAÇÃO é obrigatório!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
 
 }

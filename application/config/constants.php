@@ -144,6 +144,16 @@ define('GUCSTAT_ATIVO', 'A');
 define('GUCSTAT_INATIVO', 'I');
 
 /**---------------------------------------
+ * CONFIRMAREMAIL FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela RECUPERARSENHA
+ *
+ */
+define('CACSTAT_ATIVO', 'A');
+define('CACSTAT_INATIVO', 'I');
+
+/**---------------------------------------
  * RECUPERARSENHA FIELDS RULES
  * ---------------------------------------
  *

@@ -64,6 +64,7 @@ $route['API/account/login']['post'] = 'api/account/login';
 $route['API/account/login/facebook']['post'] = 'api/account/login_facebook';
 $route['API/account/register']['post'] = 'api/account/register';
 $route['API/account/recover']['post'] = 'api/account/recover';
+$route['API/account/email/confirmation']['get'] = 'api/account/email_confirmation';
 $route['API/account/password/reset']['get'] = 'api/account/password_reset';
 
 /**

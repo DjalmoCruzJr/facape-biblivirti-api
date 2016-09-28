@@ -28,6 +28,7 @@ class Account extends CI_Controller {
         // Loading models
         $this->load->model("usuario_model");
         $this->load->model("recuperarsenha_model");
+        $this->load->model("confirmaremail_model");
 
         // Loading libraries
         $this->load->library('encryption/biblivirti_hash');
@@ -80,6 +81,10 @@ class Account extends CI_Controller {
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum usuário encontrado.";
+            } else if ($user->uscstat === USCSTAT_INATIVO) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
+                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-mail para ativar sua conta.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
                 $this->response['response_code'] = RESPONSE_CODE_OK;
@@ -136,6 +141,10 @@ class Account extends CI_Controller {
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum usuário encontrado.";
+            } else if ($user->uscstat === USCSTAT_INATIVO) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
+                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-mail para ativar sua conta.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
                 $this->response['response_code'] = RESPONSE_CODE_OK;
@@ -191,9 +200,26 @@ class Account extends CI_Controller {
                 $response['response_message'] = "Houve um erro ao tentar cadastrar o ususario! Tente novamente.\n";
                 $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
             } else {
-                $response['response_code'] = RESPONSE_CODE_OK;
-                $response['response_message'] = "Usuário cadastrado com  sucesso!";
-                $response['response_data'] = ['usnid' => $id];
+                // Desabilita todos os tokens de confirmacao anteriores para o usuario em questao
+                $this->recuperarsenha_model->disable_all_tokens_by_rsnidus($id);
+
+                $token['canidus'] = $id;
+                $token['cactokn'] = $this->biblivirti_hash->token($data['uscmail']);
+                $token['canid'] = $this->confirmaremail_model->save($token);
+
+                // Verifica se o token de redefinicao foi gravado corretamente
+                if ($token['canid'] === 0) {
+                    $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $response['response_message'] = "Houve um erro ao tentar gerar token de confirmação de e-mail! Tente novamente.\n";
+                    $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                } else {
+                    // FALTA: Enviar o email com o link de redefinicao de senha
+
+                    // FALTA: Confirmar o envio do email com o link de redefinicao de senha
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Usuário cadastrado com  sucesso!";
+                    $response['response_data'] = ['usnid' => $id];
+                }
             }
         }
 
@@ -250,9 +276,10 @@ class Account extends CI_Controller {
 
                 $token['rsnidus'] = $user->usnid;
                 $token['rsctokn'] = $this->biblivirti_hash->token($user->uscmail); // Gera token de redefinicao de senha
-                $id = $this->recuperarsenha_model->save($token);
-                // Verifica se houve falha na execucao do model
-                if ($id === 0) {
+                $token['rsnid'] = $this->recuperarsenha_model->save($token);
+
+                // Verifica se o token de redefinicacao foi gravado com sucesso
+                if ($token['rsnid'] === 0) {
                     $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                     $response['response_message'] = "Houve um erro ao tentar recuperar senha de acesso! Tente novamente.\n";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
@@ -265,6 +292,75 @@ class Account extends CI_Controller {
                     $response['response_code'] = RESPONSE_CODE_OK;
                     $response['response_message'] = "E-mail confirmado com sucesso!\n";
                     $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-mail!";
+                    $response['response_data'] = $user;
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/account/email/confirmation?cactokn=$1
+     * @param string cactokn
+     * @return JSON
+     *
+     * Metodo para confirmar o e-mail de acesso um usuario.
+     * Recebe o(s) parametro(s) <i>cactokn</i> atraves de <i>GET</i>
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : {
+     *          "usnid" : "ID do usuario",
+     *          "uscnome" : "Nome do usuario",
+     *          "uscmail" : "E-mail do usuario",
+     *          "usclogn" : "Login do usuario",
+     *          "uscfoto" : "Caminho da foto do usuario",
+     *          "uscstat" : "Status do usuario",
+     *          "tsdcadt" : "Data de cadastro do usuario",
+     *          "usdaldt" : "Data de atualizacao do usuario"
+     *      }
+     * }
+     */
+    public function email_confirmation() {
+        $data['cactokn'] = $this->input->get('cactokn');
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_email_confirmation() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            $token = $this->confirmaremail_model->find_by_cactokn($data['cactokn']);
+            if (is_null($token)) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Token de confirmação inválido!";
+            } else {
+                $user = $this->usuario_model->find_by_usnid($token->canidus);
+                $user->uscstat = USCSTAT_ATIVO; // Muda o status do usuario para ATIVO
+                $user2['usnid'] = $user->usnid;
+                $user2['uscstat'] = $user->uscstat;
+
+                // Verifica o usuario foi atualizado com sucesso
+                if ($this->usuario_model->save($user2) === false) {
+                    $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $response['response_message'] = "Houve um erro ao tentar confirmar e-mail do usuário! Tente novamente.\n";
+                    $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                } else {
+                    $token->cacstat = CACSTAT_INATIVO; // Muda o status do token para INATIVO
+                    $token2['canid'] = $token->canid;
+                    $token2['cacstat'] = $token->cacstat;
+                    $this->confirmaremail_model->save($token2);
+
+                    unset($user->uscsenh); // Remove a senha do obejeto de resposta
+
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "E-mail confirmado com cucesso!";
                     $response['response_data'] = $user;
                 }
             }
