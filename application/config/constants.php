@@ -122,6 +122,14 @@ define('USCSTAT_ATIVO', 'A');
 define('USCSTAT_INATIVO', 'I');
 
 /**---------------------------------------
+ * AREAINTERESSE FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela AREAINTERESSE
+ *
+ */
+define('AICDESC_MAX_LENGHT', 50);
+/**---------------------------------------
  * GRUPO FIELDS RULES
  * ---------------------------------------
  *
