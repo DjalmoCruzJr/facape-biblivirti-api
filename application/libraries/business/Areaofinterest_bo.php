@@ -87,7 +87,36 @@ class Areaofinterest_bo {
             $this->errors['aicdesc'] = 'A DESCRIÇÃO da área de interesse deve conter no máximo ' . AICDESC_MAX_LENGHT . ' caracter(es)!';
             $status = FALSE;
         }
-        
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>add</i> do controller <i>AreaOfInterest</i>.
+     */
+    public function validate_add() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo AICDESC (Descricao)
+        if (!isset($this->data['aicdesc']) || empty(trim($this->data['aicdesc']))) {
+            $this->errors['aicdesc'] = 'A DESCRIÇÃO é obrigatório!';
+            $status = FALSE;
+        } else if (strlen($this->data['aicdesc']) > AICDESC_MAX_LENGHT) {
+            $this->errors['aicdesc'] = 'A DESCRIÇÃO deve conter no máximo ' . AICDESC_MAX_LENGHT . ' caracter(es)!';
+            $status = FALSE;
+        } else if (!is_null($this->CI->areainteresse_model->find_by_aicdesc($this->data['aicdesc'], true))) {
+            $this->errors['aicdesc'] = 'Já existe uma área de interesse cadastrada com essa descrição!';
+            $status = FALSE;
+        }
+
         return $status;
     }
 

@@ -23,9 +23,10 @@ class Usuario_model extends CI_Model {
      * Metodo para salvar um ou atualizar um  usuario.
      */
     public function save($data) {
-        if (!isset($data['usnid'])) {
+        // Verifica se o ID do usuario foi inbformado
+        if (!isset($data['usnid'])) { // INSERCAO
             return $this->db->insert('usuario', $data) ? $this->db->insert_id() : null;
-        } else {
+        } else { // ATUALIZACAO
             $usnid = $data['usnid'];
             unset($data['usnid']);
             $this->db->where(['usnid' => $usnid]);

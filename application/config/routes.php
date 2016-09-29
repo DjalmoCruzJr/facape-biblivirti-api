@@ -71,7 +71,7 @@ $route['API/account/password/reset']['get'] = 'api/account/password_reset';
  * API AREA OF INTEREST ROUTES
  */
 $route['API/areaofinterest/list']['post'] = 'api/areaofinterest/list_all';
-
+$route['API/areaofinterest/add']['post'] = 'api/areaofinterest/add';
 /**
  * API GROUP ROUTES
  */

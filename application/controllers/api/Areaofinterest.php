@@ -85,4 +85,52 @@ class Areaofinterest extends CI_Controller {
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: api/areaofinterest/add
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para salva uma nova area de interesse.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "aicdeesc": "Descricao da area de interesse"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "request_code" : "Codigo da requsicao",
+     *      "request_message" : "Mensagem da requsicao",
+     *      "request_data" : {
+     *          "ainid" : "ID da area de interesse"
+     *      }
+     * }
+     */
+    public function add() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->areaofinterest_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->areaofinterest_bo->validate_add() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->areaofinterest_bo->get_errors();
+        } else {
+            $data = $this->areaofinterest_bo->get_data();
+            $id = $this->areainteresse_model->save($data);
+            // verifica se houve falha na execucao do model
+            if ($id === 0) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Houve um erro ao tentar salvar as informações da área de interesse! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            } else {
+                $response['response_code'] = RESPONSE_CODE_OK;
+                $response['response_message'] = "Área de interesse cadastrada com sucesso!";
+                $response['response_data'] = ['ainid' => $id];
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
 }
