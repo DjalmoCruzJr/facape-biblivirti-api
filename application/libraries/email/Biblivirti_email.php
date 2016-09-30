@@ -47,12 +47,16 @@ class Biblivirti_email {
         return $this->errors;
     }
 
-    public function set_data($from = null, $to = null, $subject = null, $message = null) {
+    public function get_message() {
+        return $this->data['message'];
+    }
+
+    public function set_data($from = null, $to = null, $subject = null, $message = null, $datas = []) {
         $this->data['from'] = $from;
         $this->data['to'] = $to;
-        $this->data['reply_to'] = EMAIL_SMTP_USER;
+        $this->data['bcc'] = EMAIL_SMTP_USER;
         $this->data['subject'] = $subject;
-        $this->data['message'] = $message;
+        $this->data['message'] = is_null($message) ? $message : $this->_replace_keys($message, $datas);
     }
 
     /**
@@ -67,7 +71,6 @@ class Biblivirti_email {
         // Setando as configuracoes de email no objeto
         $this->CI->email->initialize($this->configs);
 
-
         if ($this->_validate_data() === false) {
             return false;
         }
@@ -75,7 +78,7 @@ class Biblivirti_email {
         // Setando os dados do email
         $this->CI->email->from($this->data['from']);
         $this->CI->email->to($this->data['to']);
-        $this->CI->email->reply_to($this->data['reply_to']);
+        $this->CI->email->bcc($this->data['bcc']);
         $this->CI->email->subject($this->data['subject']);
         $this->CI->email->message($this->data['message']);
 
@@ -93,14 +96,29 @@ class Biblivirti_email {
      * PRIVATE METHODS
      * -----------------------------------------------------------------------------*/
     private function _load_configs() {
+        $this->configs['useragent'] = EMAIL_USERAGENT;
+        $this->configs['mailtype'] = EMAIL_MAILTYPE;
         $this->configs['protocol'] = EMAIL_PROTOCOL;
         $this->configs['smtp_host'] = EMAIL_SMTP_HOST;
         $this->configs['smtp_port'] = EMAIL_SMTP_PORT;
+        $this->configs['smtp_timeout'] = EMAIL_TIMEOUT;
         $this->configs['smtp_user'] = EMAIL_SMTP_USER;
-        $this->configs['smtp_pass'] = EMAIL_SMTP_PASS;
-        $this->configs['mailtype'] = EMAIL_TYPE;
-        $this->configs['charset'] = EMAIL_CHARTSET;
+        $this->configs['smtp_pass'] = base64_decode(EMAIL_SMTP_PASS);
+        $this->configs['validate'] = EMAIL_VALIDATE;
         $this->configs['wordwrap'] = EMAIL_WORDWRAP;
+        $this->configs['charset'] = EMAIL_CHARTSET;
+        $this->configs['newline'] = EMAIL_NEWLINE;
+    }
+
+    private function _replace_keys($message = null, $datas = null) {
+        if(is_null($message) || is_null($datas)) {
+            return null;
+        }
+        $keys = array_keys($datas);
+        foreach ($keys as $key) {
+            $message = str_replace($key, $datas[$key], $message);
+        }
+        return $message;
     }
 
     private function _validate_data() {
@@ -124,12 +142,12 @@ class Biblivirti_email {
             $status = false;
         }
 
-        // Validando o parametro REPLAY_TO (email de copia)
-        if (!isset($this->data['reply_to']) || empty(trim($this->data['reply_to']))) {
-            $this->errors['reply_to'] = 'O parâmetro REPLAY_TO é obrigatório.';
+        // Validando o parametro BCC (email de copia em background)
+        if (!isset($this->data['bcc']) || empty(trim($this->data['bcc']))) {
+            $this->errors['bcc'] = 'O parâmetro BCC é obrigatório.';
             $status = false;
-        } else if (!filter_var($this->data['reply_to'], FILTER_VALIDATE_EMAIL)) {
-            $this->errors['reply_to'] = 'Informe um e-mail válido.';
+        } else if (!filter_var($this->data['bcc'], FILTER_VALIDATE_EMAIL)) {
+            $this->errors['bcc'] = 'Informe um e-mail válido.';
             $status = false;
         }
 
