@@ -44,7 +44,7 @@ class Account extends CI_Controller {
      * Metodo para autenticar um usuario.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "uscmail" : "E-mail do usuario",
+     *      "uscmail" : "E-email do usuario",
      *      "uscsenh" : "Senha do usuario"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
@@ -55,7 +55,7 @@ class Account extends CI_Controller {
      *          "usnid" : "ID do usuario",
      *          "uscfbid" : "FacebookID do usuario",
      *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-mail do usuario",
+     *          "uscmail" : "E-email do usuario",
      *          "usclogn" : "Login do usuario",
      *          "uscfoto" : "Caminho da foto do usuario",
      *          "uscstat" : "Status do usuario",
@@ -84,7 +84,7 @@ class Account extends CI_Controller {
             } else if ($user->uscstat === USCSTAT_INATIVO) {
                 $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
-                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-mail para ativar sua conta.";
+                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
                 $this->response['response_code'] = RESPONSE_CODE_OK;
@@ -115,7 +115,7 @@ class Account extends CI_Controller {
      *          "usnid" : "ID do usuario",
      *          "uscfbid" : "FacebookID do usuario",
      *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-mail do usuario",
+     *          "uscmail" : "E-email do usuario",
      *          "usclogn" : "Login do usuario",
      *          "uscfoto" : "Caminho da foto do usuario",
      *          "uscstat" : "Status do usuario",
@@ -144,7 +144,7 @@ class Account extends CI_Controller {
             } else if ($user->uscstat === USCSTAT_INATIVO) {
                 $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
-                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-mail para ativar sua conta.";
+                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
                 $this->response['response_code'] = RESPONSE_CODE_OK;
@@ -165,7 +165,7 @@ class Account extends CI_Controller {
      * Metodo para cadastrar um novo usuario.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "uscmail": "E-mail do usuario",
+     *      "uscmail": "E-email do usuario",
      *      "usclogn": "Login do usuario",
      *      "uscsenh": "Senha do usuario",
      *      "uscsenh2": "Confirmacao de senha"
@@ -210,7 +210,7 @@ class Account extends CI_Controller {
                 // Verifica se o token de redefinicao foi gravado corretamente
                 if ($token['canid'] === 0) {
                     $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $response['response_message'] = "Houve um erro ao tentar gerar token de confirmação de e-mail! Tente novamente.\n";
+                    $response['response_message'] = "Houve um erro ao tentar gerar token de confirmação de e-email! Tente novamente.\n";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     // FALTA: Enviar o email com o link de redefinicao de senha
@@ -235,7 +235,7 @@ class Account extends CI_Controller {
      * Metodo para recuperar o acesso um usuario.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "uscmail": "E-mail do usuario"
+     *      "uscmail": "E-email do usuario"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
@@ -244,7 +244,7 @@ class Account extends CI_Controller {
      *      "response_data" : {
      *          "usnid" : "ID do usuario",
      *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-mail do usuario",
+     *          "uscmail" : "E-email do usuario",
      *          "usclogn" : "Login do usuario",
      *          "uscfoto" : "Caminho da foto do usuario",
      *          "uscstat" : "Status do usuario",
@@ -269,7 +269,7 @@ class Account extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "E-mail não encontrado.";
+                $response['response_message'] = "E-email não encontrado.";
             } else {
                 // Desabilita todos os tokens de redefinicao anteriores para o usuario em questao
                 $this->recuperarsenha_model->disable_all_tokens_by_rsnidus($user->usnid);
@@ -290,8 +290,8 @@ class Account extends CI_Controller {
 
                     unset($user->uscsenh); // Remove a senha do objeto de retorno
                     $response['response_code'] = RESPONSE_CODE_OK;
-                    $response['response_message'] = "E-mail confirmado com sucesso!\n";
-                    $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-mail!";
+                    $response['response_message'] = "E-email confirmado com sucesso!\n";
+                    $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-email!";
                     $response['response_data'] = $user;
                 }
             }
@@ -306,7 +306,7 @@ class Account extends CI_Controller {
      * @param string cactokn
      * @return JSON
      *
-     * Metodo para confirmar o e-mail de acesso um usuario.
+     * Metodo para confirmar o e-email de acesso um usuario.
      * Recebe o(s) parametro(s) <i>cactokn</i> atraves de <i>GET</i>
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
@@ -315,7 +315,7 @@ class Account extends CI_Controller {
      *      "response_data" : {
      *          "usnid" : "ID do usuario",
      *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-mail do usuario",
+     *          "uscmail" : "E-email do usuario",
      *          "usclogn" : "Login do usuario",
      *          "uscfoto" : "Caminho da foto do usuario",
      *          "uscstat" : "Status do usuario",
@@ -349,7 +349,7 @@ class Account extends CI_Controller {
                 // Verifica o usuario foi atualizado com sucesso
                 if ($this->usuario_model->save($user2) === false) {
                     $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $response['response_message'] = "Houve um erro ao tentar confirmar e-mail do usuário! Tente novamente.\n";
+                    $response['response_message'] = "Houve um erro ao tentar confirmar e-email do usuário! Tente novamente.\n";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     $token->cacstat = CACSTAT_INATIVO; // Muda o status do token para INATIVO
@@ -360,7 +360,7 @@ class Account extends CI_Controller {
                     unset($user->uscsenh); // Remove a senha do obejeto de resposta
 
                     $response['response_code'] = RESPONSE_CODE_OK;
-                    $response['response_message'] = "E-mail confirmado com cucesso!";
+                    $response['response_message'] = "E-email confirmado com cucesso!";
                     $response['response_data'] = $user;
                 }
             }
@@ -385,7 +385,7 @@ class Account extends CI_Controller {
      *          "user"  : {
      *              "usnid" : "ID do usuario",
      *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E-mail do usuario",
+     *              "uscmail" : "E-email do usuario",
      *              "usclogn" : "Login do usuario",
      *              "uscfoto" : "Caminho da foto do usuario",
      *              "uscstat" : "Status do usuario",

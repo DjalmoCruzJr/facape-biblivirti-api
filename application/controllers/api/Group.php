@@ -62,7 +62,7 @@ class Group extends CI_Controller {
      *                  "usnid" : "ID do usuario",
      *                  "uscfbid" : "FacebookID do usuario",
      *                  "uscnome" : "Nome do usuario",
-     *                  "uscmail" : "E-mail do usuario",
+     *                  "uscmail" : "E-email do usuario",
      *                  "usclogn" : "Login do usuario",
      *                  "uscfoto" : "Caminho da foto do usuario",
      *                  "uscstat" : "Status do usuario",

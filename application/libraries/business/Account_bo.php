@@ -160,7 +160,7 @@ class Account_bo {
             $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         } else if (!is_null($this->CI->usuario_model->find_by_uscmail($this->data['uscmail']))) {
-            $this->errors['uscmail'] = 'Já existe um usuário cadastrado com esse endereço de e-mail!';
+            $this->errors['uscmail'] = 'Já existe um usuário cadastrado com esse endereço de e-email!';
             $status = FALSE;
         }
 
