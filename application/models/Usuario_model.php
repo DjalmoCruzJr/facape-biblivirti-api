@@ -9,7 +9,7 @@
  */
 class Usuario_model extends CI_Model {
 
-	/**
+    /**
      * Usuario_model constructor.
      */
     public function __construct() {
@@ -95,4 +95,14 @@ class Usuario_model extends CI_Model {
         return ($query->num_rows() > 0) ? $query->result()[0] : null;
     }
 
+    /**
+     * @param $usnid
+     * @return bool
+     *
+     * Metodo para excluir um usuario.
+     */
+    public function delete($usnid) {
+        $this->db->where('usnid', $usnid);
+        return $this->db->delete('usuario');
+    }
 }

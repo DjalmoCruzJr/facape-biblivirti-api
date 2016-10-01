@@ -34,6 +34,7 @@ class Account extends CI_Controller {
         $this->load->library('encryption/biblivirti_hash');
         $this->load->library('business/account_bo');
         $this->load->library('input/biblivirti_input');
+        $this->load->library('email/biblivirti_email');
     }
 
     /**
@@ -213,15 +214,37 @@ class Account extends CI_Controller {
                     $response['response_message'] = "Houve um erro ao tentar gerar token de confirmação de e-email! Tente novamente.\n";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-                    // FALTA: Enviar o email com o link de redefinicao de senha
+                    // Seta os dados para o envio do email de ativação de conta
+                    $from = EMAIL_SMTP_USER;
+                    $to = $data['uscmail'];
+                    $subject = EMAIL_SUBJECT__NEW_REGISTER;
+                    $message = EMAIL_MESSAGE_NEW_REGISTER;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => $data['usclogn'],
+                        EMAIL_KEY_CACTOKN => $token['cactokn'],
+                        EMAIL_KEY_CONFIRMATION_LINK => base_url('API/account/email/confirmation') . '?cactokn=' . $token['cactokn'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
 
-                    // FALTA: Confirmar o envio do email com o link de redefinicao de senha
-                    $response['response_code'] = RESPONSE_CODE_OK;
-                    $response['response_message'] = "Usuário cadastrado com  sucesso!";
-                    $response['response_data'] = ['usnid' => $id];
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->usuario_model->delete($id); // Remove o usuario ja que o email de ativacao nao foi ativado.
+                        $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $response['response_message'] = "Houve um erro ao tentar enviar e-mail de ativação de conta! Tente novamente.\n";
+                        $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                        $response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $response['response_code'] = RESPONSE_CODE_OK;
+                        $response['response_message'] = "Usuário cadastrado com  sucesso!";
+                        $response['response_data'] = ['usnid' => $id];
+                    }
                 }
             }
         }
+
 
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($response, JSON_PRETTY_PRINT);
@@ -235,7 +258,7 @@ class Account extends CI_Controller {
      * Metodo para recuperar o acesso um usuario.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "uscmail": "E-email do usuario"
+     *      "uscmail": "E - email do usuario"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
@@ -244,7 +267,7 @@ class Account extends CI_Controller {
      *      "response_data" : {
      *          "usnid" : "ID do usuario",
      *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-email do usuario",
+     *          "uscmail" : "E - email do usuario",
      *          "usclogn" : "Login do usuario",
      *          "uscfoto" : "Caminho da foto do usuario",
      *          "uscstat" : "Status do usuario",
@@ -261,7 +284,7 @@ class Account extends CI_Controller {
         // Verifica se os dados nao foram validados
         if ($this->account_bo->validate_recover() === FALSE) {
             $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
@@ -269,7 +292,7 @@ class Account extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "E-email não encontrado.";
+                $response['response_message'] = "E - email não encontrado . ";
             } else {
                 // Desabilita todos os tokens de redefinicao anteriores para o usuario em questao
                 $this->recuperarsenha_model->disable_all_tokens_by_rsnidus($user->usnid);
@@ -281,7 +304,7 @@ class Account extends CI_Controller {
                 // Verifica se o token de redefinicacao foi gravado com sucesso
                 if ($token['rsnid'] === 0) {
                     $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $response['response_message'] = "Houve um erro ao tentar recuperar senha de acesso! Tente novamente.\n";
+                    $response['response_message'] = "Houve um erro ao tentar recuperar senha de acesso!Tente novamente . \n";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     // FALTA: Enviar o email com o link de redefinicao de senha
@@ -290,8 +313,8 @@ class Account extends CI_Controller {
 
                     unset($user->uscsenh); // Remove a senha do objeto de retorno
                     $response['response_code'] = RESPONSE_CODE_OK;
-                    $response['response_message'] = "E-email confirmado com sucesso!\n";
-                    $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-email!";
+                    $response['response_message'] = "E - email confirmado com sucesso!\n";
+                    $response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e - email!";
                     $response['response_data'] = $user;
                 }
             }
@@ -315,7 +338,7 @@ class Account extends CI_Controller {
      *      "response_data" : {
      *          "usnid" : "ID do usuario",
      *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-email do usuario",
+     *          "uscmail" : "E - email do usuario",
      *          "usclogn" : "Login do usuario",
      *          "uscfoto" : "Caminho da foto do usuario",
      *          "uscstat" : "Status do usuario",
@@ -332,7 +355,7 @@ class Account extends CI_Controller {
         // Verifica se os dados nao foram validados
         if ($this->account_bo->validate_email_confirmation() === FALSE) {
             $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
@@ -349,7 +372,7 @@ class Account extends CI_Controller {
                 // Verifica o usuario foi atualizado com sucesso
                 if ($this->usuario_model->save($user2) === false) {
                     $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $response['response_message'] = "Houve um erro ao tentar confirmar e-email do usuário! Tente novamente.\n";
+                    $response['response_message'] = "Houve um erro ao tentar confirmar e - email do usuário!Tente novamente . \n";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     $token->cacstat = CACSTAT_INATIVO; // Muda o status do token para INATIVO
@@ -360,7 +383,7 @@ class Account extends CI_Controller {
                     unset($user->uscsenh); // Remove a senha do obejeto de resposta
 
                     $response['response_code'] = RESPONSE_CODE_OK;
-                    $response['response_message'] = "E-email confirmado com cucesso!";
+                    $response['response_message'] = "E - email confirmado com cucesso!";
                     $response['response_data'] = $user;
                 }
             }
@@ -385,7 +408,7 @@ class Account extends CI_Controller {
      *          "user"  : {
      *              "usnid" : "ID do usuario",
      *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E-email do usuario",
+     *              "uscmail" : "E - email do usuario",
      *              "usclogn" : "Login do usuario",
      *              "uscfoto" : "Caminho da foto do usuario",
      *              "uscstat" : "Status do usuario",
@@ -405,7 +428,7 @@ class Account extends CI_Controller {
         // Verifica se os dados nao foram validados
         if ($this->account_bo->validate_password_reset() === FALSE) {
             $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
             $response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();

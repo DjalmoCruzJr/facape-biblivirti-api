@@ -86,7 +86,7 @@ class Biblivirti_email {
         if ($this->CI->email->send()) {
             return true;
         } else {
-            $this->errors['errors'] = $this->CI->email->print_debugger();
+            $this->errors['seding_errors'] = $this->CI->email->print_debugger();
             return false;
         }
 
