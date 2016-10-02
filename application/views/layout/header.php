@@ -11,7 +11,7 @@
     <meta name="keywords" content="Biblivirti, AVAM, Sysmob, djalmocruzjr">
     <meta name="author" content="Djalmocruzjr (djalmo.cruz@gmail.com)">
     <!-- Favicon -->
-    <link rel="shortcut icon" href="<?php echo base_url(ASSETS_IMAGES_PATH . 'favicon_green.ico'); ?>"/>
+    <link rel="shortcut icon" href="<?php echo base_url(ASSETS_IMAGES_PATH . 'biblivirti.ico'); ?>"/>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<?php echo base_url(ASSETS_CSS_PATH . 'bootstrap.min.css'); ?>">
     <!-- JQuery Javascript -->
