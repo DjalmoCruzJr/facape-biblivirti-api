@@ -250,7 +250,7 @@ define('EMAIL_MAILTYPE', 'html');
 define('EMAIL_PROTOCOL', 'smtp');
 define('EMAIL_SMTP_HOST', 'ssl://smtp.googlemail.com');
 define('EMAIL_SMTP_PORT', 465);
-define('EMAIL_TIMEOUT', 10);
+define('EMAIL_TIMEOUT', 60);
 define('EMAIL_SMTP_USER', 'suporte.biblivirti@gmail.com');
 define('EMAIL_SMTP_USER_ALIAS', 'Suporte Biblivirti AVAM');
 define('EMAIL_SMTP_PASS', 'c3lzbW9iQGJpYmxpdmlydGkm'); // base64 encoded
@@ -260,20 +260,25 @@ define('EMAIL_CHARTSET', 'utf-8');
 define('EMAIL_NEWLINE', "\r\n");
 
 define('EMAIL_SUBJECT_EMAIL_CONFIRMATION', 'Confirmação de E-mail');
-define('EMAIL_SUBJECT__NEW_REGISTER', 'Nova Conta');
-define('EMAIL_SUBJECT__NOTIFICATION', 'Notificação');
-define('EMAIL_SUBJECT__PASSWORD_RESET', 'Recuperação de Senha');
-define('EMAIL_SUBJECT__PASSWORD_RESETED', 'Alteração de Senha');
+define('EMAIL_SUBJECT_NEW_REGISTER', 'Nova Conta');
+define('EMAIL_SUBJECT_NEW_GROUP', 'Novo Grupo');
+define('EMAIL_SUBJECT_EDIT_GROUP', 'Edição de Grupo');
+define('EMAIL_SUBJECT_DELETE_GROUP', 'Exclusão de Grupo');
+define('EMAIL_SUBJECT_PASSWORD_RECOVERY', 'Recuperação de Senha');
+define('EMAIL_SUBJECT_PASSWORD_CHANGED', 'Alteração de Senha');
 
-define('EMAIL_MESSAGE_EMAIL_CONFIRMATION', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p>Sua conta ainda não foi ativada.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativaçao: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
-define('EMAIL_MESSAGE_NEW_REGISTER', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua conta foi criada com sucesso.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativação: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
-define('EMAIL_MESSAGE_NOTIFICATION', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>{notification_message}</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
-define('EMAIL_MESSAGE_PASSWORD_RESET', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Para recuperar sua senha de acesso basta clicar no link abaixo.</p><p>Link de recuperação: <a href="{recovery_link}" target="blank">{recovery_link}</a></p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
-define('EMAIL_MESSAGE_PASSWORD_RESETED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua senha foi alterada com sucesso.</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_EMAIL_CONFIRMATION', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p>Sua conta ainda não foi ativada.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativaçao: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
+define('EMAIL_MESSAGE_NEW_REGISTER', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua conta foi criada com sucesso.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativação: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_NEW_GROUP', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Seu grupo <strong>{grcnome}</strong> foi criado com sucesso!</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_EDIT_GROUP', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>As informações do grupo <strong>{grcnome}</strong> foram alteradas com sucesso!</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_DELETE_GROUP', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>As informações do grupo <strong>{grcnome}</strong> foram excluidas com sucesso!</p><p>Caso não tenha sido você que realizou esta exclusão,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_PASSWORD_RECOVERY', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Para recuperar sua senha de acesso basta clicar no link abaixo.</p><p>Link de recuperação: <a href="{recovery_link}" target="blank">{recovery_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_PASSWORD_CHANGED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua senha foi alterada com sucesso.</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 
 define('EMAIL_KEY_EMAIL_SMTP_USER_ALIAS', '{email_smtp_user_alias}');
 define('EMAIL_KEY_EMAIL_SMTP_USER', '{email_smtp_user}');
 define('EMAIL_KEY_USCNOME', '{uscnome}');
+define('EMAIL_KEY_GRCNOME', '{grcnome}');
 define('EMAIL_KEY_CACTOKN', '{cactokn}');
 define('EMAIL_KEY_NOTIFICATION_MESSAGE', '{notification_message}');
 define('EMAIL_KEY_RECOVERY_LINK', '{recovery_link}');
