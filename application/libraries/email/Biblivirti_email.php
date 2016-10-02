@@ -82,6 +82,10 @@ class Biblivirti_email {
         $this->CI->email->subject($this->data['subject']);
         $this->CI->email->message($this->data['message']);
 
+        echo "<pre>";
+        var_dump($this->data);
+        exit;
+
         // Verificando se houve falha no envio do email
         if ($this->CI->email->send()) {
             return true;

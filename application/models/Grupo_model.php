@@ -8,8 +8,8 @@
  * Model da tabela <b>GRUPO</b>
  */
 class Grupo_model extends CI_Model {
-    
-	/**
+
+    /**
      * Grupo_model constructor.
      */
     public function __construct() {
@@ -82,7 +82,14 @@ class Grupo_model extends CI_Model {
     public function find_by_grnid($grnid) {
         $this->db->where(['grnid' => $grnid]);
         $query = $this->db->get('grupo');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
+        if ($query->num_rows() > 0) {
+            $group = $query->result()[0];
+            $group->area_of_interest = $this->areainteresse_model->find_by_ainid($group->grnidai);
+            $group->admin = $this->find_admin($group->grnid);
+            unset($group->grnidai);
+            return $group;
+        }
+        return null;
     }
 
     /**
@@ -98,6 +105,16 @@ class Grupo_model extends CI_Model {
         $this->db->where(['gunidgr' => $grnid, 'guladm' => true]);
         $query = $this->db->get();
         return ($query->num_rows() > 0) ? $query->result()[0] : null;
+    }
+
+    public function find_users($grnid) {
+        $this->db->select('usnid, uscfbid, uscnome, uscmail, usclogn, uscfoto, uscstat, usdcadt');
+        $this->db->from('usuario');
+        $this->db->join('grupousuario', 'gunidus = usnid', 'inner');
+        $this->db->join('grupo', 'gunidgr = grnid', 'inner');
+        $this->db->where(['grnid' => $grnid]);
+        $query = $this->db->get();
+        return ($query->num_rows() > 0) ? $query->result() : null;
     }
 
     /**

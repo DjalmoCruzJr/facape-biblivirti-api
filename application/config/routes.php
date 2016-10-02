@@ -63,7 +63,7 @@ $route['translate_uri_dashes'] = FALSE;
 $route['API/account/login']['post'] = 'api/account/login';
 $route['API/account/login/facebook']['post'] = 'api/account/login_facebook';
 $route['API/account/register']['post'] = 'api/account/register';
-$route['API/account/recover']['post'] = 'api/account/recover';
+$route['API/account/recovery']['post'] = 'api/account/recovery';
 $route['API/account/email/confirmation']['get'] = 'api/account/email_confirmation';
 $route['API/account/password/reset']['get'] = 'api/account/password_reset';
 
@@ -79,6 +79,7 @@ $route['API/group/list']['post'] = 'api/group/list_all';
 $route['API/group/add']['post'] = 'api/group/add';
 $route['API/group/edit']['post'] = 'api/group/edit';
 $route['API/group/delete']['post'] = 'api/group/delete';
+$route['API/group/info']['post'] = 'api/group/info';
 
 /**
  * API MATERIAL ROUTES

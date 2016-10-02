@@ -206,9 +206,9 @@ class Account_bo {
     /**
      * @return bool
      *
-     * Metodo para validar os dados inentes ao processo de <i>recover</i> do controller <i>Account</i>.
+     * Metodo para validar os dados inentes ao processo de <i>recovery</i> do controller <i>Account</i>.
      */
-    public function validate_recover() {
+    public function validate_recovery() {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
