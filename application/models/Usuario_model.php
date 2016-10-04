@@ -51,7 +51,7 @@ class Usuario_model extends CI_Model {
     public function find_by_usnid($usnid) {
         $this->db->where('usnid', $usnid);
         $query = $this->db->get('usuario');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
@@ -101,6 +101,18 @@ class Usuario_model extends CI_Model {
             $this->db->where('uscstat', USCSTAT_ATIVO);
         }
         $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $uscfbid
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela USUARIO pela FacebookID
+     */
+    public function find_by_uscfbid($uscfbid) {
+        $this->db->where('uscfbid', $uscfbid);
+        $query = $this->db->get('usuario');
         return $query->num_rows() > 0 ? $query->result() : null;
     }
 

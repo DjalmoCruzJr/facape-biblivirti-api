@@ -9,7 +9,7 @@
  */
 class Confirmaremail_model extends CI_Model {
 
-	/**
+    /**
      * Recuperarsenha_model constructor.
      */
     public function __construct() {
@@ -23,15 +23,7 @@ class Confirmaremail_model extends CI_Model {
      * Metodo para salvar um token de confirmacao de e-mail.
      */
     public function save($data) {
-        // Verifica se o ID do token nao foi informado
-        if (!isset($data['canid'])) {
-            return ($this->db->insert('confirmaremail', $data)) ? $this->db->insert_id() : false;
-        } else {
-            $canid = $data['canid'];
-            unset($data['canid']);
-            $this->db->where(['canid' => $canid]);
-            return $this->db->update('confirmaremail', $data);
-        }
+        return ($this->db->insert('confirmaremail', $data)) ? $this->db->insert_id() : false;
     }
 
     /**
@@ -44,6 +36,19 @@ class Confirmaremail_model extends CI_Model {
         $this->db->where(['cactokn' => $cactokn, 'cacstat' => $rscstat]);
         $query = $this->db->get('confirmaremail');
         return ($query->num_rows() > 0) ? $query->result()[0] : null;
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     *
+     * Metodo para atualizar um registro da tabela CONFIRMAREMAIL
+     */
+    public function update($data) {
+        $canid = $data['canid'];
+        unset($data['canid']);
+        $this->db->where(['canid' => $canid]);
+        return $this->db->update('confirmaremail', $data);
     }
 
     /**

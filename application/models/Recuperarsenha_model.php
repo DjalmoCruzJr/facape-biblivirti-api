@@ -9,7 +9,7 @@
  */
 class Recuperarsenha_model extends CI_Model {
 
-	/**
+    /**
      * Recuperarsenha_model constructor.
      */
     public function __construct() {
@@ -23,15 +23,7 @@ class Recuperarsenha_model extends CI_Model {
      * Metodo para salvar um token de recuperacao de senha.
      */
     public function save($data) {
-        // Verifica se o ID do token nao foi informado
-        if (!isset($data['rsnid'])) {
-            return ($this->db->insert('recuperarsenha', $data)) ? $this->db->insert_id() : false;
-        } else {
-            $rsnid = $data['rsnid'];
-            unset($data['rsnid']);
-            $this->db->where(['rsnid' => $rsnid]);
-            return $this->db->update('recuperarsenha', $data);
-        }
+        return ($this->db->insert('recuperarsenha', $data)) ? $this->db->insert_id() : false;
     }
 
     /**
@@ -44,6 +36,19 @@ class Recuperarsenha_model extends CI_Model {
         $this->db->where(['rsctokn' => $rsctokn, 'rscstat' => $rscstat]);
         $query = $this->db->get('recuperarsenha');
         return ($query->num_rows() > 0) ? $query->result()[0] : null;
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     *
+     * Metodo para atualizar um registro da tabela RECUPERARSENHA
+     */
+    public function update($data) {
+        $rsnid = $data['rsnid'];
+        unset($data['rsnid']);
+        $this->db->where(['rsnid' => $rsnid]);
+        return $this->db->update('recuperarsenha', $data);
     }
 
     /**

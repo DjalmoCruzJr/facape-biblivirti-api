@@ -77,8 +77,8 @@ class Account extends CI_Controller {
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
-            $user = $this->usuario_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']));
-            // Verifica se houve falha na execucao do model
+            $user = $this->usuario_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']))[0];
+            // Verifica se o usuario foi encontrado com sucesso
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum usuário encontrado.";
@@ -137,7 +137,7 @@ class Account extends CI_Controller {
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
-            $user = $this->usuario_model->find_by_uscfbid($data['uscfbid']);
+            $user = $this->usuario_model->find_by_uscfbid($data['uscfbid'])[0];
             // Verifica se houve flaha na execucao do model
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -201,9 +201,6 @@ class Account extends CI_Controller {
                 $this->response['response_message'] = "Houve um erro ao tentar cadastrar o ususario! Tente novamente.\n";
                 $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
             } else {
-                // Desabilita todos os tokens de confirmacao anteriores para o usuario em questao
-                $this->recuperarsenha_model->disable_all_tokens_by_rsnidus($id);
-
                 $token['canidus'] = $id;
                 $token['cactokn'] = $this->biblivirti_hash->token($data['uscmail']);
                 $token['canid'] = $this->confirmaremail_model->save($token);
@@ -237,7 +234,7 @@ class Account extends CI_Controller {
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {*/
                     $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "Usuário cadastrado com  sucesso!";
+                    $this->response['response_message'] = "Usuário cadastrado com sucesso!";
                     $this->response['response_data'] = ['usnid' => $id];
                     //}
                 }
@@ -287,7 +284,7 @@ class Account extends CI_Controller {
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
-            $user = $this->usuario_model->find_by_uscmail($data['uscmail']);
+            $user = $this->usuario_model->find_by_uscmail($data['uscmail'])[0];
 
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
@@ -370,8 +367,7 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public
-    function email_confirmation() {
+    public function email_confirmation() {
         $data['cactokn'] = $this->input->get('cactokn');
 
         $this->response = [];
@@ -388,13 +384,13 @@ class Account extends CI_Controller {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Token de confirmação inválido!";
             } else {
-                $user = $this->usuario_model->find_by_usnid($token->canidus);
+                $user = $this->usuario_model->find_by_usnid($token->canidus)[0];
                 $user->uscstat = USCSTAT_ATIVO; // Muda o status do usuario para ATIVO
                 $user2['usnid'] = $user->usnid;
                 $user2['uscstat'] = $user->uscstat;
 
                 // Verifica o usuario foi atualizado com sucesso
-                if ($this->usuario_model->save($user2) === false) {
+                if ($this->usuario_model->update($user2) === false) {
                     $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                     $this->response['response_message'] = "Houve um erro ao tentar confirmar e - email do usuário!Tente novamente . \n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
@@ -402,13 +398,33 @@ class Account extends CI_Controller {
                     $token->cacstat = CACSTAT_INATIVO; // Muda o status do token para INATIVO
                     $token2['canid'] = $token->canid;
                     $token2['cacstat'] = $token->cacstat;
-                    $this->confirmaremail_model->save($token2);
+                    $this->confirmaremail_model->update($token2);
 
+                    // Seta os dados para o envio do email de recuperação de senha
+                    /*$from = EMAIL_SMTP_USER;
+                    $to = $user->uscmail;
+                    $subject = EMAIL_SUBJECT_ACCOUNT_ACTIVATED;
+                    $message = EMAIL_MESSAGE_ACCOUNT_ACTIVATED;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de recuperação de senha! Tente novamente.\n";
+                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {*/
                     unset($user->uscsenh); // Remove a senha do obejeto de resposta
-
                     $this->response['response_code'] = RESPONSE_CODE_OK;
                     $this->response['response_message'] = "E - email confirmado com cucesso!";
                     $this->response['response_data'] = $user;
+                    //}
                 }
             }
         }
@@ -444,8 +460,7 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public
-    function password_reset() {
+    public function password_reset() {
         $data['rsctokn'] = $this->input->get('rsctokn');
 
         $this->response = [];
@@ -471,7 +486,7 @@ class Account extends CI_Controller {
                 $token2['rsnidus'] = $token->rsnidus;
                 $token2['rsctokn'] = $token->rsctokn;
                 $token2['rscstat'] = $token->rscstat;
-                $this->recuperarsenha_model->save($token2);
+                $this->recuperarsenha_model->update($token2);
 
                 // Prepara os dados da resposta
                 $data = [];
