@@ -33,7 +33,7 @@ class Conteudo_model extends CI_Model {
      *
      * Metodo para buscar todos os registros da tabela CONTEUDO
      */
-    public function find_all($limit = 10, $offset = 0) {
+    public function find_all($limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT) {
         $query = $this->db->get('conteudo', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
     }
@@ -47,7 +47,7 @@ class Conteudo_model extends CI_Model {
     public function find_by_conid($conid) {
         $this->db->where('conid', $conid);
         $query = $this->db->get('conteudo');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
@@ -61,12 +61,26 @@ class Conteudo_model extends CI_Model {
      * Se $like = TRUE a busca eh feita no formato: field LIKE value
      * Se $like = FALSE a busca eh feita no formato: field = value
      */
-    public function find_by_cocdesc($cocdesc, $limit = 10, $offset = 0, $like = true) {
+    public function find_by_cocdesc($cocdesc, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true) {
         if ($like === true) {
             $this->db->like('cocdesc', $cocdesc);
         } else {
             $this->db->where('cocdesc', $cocdesc);
         }
+        $query = $this->db->get('conteudo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $grnid
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela CONTEUDO relacionado com um GRUPO
+     */
+    public function find_by_grnid($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT) {
+        $this->db->where('conidgr', $grnid);
         $query = $this->db->get('conteudo', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
     }

@@ -173,7 +173,7 @@ class Content extends CI_Controller {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "Nenhum conteúdo encontrado.";
             } else {
-                $this->conteudo_model->save($data);
+                $this->conteudo_model->update($data);
                 $response['response_message'] = "Conteúdo atualizado com sucesso!";
                 $response['response_data'] = ['conid' => $data['conid']];
             }

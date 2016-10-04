@@ -86,7 +86,7 @@ class Areaofinterest extends CI_Controller {
     }
 
     /**
-     * @url: api/areaofinterest/add
+     * @url: API/areaofinterest/add
      * @param string JSON
      * @return JSON
      *
