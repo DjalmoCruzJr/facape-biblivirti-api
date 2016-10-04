@@ -1,0 +1,209 @@
+/*********************************************/
+********* Modelo Objeto Relacional ************
+/*********************************************/
+
+********* ENUM's ************
+
+Enum EStatusUsuario
+	ATIVO			('A')
+	INATIVO			('I')
+	
+Enum EStatusMaterial
+	ATIVO			('A')
+	INATIVO			('I')
+	
+EStatusMensagem
+	ATIVO			('A')
+	INATIVO			('I')
+	
+Enum ETipoMaterial
+	APRESENTACAO 	('A')
+	EXERCICIO		('E')
+	FORMULA			('F')
+	JOGO			('J')
+	LIVRO			('L')
+	SIMULADO		('S')
+	VIDEO			('V')
+	
+Enum ETipoGrupo
+	ABERTO			('A')
+	FECHADO			('F')
+
+Enum EStatusDuvida
+	ATIVO			('A')
+	INATIVO			('I')
+
+Enum EStatusDuvidaResposta
+	ATIVO			('A')
+	INATIVO			('I')	
+	
+Enum EStatusAvaliacao
+	INICIADA		('I')
+	FINALIZADA		('F')
+	
+	
+********* CLASSES ************
+
+Class AreaInteresse
+	id				: Integer
+	descricao		: String
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Conteudo
+	id				: Integer
+	descricao		: String
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Usuario
+	id				: Integer
+	nome			: String
+	email			: String
+	login			: String
+	senha			: String
+	foto			: String
+	grupos			: List<Grupo>
+	status			: EStatusUsuario
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Grupo
+	id				: Integer
+	nome			: String
+	foto			: String
+	tipo			: ETipoGrupo
+	areaInteresse	: AreaInteresse
+	admin			: Usuario
+	membros			: List<Usuario>
+	conteudos		: List<Conteudo>
+	materiais		: List<Material>
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Alternativa
+	id				: Integer
+	questao			: Questao
+	texto			: String
+	certa			: Boolean
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Mensagem
+	id				: Integer
+	usuario			: Usuario
+	grupo			: Grupo
+	text			: String
+	anexo			: String
+	status			: EStatusMensagem
+	dataEnvio		: DateTime
+	dataRecebimento	: DateTime
+********* OK ************
+	
+Class Comentario
+	id				: Integer
+	grupo			: Grupo
+	usuario			: Usuario
+	material		: Material
+	respostas		: List<Comentario>
+	text			: String
+	anexo			: String
+	status			: EStatusMensagem
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Questao
+	id				: Integer
+	descricao		: String
+	texto			: String
+	anexo			: String
+	alternativas	: List<Alternativa>
+	dataCadastro	: DateTime	
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Duvida
+	id				: Integer
+	texto			: String
+	anexo			: String
+	anonima			: Boolean
+	status			: EStatusDuvida
+	usuario			: Usuario
+	grupo			: Grupo
+	respostas		: List<DuvidaResposta>
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class DuvidaResposta
+	id				: Integer
+	texto			: String
+	anexo			: String
+	anonima			: Boolean
+	status			: EStatusDuvidaResposta
+	usuario			: Usuario
+	duvida			: Duvida
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Abstract Class Material
+	id				: Integer
+	descricao		: String
+	tipo			: ETipoMaterial
+	status			: EStatusMaterial
+	conteudos		: List<Conteudo>
+	comentarios		: List<Comentario>
+	dataCadastro	: DateTime
+	dataAlteracao	: DateTime
+********* OK ************
+
+Class Apresentacao extends Material
+	url				: String
+********* OK ************
+
+Class Exercicio extends Material
+	url				: String
+********* OK ************
+	
+Class Formula extends Material
+	url				: String
+********* OK ************
+
+Class Jogo extends Material
+	url				: String
+********* OK ************
+
+Class Livro extends Material
+	url				: String
+********* OK ************
+
+Class Simulado extends Material
+	nivel			: ENivelSimulado
+	questoes		: List<Questao>
+********* OK ************
+
+Class Avaliacao
+	id				: Integer
+	usuario			: Usuario
+	simulado		: Simulado
+	status			: EStatusAvaliacao
+	respostas		: List<Resposta>
+	dataInicio		: DateTime
+	dataTermino		: DateTime
+********* OK ************
+
+Class Resposta
+	id				: Integer
+	avaliacao		: Avaliacao
+	questao			: Questao
+	alternativa		: Alternativa
+	dataInicio      : DateTime
+	dataEnvio       : DateTime
+********* OK ************

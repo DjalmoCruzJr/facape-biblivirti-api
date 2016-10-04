@@ -18,88 +18,131 @@ class Usuario_model extends CI_Model {
 
     /**
      * @param $data
-     * @return mixed
+     * @return int
      *
-     * Metodo para salvar um ou atualizar um  usuario.
+     * Metodo para salvar um registro na tabela USUARIO
      */
     public function save($data) {
-        // Verifica se o ID do usuario foi inbformado
-        if (!isset($data['usnid'])) { // INSERCAO
-            return $this->db->insert('usuario', $data) ? $this->db->insert_id() : null;
-        } else { // ATUALIZACAO
-            $usnid = $data['usnid'];
-            unset($data['usnid']);
-            $this->db->where(['usnid' => $usnid]);
-            return $this->db->update('usuario', $data);
+        return $this->db->insert('usuario', $data) === true ? $this->db->insert_id() : 0;
+    }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     *
+     * Metodo para buscar todos os registros da tabela USUARIO
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_all($limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('uscstat', USCSTAT_ATIVO);
         }
+        $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
      * @param $usnid
      * @return mixed
      *
-     * Metodo para buscar um usuario pelo <i>usnid</i> (ID do usuario).
+     * Metodo para buscar um registro da tabela USUARIO pelo ID
      */
     public function find_by_usnid($usnid) {
-        $this->db->where(['usnid' => $usnid]);
+        $this->db->where('usnid', $usnid);
         $query = $this->db->get('usuario');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $uscmail
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela USUARIO pela EMAIL
+     * Se $like = TRUE a busca eh feita no formato: field LIKE value
+     * Se $like = FALSE a busca eh feita no formato: field = value
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_by_uscmail($uscmail, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($like === true) {
+            $this->db->like('uscmail', $uscmail);
+        } else {
+            $this->db->where('uscmail', $uscmail);
+        }
+        if ($active === true) {
+            $this->db->where('uscstat', USCSTAT_ATIVO);
+        }
+        $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $usclogn
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela USUARIO pela LOGIN
+     * Se $like = TRUE a busca eh feita no formato: field LIKE value
+     * Se $like = FALSE a busca eh feita no formato: field = value
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_by_usclogn($usclogn, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($like === true) {
+            $this->db->like('usclogn', $usclogn);
+        } else {
+            $this->db->where('usclogn', $usclogn);
+        }
+        if ($active === true) {
+            $this->db->where('uscstat', USCSTAT_ATIVO);
+        }
+        $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
      * @param $uscmail
      * @param $uscsenh
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
      * @return mixed
      *
-     * Metodo para buscar um usuario pelo <i>uscmail</i> (e-amil) e <i>uscsenh</i> (senha).
+     * Metodo para buscar registros da tabela USUARIO pelo EMAIL e SENHA
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_by_uscmail_and_uscsenh($uscmail, $uscsenh) {
-        $this->db->where(['uscmail' => $uscmail, 'uscsenh' => $uscsenh]);
+    public function find_by_uscmail_and_uscsenh($uscmail, $uscsenh, $active = false) {
+        if ($active === true) {
+            $this->db->where('uscstat', USCSTAT_ATIVO);
+        }
+        $this->db->where('uscmail', $uscmail);
+        $this->db->where('uscsenh', $uscsenh);
         $query = $this->db->get('usuario');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
-     * @param $uscfbid
-     * @return mixed
+     * @param $data
+     * @return int
      *
-     * Metodo para buscar um usuario pelo <i>uscfbid</i> (FacebookID).
+     * metodo para atualizar um registro da tabela USUARIO
      */
-    public function find_by_uscfbid($uscfbid) {
-        $this->db->where(['uscfbid' => $uscfbid]);
-        $query = $this->db->get('usuario');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
-    }
-
-    /**
-     * @param $uscmail
-     * @return mixed
-     *
-     * Metodo para buscar um usuario pelo <i>uscmail</i> (e-mail).
-     */
-    public function find_by_uscmail($uscmail) {
-        $this->db->where(['uscmail' => $uscmail]);
-        $query = $this->db->get('usuario');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
-    }
-
-    /**
-     * @param $usclogn
-     * @return mixed
-     *
-     * Metodo para buscar um usuario pelo <i>usclogn</i> (login).
-     */
-    public function find_by_usclogn($usclogn) {
-        $this->db->where(['usclogn' => $usclogn]);
-        $query = $this->db->get('usuario');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
+    public function update($data) {
+        $usnid = $data['usnid'];
+        unset($data['usnid']);
+        $this->db->where('usnid', $usnid);
+        return $this->db->update('usuario', $data) === true ? $usnid : 0;
     }
 
     /**
      * @param $usnid
      * @return bool
      *
-     * Metodo para excluir um usuario.
+     * Metodo para excluir um registro da tabela USUARIO
      */
     public function delete($usnid) {
         $this->db->where('usnid', $usnid);

@@ -105,6 +105,15 @@ define('RESPONSE_CODE_BAD_REQUEST', 400);
 define('RESPONSE_CODE_UNAUTHORIZED', 401);
 define('RESPONSE_CODE_NOT_FOUND', 404);
 
+/**---------------------------------------
+ * FIND METHODS DEFAULT LIMIT AND OFFSET
+ * ---------------------------------------
+ *
+ * Constantes utilizadas para definir os valor padrao de limit e offset
+ * dos metodos de busca dos models
+ */
+define('LIMIT_DEFAULT', 10);
+define('OFFSET_DEFAULT', 0);
 
 /**---------------------------------------
  * USUARIO FIELDS RULES
@@ -129,6 +138,7 @@ define('USCSTAT_INATIVO', 'I');
  *
  */
 define('AICDESC_MAX_LENGHT', 50);
+
 /**---------------------------------------
  * GRUPO FIELDS RULES
  * ---------------------------------------
@@ -137,25 +147,26 @@ define('AICDESC_MAX_LENGHT', 50);
  *
  */
 define('GRCNOME_MAX_LENGTH', 50);
-define('GRCTIPO_MAX_LENGTH', 1);
 define('GRCTIPO_ABERTO', 'A');
 define('GRCTIPO_FECHADO', 'F');
+define('GRCSTAT_ATIVO', 'A');
+define('GRCSTAT_INATIVO', 'I');
 
 /**---------------------------------------
- * GRUPOUSUARIO FIELDS RULES
+ * AVALIACAO FIELDS RULES
  * ---------------------------------------
  *
- * Constantes que definem as regras de negocio dos campos da tabela GRUPOUSUARIO
+ * Constantes que definem as regras de negocio dos campos da tabela AVALIACAO
  *
  */
-define('GUCSTAT_ATIVO', 'A');
-define('GUCSTAT_INATIVO', 'I');
+define('AVCSTAT_INICIADA', 'I');
+define('AVCSTAT_FINALIZADA', 'F');
 
 /**---------------------------------------
  * CONFIRMAREMAIL FIELDS RULES
  * ---------------------------------------
  *
- * Constantes que definem as regras de negocio dos campos da tabela RECUPERARSENHA
+ * Constantes que definem as regras de negocio dos campos da tabela CONFIRMAREMAIL
  *
  */
 define('CACSTAT_ATIVO', 'A');
@@ -198,10 +209,51 @@ define('MACNIVL_PROFISSIONAL', 'P');
  * CONTEUDO FIELDS RULES
  * ---------------------------------------
  *
- * Constantes que definem as regras de negocio dos campos da tabela MATERIAL
+ * Constantes que definem as regras de negocio dos campos da tabela CONTEUDO
  *
  */
 define('COCDESC_MAX_LENGTH', 100);
+
+/**---------------------------------------
+ * DUVIDA FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela DUVIDA
+ *
+ */
+define('DVCSTAT_ATIVO', 'A');
+define('DVCSTAT_INATIVO', 'I');
+
+/**---------------------------------------
+ * DUVIDARESPOSTA FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela DUVIDARESPOSTA
+ *
+ */
+define('DRCSTAT_ATIVO', 'A');
+define('DRCSTAT_INATIVO', 'I');
+
+/**---------------------------------------
+ * COMENTARIO FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela COMENTARIO
+ *
+ */
+define('CECSTAT_ATIVO', 'A');
+define('CECSTAT_INATIVO', 'I');
+
+/**---------------------------------------
+ * MENSAGEM FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela MENSAGEM
+ *
+ */
+define('MSCSTAT_ATIVO', 'A');
+define('MSCSTAT_INATIVO', 'I');
+define('MSCANEX_MAX_LENGHT', 255);
 
 /**---------------------------------------
  * ASSETS PATHS

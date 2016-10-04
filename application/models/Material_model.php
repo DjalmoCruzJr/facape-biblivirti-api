@@ -13,149 +13,224 @@ class Material_model extends CI_Model {
      */
     public function __construct() {
         parent::__construct();
-
-        // Loading models
-        $this->load->model('comentario_model');
-        $this->load->model('historicoacesso_model');
-        $this->load->model('grupomaterial_model');
-        $this->load->model('conteudomaterial_model');
-        $this->load->model('questaosimulado_model');
     }
 
     /**
-     * @param $manid
-     * @return mixed
+     * @param $data
+     * @return int
      *
-     * Metodo para salvar ou atualizar uma Material.
+     * Metodo para salvar um registro na tabela MATERIAL
      */
     public function save($data) {
-        if (!isset($data['manid'])) { // INSERCAO
-            $grnid = $data['grnid'];
-            unset($data['grnid']);
-            if ($data['mactipo'] !== MACTIPO_SIMULADO) { // O material NAO eh um SIMULADO
-                $contens = $data['contents'];
-                unset($data['contents']);
-                if ($this->db->insert('material', $data) === true) {
-                    $manid = $this->db->insert_id();
-                    $this->grupomaterial_model->save(['gmnidgr' => $grnid, 'gmnidma' => $manid]);
-                    foreach ($contens as $content) {
-                        $this->conteudomaterial_model->save(['cmnidma' => $manid, 'cmnidco' => $content['conid']]);
-                    }
-                    return $manid;
-                }
-            } else { // O material EH um SIMULADO
-                $questions = $data['questions'];
-                unset($data['questions']);
-                if ($this->db->insert('material', $data) === true) {
-                    $manid = $this->db->insert_id();
-                    $this->grupomaterial_model->save(['gmnidgr' => $grnid, 'gmnidma' => $manid]);
-                    foreach ($questions as $question) {
-                        $this->questaosimulado_model->save(['qsnidma' => $manid, 'qsnidqe' => $question['qenid']]);
-                    }
-                    return $manid;
-                }
-            }
-            return null;
-        } else { // ATUALIZACAO
-            $grnid = $data['grnid'];
-            unset($data['grnid']);
-            $manid = $data['manid'];
-            unset($data['manid']);
-            if ($data['mactipo'] !== MACTIPO_SIMULADO) { // O material NAO eh um SIMULADO
-                $contens = $data['contents'];
-                unset($data['contents']);
-                $this->conteudomaterial_model->delete_by_manid($manid);
-                $this->db->where(['manid' => $manid]);
-                $this->db->update('material', $data);
-                foreach ($contens as $content) {
-                    $this->conteudomaterial_model->save(['cmnidma' => $manid, 'cmnidco' => $content['conid']]);
-                }
-                return $manid;
-            } else { // O material EH um SIMULADO
-                $questions = $data['questions'];
-                unset($data['questions']);
-                $this->questaosimulado_model->delete_by_manid($manid);
-                $this->db->where(['manid' => $manid]);
-                $this->db->update('material', $data);
-                foreach ($questions as $question) {
-                    $this->questaosimulado_model->save(['qsnidma' => $manid, 'qsnidqe' => $question['qenid']]);
-                }
-                return $manid;
-            }
-            return false;
+        return $this->db->insert('material', $data) === true ? $this->db->insert_id() : 0;
+    }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar todos os registros da tabela MATERIAL
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_all($limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
         }
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
      * @param $manid
      * @return mixed
      *
-     * Metodo para buscar uma Material pelo campo manid (ID).
+     * Metodo para buscar um registro da tabela MATERIAL pelo ID
      */
     public function find_by_manid($manid) {
-        $this->db->where(['manid' => $manid]);
+        $this->db->where('manid', $manid);
         $query = $this->db->get('material');
-        if ($query->num_rows() > 0) {
-            $material = $query->result()[0];
-            if ($material->mactipo === MACTIPO_SIMULADO) {
-                unset($material->macurl); // Remove o campo macurl (URL do material - NAO SIMULADO)
-                $material->questions = $this->questaosimulado_model->find_questions_by_manid($material->manid);
-            } else {
-                unset($material->macnivl); // Remove o campo macnivl (Nivel do material - SIMULADO)
-                $material->constents = $this->conteudomaterial_model->find_contents_by_manid($material->manid);
-            }
-            return $material;
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $manidgr
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL relaciondo com um GRUPO
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_manidgr($manidgr, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
         }
-        return null;
+        $this->db->where('manidgr', $manidgr);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
      * @param $macdesc
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
+     * @param bool $active
      * @return mixed
      *
-     * Metodo para buscar uma Material pelo campo macdesc (Descricao).
-     * Formato da busca: 'field' LIKE 'value'
+     * Metodo para buscar os registros da tabela MATERIAL pela DESCRICAO
+     * Se $like = TRUE a busca sera no formato: field LIKE value
+     * Se $like = FALSE a busca sera no formato: field = value
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
      */
-    public function find_by_macdesc($macdesc) {
-        $this->db->like('macdesc', $macdesc, 'both');
-        $query = $this->db->get('material');
-        return ($query->num_rows() > 0) ? $query->result() : null;
+    public function find_by_macdesc($macdesc, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        if ($like === true) {
+            $this->db->like('macdesc', $macdesc);
+        } else {
+            $this->db->where('macdesc', $macdesc);
+        }
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
-     * @param $grnid
+     * @param $mactipo
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
      * @return mixed
      *
-     * Metodo para buscar os materiais relacionado com um determinado grupo passado pelo parametro grnid(ID do grupo).
+     * Metodo para buscar os registros da tabela MATERIAL pela TIPO
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
      */
-    public function find_by_grnid($grnid, $limite = 1000, $offset = 0) {
-        $this->db->select('manid, macdesc, mactipo, malanex, macurl, macnivl, macstat, madcadt, madaldt');
-        $this->db->from('material');
-        $this->db->join('grupomaterial', 'gmnidma = manid', 'inner');
-        $this->db->join('grupo', 'gmnidgr = grnid', 'inner');
-        $this->db->where(['grnid' => $grnid]);
-        $this->db->order_by('madcadt, macdesc', 'DESC');
-        $query = $this->db->get();
-        if ($query->num_rows() > 0) {
-            $materials = $query->result();
-            foreach ($materials as $material) {
-                $material->manqtdce = $this->comentario_model->find_count_by_manid($material->manid);
-                $material->manqtdha = $this->historicoacesso_model->find_count_by_hanidma($material->manid);
-            }
-            return $materials;
+    public function find_by_mactipo($mactipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
         }
-        return null;
+        $this->db->where('mactipo', $mactipo);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $macnivl
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL pelo NIVEL (TIPO = S -> SIMULADO)
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_macnivl($macnivl, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        $this->db->where('macnivl', $macnivl);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $manidgr
+     * @param $macdesc
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL relaciondo com um GRUPO e pela DESCRICAO
+     * Se $like = TRUE a busca sera no formato: field LIKE value
+     * Se $like = FALSE a busca sera no formato: field = value
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_manidgr_and_macdesc($manidgr, $macdesc, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        if ($like === true) {
+            $this->db->like('macdesc', $macdesc);
+        } else {
+            $this->db->where('macdesc', $macdesc);
+        }
+        $this->db->where('manidgr', $manidgr);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $manidgr
+     * @param $mactipo
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL relaciondo com um GRUPO e pelo TIPO
+     * Se $like = TRUE a busca sera no formato: field LIKE value
+     * Se $like = FALSE a busca sera no formato: field = value
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_manidgr_and_mactipo($manidgr, $mactipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        $this->db->where('mactipo', $mactipo);
+        $this->db->where('manidgr', $manidgr);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $manidgr
+     * @param $macnivl
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL relaciondo com um GRUPO e pelo NIVEL (TIPO = S - SIMULADO)
+     * Se $like = TRUE a busca sera no formato: field LIKE value
+     * Se $like = FALSE a busca sera no formato: field = value
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_manidgr_and_macnivl($manidgr, $macnivl, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        $this->db->where('macnivl', $macnivl);
+        $this->db->where('manidgr', $manidgr);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $data
+     * @return int
+     *
+     * metodo para atualizar um registro da tabela MATERIAL
+     */
+    public function update($data) {
+        $manid = $data['manid'];
+        unset($data['manid']);
+        $this->db->where('manid', $manid);
+        return $this->db->update('material', $data) === true ? $manid : 0;
     }
 
     /**
      * @param $manid
      * @return bool
      *
-     * Metodo para deletar um determinado material.
+     * Metodo para excluir um registro da tabela MATERIAL
      */
     public function delete($manid) {
-        $this->db->where(['manid' => $manid]);
+        $this->db->where('manid', $manid);
         return $this->db->delete('material');
     }
-
 }

@@ -13,6 +13,17 @@ class Account extends CI_Controller {
     public function index() {
         $data['page_title'] = 'Biblivirti AVAM | Entre ou Cadastre-se!';
         $this->load->view('account/login', $data);
+
+        $this->load->model('material_model');
+
+        $data = [];
+        $data = $this->material_model->find_by_manidgr_and_macdesc(1, '');
+        echo "<pre>";
+        var_dump($data);
+        echo "<hr>";
+
+
+        exit;
     }
 
 }

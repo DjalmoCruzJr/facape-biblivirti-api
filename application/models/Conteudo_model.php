@@ -14,80 +14,85 @@ class Conteudo_model extends CI_Model {
      */
     public function __construct() {
         parent::__construct();
-
-        // Loading model
-        $this->load->model('grupoconteudo_model');
     }
 
     /**
      * @param $data
-     * @return mixed
+     * @return int
      *
-     * Metodo para salvar ou atualizar um conteudo.
+     * Metodo para salvar um registro na tabela CONTEUDO
      */
     public function save($data) {
-        // Verifica se o ID do Conteudo nao foi informado
-        if (!isset($data['conid'])) { // INSERCAO
-            $grnid = $data['grnid'];
-            unset($data['grnid']);
-            if ($this->db->insert('conteudo', $data) === true) {
-                $conid = $this->db->insert_id();
-                $this->grupoconteudo_model->save(['gcnidgr' => $grnid, 'gcnidco' => $conid]);
-                return $conid;
-            }
-            return null;
-        } else { // ATUALIZACAO
-            $grnid = $data['grnid'];
-            unset($data['grnid']);
-            $conid = $data['conid'];
-            unset($data['conid']);
-            $this->db->where(['conid' => $conid]);
-            if ($this->db->update('conteudo', $data) === true) {
-                $this->grupoconteudo_model->delete_by_grnid($grnid);
-                $this->grupoconteudo_model->save(['gcnidgr' => $grnid, 'gcnidco' => $conid]);
-                return true;
-            }
-            return false;
-        }
+        return $this->db->insert('conteudo', $data) === true ? $this->db->insert_id() : 0;
+    }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     *
+     * Metodo para buscar todos os registros da tabela CONTEUDO
+     */
+    public function find_all($limit = 10, $offset = 0) {
+        $query = $this->db->get('conteudo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
      * @param $conid
      * @return mixed
      *
-     * Metodo para buscar um conteudo pelo campo conid (ID).
+     * Metodo para buscar um registro da tabela CONTEUDO pelo ID
      */
     public function find_by_conid($conid) {
-        $this->db->where(['conid' => $conid]);
+        $this->db->where('conid', $conid);
         $query = $this->db->get('conteudo');
-        return ($query->num_rows() > 0) ? $query->result()[0] : null;
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
-     * @param $grnid
+     * @param $cocdesc
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
      * @return mixed
      *
-     * Metodo para buscar todos os conteudo relacionados com um determinado grupo.
+     * Metodo para buscar registros da tabela CONTEUDO pela descricao
+     * Se $like = TRUE a busca eh feita no formato: field LIKE value
+     * Se $like = FALSE a busca eh feita no formato: field = value
      */
-    public function find_by_grnid($grnid) {
-        $this->db->select('conid, cocdesc, codcadt, codaldt');
-        $this->db->from('conteudo');
-        $this->db->join('grupoconteudo', 'gcnidco = conid', 'inner');
-        $this->db->join('grupo', 'gcnidgr = grnid', 'inner');
-        $this->db->where(['grnid' => $grnid]);
-        $this->db->order_by('conid ASC', 'cocdesc ASC');
-        $query = $this->db->get();
-        return ($query->num_rows() > 0) ? $query->result() : null;
+    public function find_by_cocdesc($cocdesc, $limit = 10, $offset = 0, $like = true) {
+        if ($like === true) {
+            $this->db->like('cocdesc', $cocdesc);
+        } else {
+            $this->db->where('cocdesc', $cocdesc);
+        }
+        $query = $this->db->get('conteudo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
-    public function find_by_cocdesc($cocdesc, $equals = false) {
-        if ($equals === true) {
-            $this->db->where(['cocdesc' => $cocdesc]);
-        } else {
-            $this->db->like(['cocdesc' => $cocdesc]);
-        }
-        $query = $this->db->get('conteudo');
-        return ($query->num_rows() > 0) ? $query->result() : null;
+    /**
+     * @param $data
+     * @return int
+     *
+     * metodo para atualizar um registro da tabela CONTEUDO
+     */
+    public function update($data) {
+        $conid = $data['conid'];
+        unset($data['conid']);
+        $this->db->where('conid', $conid);
+        return $this->db->update('conteudo', $data) === true ? $conid : 0;
+    }
+
+    /**
+     * @param $conid
+     * @return bool
+     *
+     * Metodo para excluir um registro da tabela CONTEUDO
+     */
+    public function delete($conid) {
+        $this->db->where('conid', $conid);
+        return $this->db->delete('conteudo');
     }
 
 }
