@@ -378,13 +378,14 @@ class Account extends CI_Controller {
             $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
+            $data = [];
             $data = $this->account_bo->get_data();
             $token = $this->confirmaremail_model->find_by_cactokn($data['cactokn']);
             if (is_null($token)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Token de confirmação inválido!";
             } else {
-                $user = $this->usuario_model->find_by_usnid($token->canidus)[0];
+                $user = $this->usuario_model->find_by_usnid($token->canidus);
                 $user->uscstat = USCSTAT_ATIVO; // Muda o status do usuario para ATIVO
                 $user2['usnid'] = $user->usnid;
                 $user2['uscstat'] = $user->uscstat;
@@ -392,7 +393,7 @@ class Account extends CI_Controller {
                 // Verifica o usuario foi atualizado com sucesso
                 if ($this->usuario_model->update($user2) === false) {
                     $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $this->response['response_message'] = "Houve um erro ao tentar confirmar e - email do usuário!Tente novamente . \n";
+                    $this->response['response_message'] = "Houve um erro ao tentar confirmar e-mail do usuário! Tente novamente . \n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     $token->cacstat = CACSTAT_INATIVO; // Muda o status do token para INATIVO
@@ -422,7 +423,7 @@ class Account extends CI_Controller {
                     } else {*/
                     unset($user->uscsenh); // Remove a senha do obejeto de resposta
                     $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "E - email confirmado com cucesso!";
+                    $this->response['response_message'] = "E-mail confirmado com cucesso!";
                     $this->response['response_data'] = $user;
                     //}
                 }
