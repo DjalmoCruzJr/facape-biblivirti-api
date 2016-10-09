@@ -47,10 +47,33 @@ class Biblivirti_email {
         return $this->errors;
     }
 
+    /**
+     * @return mixed
+     *
+     * Metodo para retornar a mensagem que sera enviada por email.
+     */
     public function get_message() {
         return $this->data['message'];
     }
 
+    /**
+     * @return array
+     *
+     * Metodo para retornar os dados a serem envidos por email.
+     */
+    public function get_data() {
+        return $this->data;
+    }
+
+    /**
+     * @param null $from
+     * @param null $to
+     * @param null $subject
+     * @param null $message
+     * @param array $datas
+     *
+     * Metodo para setar os dados do email a ser enviado.
+     */
     public function set_data($from = null, $to = null, $subject = null, $message = null, $datas = []) {
         $this->data['from'] = $from;
         $this->data['to'] = $to;
@@ -82,10 +105,6 @@ class Biblivirti_email {
         $this->CI->email->subject($this->data['subject']);
         $this->CI->email->message($this->data['message']);
 
-        echo "<pre>";
-        var_dump($this->data);
-        exit;
-
         // Verificando se houve falha no envio do email
         if ($this->CI->email->send()) {
             return true;
@@ -99,6 +118,9 @@ class Biblivirti_email {
     /**----------------------------------------------------------------------------
      * PRIVATE METHODS
      * -----------------------------------------------------------------------------*/
+    /**
+     * Metodo para carregar as configuracoes de envio de email.
+     */
     private function _load_configs() {
         $this->configs['useragent'] = EMAIL_USERAGENT;
         $this->configs['mailtype'] = EMAIL_MAILTYPE;
@@ -114,8 +136,15 @@ class Biblivirti_email {
         $this->configs['newline'] = EMAIL_NEWLINE;
     }
 
+    /**
+     * @param null $message
+     * @param null $datas
+     * @return mixed|null
+     *
+     * Metodo para realizar a troca das chaves da mensagem do email pelos seus respectivos valores.
+     */
     private function _replace_keys($message = null, $datas = null) {
-        if(is_null($message) || is_null($datas)) {
+        if (is_null($message) || is_null($datas)) {
             return null;
         }
         $keys = array_keys($datas);
@@ -125,6 +154,11 @@ class Biblivirti_email {
         return $message;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para verificar se as informacoes a serem enviadas sao validas.
+     */
     private function _validate_data() {
         $status = true;
 
