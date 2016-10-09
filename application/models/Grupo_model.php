@@ -23,7 +23,13 @@ class Grupo_model extends CI_Model {
      * Metodo para salvar um registro na tabela GRUPO
      */
     public function save($data) {
-        return $this->db->insert('grupo', $data) === true ? $this->db->insert_id() : 0;
+        $usnid = $data['usnid'];
+        unset($data['usnid']);
+        $grnid = $this->db->insert('grupo', $data) === true ? $this->db->insert_id() : 0;
+        if ($grnid !== 0) {// Verifica se o grupo foi salvo com sucesso
+            $this->add_member($grnid, $usnid, true); // Adiciona o membro como administrador do grupo
+        }
+        return $grnid;
     }
 
     /**
@@ -51,7 +57,7 @@ class Grupo_model extends CI_Model {
     public function find_by_grnid($grnid) {
         $this->db->where('grnid', $grnid);
         $query = $this->db->get('grupo');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
@@ -109,7 +115,6 @@ class Grupo_model extends CI_Model {
      * @return mixed
      *
      * Metodo para buscar registros da tabela GRUPO pela TIPO
-     * Se $like = FALSE a busca eh feita no formato: field = value
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
     public function find_by_grctipo($grctipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
@@ -122,12 +127,94 @@ class Grupo_model extends CI_Model {
     }
 
     /**
+     * @param $usnid
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return midex
+     *
+     * Metodo para buscar registros da tabela GRUPO relacionados com um USUARIO
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_by_usnid($usnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('grcstat', GRCSTAT_ATIVO);
+        }
+        $this->db->select('grnid, grnidai, grcnome, grcfoto, grctipo, grcstat, grdcadt, grdaldt');
+        $this->db->join('grupousuario', 'gunidgr = grnid', 'inner');
+        $this->db->join('usuario', 'gunidus = usnid', 'inner');
+        $this->db->where('usnid', $usnid);
+        $query = $this->db->get('grupo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $usnid
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return midex
+     *
+     * Metodo para buscar o(s) administrador(es) de um determinado GRUPO
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_group_admin($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('grcstat', GRCSTAT_ATIVO);
+        }
+        $this->db->select('usnid, uscfbid, uscnome, uscmail, usclogn, uscfoto, uscstat, usdcadt, usdaldt');
+        $this->db->join('grupousuario', 'gunidus = usnid', 'inner');
+        $this->db->join('grupo', 'gunidgr = grnid', 'inner');
+        $this->db->where('grnid', $grnid);
+        $this->db->where('guladm', true);
+        $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
+    }
+
+    /**
+     * @param $usnid
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return midex
+     *
+     * Metodo para buscar o(s) usuario(s) de um determinado GRUPO
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_group_users($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active === true) {
+            $this->db->where('grcstat', GRCSTAT_ATIVO);
+        }
+        $this->db->select('usnid, uscfbid, uscnome, uscmail, usclogn, uscfoto, uscstat, usdcadt, usdaldt');
+        $this->db->join('grupousuario', 'gunidus = usnid', 'inner');
+        $this->db->join('grupo', 'gunidgr = grnid', 'inner');
+        $this->db->where('grnid', $grnid);
+        $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $grnid
+     * @param $usnid
+     * @param bool $admin
+     * @return bool
+     *
+     * Metoda associar um USUARIO a um GRUPO
+     */
+    public function add_member($grnid, $usnid, $admin = false) {
+        $data = ['gunidgr' => $grnid, 'gunidus' => $usnid, 'guladm' => $admin];
+        return $this->db->insert('grupousuario', $data) === true;
+    }
+
+    /**
      * @param $data
      * @return int
      *
      * metodo para atualizar um registro da tabela GRUPO
      */
     public function update($data) {
+        $usnid = $data['usnid'];
+        unset($data['usnid']);
         $grnid = $data['grnid'];
         unset($data['grnid']);
         $this->db->where('grnid', $grnid);

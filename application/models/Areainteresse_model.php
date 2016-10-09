@@ -47,7 +47,7 @@ class Areainteresse_model extends CI_Model {
     public function find_by_ainid($ainid) {
         $this->db->where('ainid', $ainid);
         $query = $this->db->get('areainteresse');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
