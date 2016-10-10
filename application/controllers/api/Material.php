@@ -284,4 +284,63 @@ class Material extends CI_Controller {
         echo json_encode($response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/material/search
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para buscar materiais.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "macdesc" : "Descricao do material",
+     *      "mactipo" : "Tipo do material"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "request_code" : "Codigo da requsicao",
+     *      "request_message" : "Mensagem da requsicao",
+     *      "request_data" : [
+     *          {
+     *              "manid" : "ID do material",
+     *              "macdesc" : "Descricao do usuario",
+     *              "mactipo" : "Tipo de material",
+     *              "macurl" : "URL do material",
+     *              "macnivl" : "Nivel do material",
+     *              "macstat" : "Status do material",
+     *              "madcadt" : "Data de cadastro do material",
+     *              "madaldt" : "Data de atualizacao do material"
+     *              "manqtdce" : "Qtd. de comentarios do material"
+     *              "manqtdha" : "Qtd. de vizualizacoes do material"
+     *          },
+     *      ]
+     * }
+     */
+    public function search() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->material_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->material_bo->validate_search() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->material_bo->get_errors();
+        } else {
+            $data = $this->material_bo->get_data();
+
+            $materials = $this->material_model->find_by_macdesc_and_mactipo($data['macdesc'], $data['mactipo']);
+            if (is_null($materials)) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Nenhum material encontrado.";
+            } else {
+                $response['response_code'] = RESPONSE_CODE_OK;
+                $response['response_message'] = "Material(ais) encontrado(s) com sucesso!";
+                $response['response_data'] = $materials;
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
 }

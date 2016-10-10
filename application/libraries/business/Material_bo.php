@@ -174,7 +174,7 @@ class Material_bo {
                     | strcmp($this->data['mactipo'], MACTIPO_VIDEO) === 0)
             ) {
                 $tipos = MACTIPO_APRESENTACAO . ',' . MACTIPO_EXERCICIO . ',' . MACTIPO_FORMULA . ',' . MACTIPO_JOGO . ',' . MACTIPO_LIVRO . ',' . MACTIPO_SIMULADO . ',' . MACTIPO_VIDEO;
-                $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
+                $this->errors['mactipo'] = 'O TIPO DE MATERIAL deve ser um valor do tipo String (' . $tipos . ')!';
                 $status = false;
             } else {
                 // Verifica se o material eh um SIMULADO
@@ -325,7 +325,7 @@ class Material_bo {
                     | strcmp($this->data['mactipo'], MACTIPO_VIDEO) === 0)
             ) {
                 $tipos = MACTIPO_APRESENTACAO . ',' . MACTIPO_EXERCICIO . ',' . MACTIPO_FORMULA . ',' . MACTIPO_JOGO . ',' . MACTIPO_LIVRO . ',' . MACTIPO_SIMULADO . ',' . MACTIPO_VIDEO;
-                $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
+                $this->errors['mactipo'] = 'O TIPO DE MATERIAL deve ser um valor do tipo String (' . $tipos . ')!';
                 $status = false;
             } else {
                 // Verifica se o material eh um SIMULADO
@@ -430,6 +430,52 @@ class Material_bo {
         } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
             $this->errors['manid'] = 'ID DO MATERIAL inválido!';
             $status = FALSE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>search</i> do controller <i>Material</i>.
+     */
+    public function validate_search() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo MACDESC (Descricao do material)
+        if (!isset($this->data['macdesc']) || empty(trim($this->data['macdesc']))) {
+            $this->errors['macdesc'] = 'A DESCRIÇÃO DO MATERIAL é obrigatória!';
+            $status = false;
+        } else if (strlen($this->data['macdesc']) > MACDESC_MAX_LENGTH) {
+            $this->errors['macdesc'] = 'A DESCRIÇÃO DO MATERIAL deve conter no máximo ' . MACDESC_MAX_LENGTH . ' caracter(es)!';
+            $status = false;
+        }
+
+        // Validando o campo <i>MACTIPO</i> (Tipo do material)
+        if (isset($this->data['mactipo'])) {
+            // Verifica se o tipo de material foi preenchido com valores validos
+            if (!is_string($this->data['mactipo']) || strlen($this->data['mactipo']) !== 1 ||
+                !(strcmp($this->data['mactipo'], MACTIPO_APRESENTACAO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_EXERCICIO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_FORMULA) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_JOGO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_LIVRO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_SIMULADO) === 0
+                    | strcmp($this->data['mactipo'], MACTIPO_VIDEO) === 0)
+            ) {
+                $tipos = MACTIPO_APRESENTACAO . ',' . MACTIPO_EXERCICIO . ',' . MACTIPO_FORMULA . ',' . MACTIPO_JOGO . ',' . MACTIPO_LIVRO . ',' . MACTIPO_SIMULADO . ',' . MACTIPO_VIDEO;
+                $this->errors['mactipo'] = 'O TIPO DE MATERIAL deve ser um valor do tipo String (' . $tipos . ')!';
+                $status = false;
+            }
+        } else {
+            $this->data['mactipo'] = null;
         }
 
         return $status;

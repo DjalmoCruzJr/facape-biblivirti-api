@@ -200,8 +200,6 @@ class Material_model extends CI_Model {
      * @return mixed
      *
      * Metodo para buscar os registros da tabela MATERIAL relaciondo com um GRUPO e pelo TIPO
-     * Se $like = TRUE a busca sera no formato: field LIKE value
-     * Se $like = FALSE a busca sera no formato: field = value
      * Se $active = TRUE a busca trara somente registros com status ATIVO
      */
     public function find_by_manidgr_and_mactipo($manidgr, $mactipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
@@ -210,6 +208,35 @@ class Material_model extends CI_Model {
         }
         $this->db->where('mactipo', $mactipo);
         $this->db->where('manidgr', $manidgr);
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $macdesc
+     * @param $mactipo
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL pela DESCFRICAO e pelo TIPO
+     * Se $like = TRUE a busca sera no formato: field LIKE value
+     * Se $like = FALSE a busca sera no formato: field = value
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_macdesc_and_mactipo($macdesc, $mactipo = null, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($active === true) { // Verifica se a busca trara somente registros ativos
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        if ($like === true) { // Verifica se a busca sera feita no formato LIKE
+            $this->db->like('macdesc', $macdesc);
+        } else { // Verifica se a busca sera feita no formato WHERE
+            $this->db->where('macdesc', $macdesc);
+        }
+        if (!is_null($mactipo)) { // Verifica se a busca sera feita por um tipo especifico de material
+            $this->db->where('mactipo', $mactipo);
+        }
         $query = $this->db->get('material', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
     }
