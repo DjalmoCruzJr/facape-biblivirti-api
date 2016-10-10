@@ -47,7 +47,7 @@ class Questao_model extends CI_Model {
     public function find_by_qenid($qenid) {
         $this->db->where('qenid', $qenid);
         $query = $this->db->get('questao');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**

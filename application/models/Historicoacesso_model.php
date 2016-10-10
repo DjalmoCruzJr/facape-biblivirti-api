@@ -22,7 +22,7 @@ class Historicoacesso_model extends CI_Model {
      *
      * Metodo que retorna a qtd. de vizualizacoes de um determinado material.
      */
-    public function find_count_by_hanidma($hanidma) {
+    public function count_by_hanidma($hanidma) {
         $this->db->where(['hanidma' => $hanidma]);
         $query = $this->db->get('historicoacesso');
         return $query->num_rows();

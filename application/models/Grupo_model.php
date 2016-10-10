@@ -214,8 +214,8 @@ class Grupo_model extends CI_Model {
      */
     public function update($data) {
         $usnid = $data['usnid'];
-        unset($data['usnid']);
         $grnid = $data['grnid'];
+        unset($data['usnid']);
         unset($data['grnid']);
         $this->db->where('grnid', $grnid);
         return $this->db->update('grupo', $data) === true ? $grnid : 0;

@@ -122,6 +122,9 @@ class Material_bo {
         } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
             $this->errors['grnid'] = 'ID DO GRUPO inválido!';
             $status = false;
+        } else {
+            $this->data['manidgr'] = $this->data['grnid'];
+            unset($this->data['grnid']);
         }
 
         // Validando o campo MACDESC (Descricao do material)
@@ -131,6 +134,28 @@ class Material_bo {
         } else if (strlen($this->data['macdesc']) > MACDESC_MAX_LENGTH) {
             $this->errors['macdesc'] = 'A DESCRIÇÃO DO MATERIAL deve conter no máximo ' . MACDESC_MAX_LENGTH . ' caracter(es)!';
             $status = false;
+        }
+
+        // Validando o campo contents (Conteudos relacionados com o material)
+        if (!isset($this->data['contents']) || !is_array($this->data['contents']) || empty($this->data['contents'])) {
+            $this->errors['contents'] = 'O material deve conter pelo menos 1 conteudo relacionado!';
+            $status = false;
+        } else {
+            // Validando os conteudos relacionados do material
+            $i = 0;
+            foreach ($this->data['contents'] as $content) {
+                $i++;
+                if (!isset($content['conid']) || empty($content['conid'])) {
+                    $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO é obrigatório!';
+                    $status = false;
+                } else if (!is_numeric($content['conid'])) {
+                    $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO deve ser o um valor inteiro!';
+                    $status = false;
+                } else if (is_null($this->CI->conteudo_model->find_by_conid($content['conid']))) {
+                    $this->errors['contents']['conid' . $i] = 'ID DO CONTEÚDO  inválido!';
+                    $status = false;
+                }
+            }
         }
 
         // Validando o campo MACTIPO (Tipo de material)
@@ -193,47 +218,18 @@ class Material_bo {
                         }
                     }
 
-                    unset($this->data['malanex']); // Remove o campo MALANEX ja que se trata de um SIMULADO
                     unset($this->data['macurl']); // Remove o campo MACURL ja que se trata de um SIMULADO
-                } else {
-                    // Validando o campo MALANEX (Define se o material eh um anexo ou nao)
-                    if (!isset($this->data['malanex']) || !is_bool($this->data['malanex'])) {
-                        $this->errors['malanex'] = 'Este campo deve conter valores booleanos (true, false)!';
-                        $status = false;
-                    }
-
+                } else { // O Material NAO EH um simulado
                     // Validando o campo MACURL (URL do material)
                     if (!isset($this->data['macurl']) || empty($this->data['macurl'])) {
                         $this->errors['macurl'] = 'A URL DO MATERIAL é obrigatória!';
                         $status = false;
                     } else {
-                        //Verifica se o material eh um LINK
-                        if ($this->data['malanex'] === false) {
-                            // Validando o campo MACURL (URL do material - LINK)
+                        //Verifica o tipo do material eh VIDEO ou JOGO
+                        if ($this->data['mactipo'] === MACTIPO_VIDEO || $this->data['mactipo'] === MACTIPO_JOGO) {
+                            // Validando o campo MACURL (URL do material tem que ser um LINK valido)
                             if (!filter_var($this->data['macurl'], FILTER_VALIDATE_URL)) {
                                 $this->errors['macurl'] = 'Informe uma URL DO MATERIAL válida!';
-                                $status = false;
-                            }
-                        }
-                    }
-
-                    // Validando o campo contents (Conteudos relacionados com o material)
-                    if (!isset($this->data['contents']) || !is_array($this->data['contents']) || empty($this->data['contents'])) {
-                        $this->errors['contents'] = 'O material deve conter pelo menos 1 conteudo relacionado!';
-                        $status = false;
-                    } else {
-                        // Validando os conteudos relacionados do material
-                        $i = 0;
-                        foreach ($this->data['contents'] as $content) {
-                            $i++;
-                            if (!isset($content['conid']) || empty($content['conid'])) {
-                                $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO é obrigatório!';
-                                $status = false;
-                            } else if (!is_numeric($content['conid'])) {
-                                $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO deve ser o um valor inteiro!';
-                                $status = false;
-                            } else if (is_null($this->CI->conteudo_model->find_by_conid($content['conid']))) {
-                                $this->errors['contents']['conid' . $i] = 'ID DO CONTEÚDO  inválido!';
                                 $status = false;
                             }
                         }
@@ -261,19 +257,19 @@ class Material_bo {
             return false;
         }
 
-        // Validando o campo GRNID (ID do Grupo)
-        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
-            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+        // Validando o campo USNID (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
             $status = false;
-        } else if (!is_numeric($this->data['grnid'])) {
-            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
             $status = false;
-        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
-            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
             $status = false;
         }
 
-        // Validando o campo MANID (ID do material)
+        // Validando o campo MANID (ID do Material)
         if (!isset($this->data['manid']) || empty(trim($this->data['manid']))) {
             $this->errors['manid'] = 'O ID DO MATERIAL é obrigatório!';
             $status = false;
@@ -289,6 +285,28 @@ class Material_bo {
         } else if (strlen($this->data['macdesc']) > MACDESC_MAX_LENGTH) {
             $this->errors['macdesc'] = 'A DESCRIÇÃO DO MATERIAL deve conter no máximo ' . MACDESC_MAX_LENGTH . ' caracter(es)!';
             $status = false;
+        }
+
+        // Validando o campo contents (Conteudos relacionados com o material)
+        if (!isset($this->data['contents']) || !is_array($this->data['contents']) || empty($this->data['contents'])) {
+            $this->errors['contents'] = 'O material deve conter pelo menos 1 conteudo relacionado!';
+            $status = false;
+        } else {
+            // Validando os conteudos relacionados do material
+            $i = 0;
+            foreach ($this->data['contents'] as $content) {
+                $i++;
+                if (!isset($content['conid']) || empty($content['conid'])) {
+                    $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO é obrigatório!';
+                    $status = false;
+                } else if (!is_numeric($content['conid'])) {
+                    $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO deve ser o um valor inteiro!';
+                    $status = false;
+                } else if (is_null($this->CI->conteudo_model->find_by_conid($content['conid']))) {
+                    $this->errors['contents']['conid' . $i] = 'ID DO CONTEÚDO  inválido!';
+                    $status = false;
+                }
+            }
         }
 
         // Validando o campo MACTIPO (Tipo de material)
@@ -351,47 +369,18 @@ class Material_bo {
                         }
                     }
 
-                    unset($this->data['malanex']); // Remove o campo MALANEX ja que se trata de um SIMULADO
                     unset($this->data['macurl']); // Remove o campo MACURL ja que se trata de um SIMULADO
-                } else {
-                    // Validando o campo MALANEX (Define se o material eh um anexo ou nao)
-                    if (!isset($this->data['malanex']) || !is_bool($this->data['malanex'])) {
-                        $this->errors['malanex'] = 'Este campo deve conter valores booleanos (true, false)!';
-                        $status = false;
-                    }
-
+                } else { // O Material NAO EH um simulado
                     // Validando o campo MACURL (URL do material)
                     if (!isset($this->data['macurl']) || empty($this->data['macurl'])) {
                         $this->errors['macurl'] = 'A URL DO MATERIAL é obrigatória!';
                         $status = false;
                     } else {
-                        //Verifica se o material eh um LINK
-                        if ($this->data['malanex'] === false) {
-                            // Validando o campo MACURL (URL do material - LINK)
+                        //Verifica o tipo do material eh VIDEO ou JOGO
+                        if ($this->data['mactipo'] === MACTIPO_VIDEO || $this->data['mactipo'] === MACTIPO_JOGO) {
+                            // Validando o campo MACURL (URL do material tem que ser um LINK valido)
                             if (!filter_var($this->data['macurl'], FILTER_VALIDATE_URL)) {
                                 $this->errors['macurl'] = 'Informe uma URL DO MATERIAL válida!';
-                                $status = false;
-                            }
-                        }
-                    }
-
-                    // Validando o campo contents (Conteudos relacionados com o material)
-                    if (!isset($this->data['contents']) || !is_array($this->data['contents']) || empty($this->data['contents'])) {
-                        $this->errors['contents'] = 'O material deve conter pelo menos 1 conteudo relacionado!';
-                        $status = false;
-                    } else {
-                        // Validando os conteudos relacionados do material
-                        $i = 0;
-                        foreach ($this->data['contents'] as $content) {
-                            $i++;
-                            if (!isset($content['conid']) || empty($content['conid'])) {
-                                $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO é obrigatório!';
-                                $status = false;
-                            } else if (!is_numeric($content['conid'])) {
-                                $this->errors['contents']['conid' . $i] = 'O ID DO CONTEÚDO deve ser o um valor inteiro!';
-                                $status = false;
-                            } else if (is_null($this->CI->conteudo_model->find_by_conid($content['conid']))) {
-                                $this->errors['contents']['conid' . $i] = 'ID DO CONTEÚDO  inválido!';
                                 $status = false;
                             }
                         }
@@ -426,20 +415,8 @@ class Material_bo {
         } else if (!is_numeric($this->data['usnid'])) {
             $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
             $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
-            $status = FALSE;
-        }
-
-        // Validando o campo <i>grnid</i> (ID do Grupo)
-        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
-            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
-            $status = FALSE;
-        } else if (!is_numeric($this->data['grnid'])) {
-            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
-            $status = FALSE;
-        } else if(is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
-            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
             $status = FALSE;
         }
 
@@ -447,10 +424,10 @@ class Material_bo {
         if (!isset($this->data['manid']) || empty(trim($this->data['manid']))) {
             $this->errors['manid'] = 'O ID DO MATERIAL é obrigatório!';
             $status = FALSE;
-        } else if (!is_numeric($this->data['grnid'])) {
+        } else if (!is_numeric($this->data['manid'])) {
             $this->errors['manid'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
+        } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
             $this->errors['manid'] = 'ID DO MATERIAL inválido!';
             $status = FALSE;
         }

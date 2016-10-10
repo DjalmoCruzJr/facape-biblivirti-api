@@ -27,6 +27,8 @@ class Material extends CI_Controller {
 
         // Loading models
         $this->load->model("material_model");
+        $this->load->model("comentario_model");
+        $this->load->model("historicoacesso_model");
 
         // Loading libraries
         $this->load->library('business/material_bo');
@@ -74,12 +76,16 @@ class Material extends CI_Controller {
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
             $data = $this->material_bo->get_data();
-            $materials = $this->material_model->find_by_grnid($data['grnid']);
+            $materials = $this->material_model->find_by_manidgr($data['grnid']);
             // Verifica se houve falha na execucao do model
             if (is_null($materials)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum material encontrado.";
             } else {
+                foreach ($materials as $material) {
+                    $material->manqtdce = count($this->comentario_model->find_by_cenidma($material->manid));
+                    $material->manqtdha = $this->historicoacesso_model->count_by_hanidma($material->manid);
+                }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Material(ais) encontrado(s) com sucesso!";
                 $this->response['response_data'] = $materials;
@@ -102,10 +108,10 @@ class Material extends CI_Controller {
      *      "macdesc" : "Descricao do material",
      *      "mactipo" : "Tipo do material",
      *      "malanex" : "Define se o material eh um anexo",
-     *      "macurl" : "URL do material",
+     *      "macurl" : "URL do material (ou nome do arquivo anexo)",
      *      "macnivl" : "Nivel do material (Somente se mactipo = S - SIMULADO)",
      *      "macstat" : "Status do material",
-     *      "contents" : [ (array de conteudos relacionados com o material - NAO SIMULADO)
+     *      "contents" : [
      *          {
      *              "conid" : "ID do conteudo relacionado"
      *          },
@@ -162,14 +168,14 @@ class Material extends CI_Controller {
      * Metodo para atualizar um material.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "grnid" : "ID do grupo",
+     *      "usnid" : "ID do usuario",
+     *      "manid" : "ID do material",
      *      "macdesc" : "Descricao do material",
      *      "mactipo" : "Tipo do material",
-     *      "malanex" : "Define se o material eh um anexo",
-     *      "macurl" : "URL do material",
+     *      "macurl" : "URL do material (ou nome do arquivo anexo)",
      *      "macnivl" : "Nivel do material (Somente se mactipo = S - SIMULADO)",
      *      "macstat" : "Status do material",
-     *      "contents" : [ (array - Somente se mactipo != S - SIMULADO)
+     *      "contents" : [
      *          {
      *              "conid" : "ID do conteudo relacionado"
      *          },
@@ -207,9 +213,17 @@ class Material extends CI_Controller {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "Nenhum material encontrado.";
             } else {
-                $this->material_model->save($data);
-                $response['response_message'] = "Material atualizado com sucesso!";
-                $response['response_data'] = ['manid' => $data['manid']];
+                $admin = $this->grupo_model->find_group_admin($material->manidgr);
+                if ($admin->usnid != $data['usnid']) {
+                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $response['response_message'] = "Erro ao tentar editar o material!\n";
+                    $response['response_message'] .= "Somente o administrador tem permissão para editá-lo!";
+                } else {
+                    unset($data['usnid']); // Remove o ID do usuairo do objeto a ser gravado.
+                    $this->material_model->update($data);
+                    $response['response_message'] = "Material atualizado com sucesso!";
+                    $response['response_data'] = ['manid' => $data['manid']];
+                }
             }
         }
 
@@ -227,7 +241,6 @@ class Material extends CI_Controller {
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
      *      "usnid" : "ID do usuario",
-     *      "grnid" : "ID do grupo",
      *      "manid" : "ID do material"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
@@ -248,9 +261,9 @@ class Material extends CI_Controller {
             $response['response_errors'] = $this->material_bo->get_errors();
         } else {
             $data = $this->material_bo->get_data();
-            // Verifica o grupo foi encontrado
-            $admin = $this->grupo_model->find_admin($data['grnid']);
-            // Verifica se o usuario nao eh administrador do grupo
+
+            $material = $this->material_model->find_by_manid($data['manid']);
+            $admin = $this->grupo_model->find_group_admin($material->manidgr);
             if ($admin->usnid != $data['usnid']) {
                 $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $response['response_message'] = "Erro ao tentar excluir o material!\n";

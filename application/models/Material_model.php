@@ -22,7 +22,34 @@ class Material_model extends CI_Model {
      * Metodo para salvar um registro na tabela MATERIAL
      */
     public function save($data) {
-        return $this->db->insert('material', $data) === true ? $this->db->insert_id() : 0;
+        if ($data['mactipo'] !== MACTIPO_SIMULADO) { // Material NAO eh simulado
+            $contents = $data['contents'];
+            unset($data['contents']);
+            $manid = $this->db->insert('material', $data) === true ? $this->db->insert_id() : 0;
+            if ($manid !== 0) {
+                foreach ($contents as $content) {
+                    $this->add_content($manid, $content['conid']);
+                }
+                return $manid;
+            }
+            return 0;
+        } else { // Material EH simulado
+            $contents = $data['contents'];
+            $questions = $data['questions'];
+            unset($data['contents']);
+            unset($data['questions']);
+            $manid = $this->db->insert('material', $data) === true ? $this->db->insert_id() : 0;
+            if ($manid !== 0) {
+                foreach ($contents as $content) {
+                    $this->add_content($manid, $content['conid']);
+                }
+                foreach ($questions as $question) {
+                    $this->add_question($manid, $question['qenid']);
+                }
+                return $manid;
+            }
+            return 0;
+        }
     }
 
     /**
@@ -51,7 +78,7 @@ class Material_model extends CI_Model {
     public function find_by_manid($manid) {
         $this->db->where('manid', $manid);
         $query = $this->db->get('material');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
@@ -211,16 +238,95 @@ class Material_model extends CI_Model {
     }
 
     /**
+     * @param $manid
+     * @param $conid
+     * @return bool
+     *
+     * Metodo para registar a relacao entre um MATERIAL e um CONTEUDO.
+     */
+    public function add_content($manid, $conid) {
+        $data = ['cmnidma' => $manid, 'cmnidco' => $conid];
+        return $this->db->insert('conteudomaterial', $data) === true;
+    }
+
+    /**
+     * @param $manid
+     * @param $qenid
+     * @return bool
+     *
+     * Metodo para registar a relacao entre um MATERIAL (Simulado) e uma QUESTAO.
+     */
+    public function add_question($manid, $qenid) {
+        $data = ['qsnidma' => $manid, 'qsnidqe' => $qenid];
+        return $this->db->insert('questaosimulado', $data) === true;
+    }
+
+    /**
      * @param $data
      * @return int
      *
      * metodo para atualizar um registro da tabela MATERIAL
      */
     public function update($data) {
-        $manid = $data['manid'];
-        unset($data['manid']);
-        $this->db->where('manid', $manid);
-        return $this->db->update('material', $data) === true ? $manid : 0;
+        if ($data['mactipo'] !== MACTIPO_SIMULADO) { // Material NAO eh simulado
+            $manid = $data['manid'];
+            $contents = $data['contents'];
+            unset($data['manid']);
+            unset($data['contents']);
+            $this->db->where('manid', $manid);
+            $manid = $this->db->update('material', $data) === true ? $manid : 0;
+            if ($manid !== 0) {
+                $this->remove_contents($manid);
+                foreach ($contents as $content) {
+                    $this->add_content($manid, $content['conid']);
+                }
+                return $manid;
+            }
+            return 0;
+        } else { // Material EH simulado
+            $manid = $data['manid'];
+            $contents = $data['contents'];
+            $questions = $data['questions'];
+            unset($data['manid']);
+            unset($data['contents']);
+            unset($data['questions']);
+            $this->db->where('manid', $manid);
+            $manid = $this->db->update('material', $data) === true ? $manid : 0;
+            if ($manid !== 0) {
+                $this->remove_contents($manid);
+                $this->remove_questions($manid);
+                foreach ($contents as $content) {
+                    $this->add_content($manid, $content['conid']);
+                }
+                foreach ($questions as $question) {
+                    $this->add_question($manid, $question['qenid']);
+                }
+                return $manid;
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * @param $manid
+     * @return bool
+     *
+     * Metodo para remover todos os conteudos relacionados com um MATERIAL
+     */
+    public function remove_contents($manid) {
+        $this->db->where('cmnidma', $manid);
+        return $this->db->delete('conteudomaterial') === true;
+    }
+
+    /**
+     * @param $manid
+     * @return bool
+     *
+     * Metodo para remover todas as questoes relacionadas com um MATERIAL (Simulado)
+     */
+    public function remove_questions($manid) {
+        $this->db->where('qsnidma', $manid);
+        return $this->db->delete('questaosimulado') === true;
     }
 
     /**
