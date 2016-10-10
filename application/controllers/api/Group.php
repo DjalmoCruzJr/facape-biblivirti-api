@@ -280,7 +280,7 @@ class Group extends CI_Controller {
      * @param int usnid
      * @return JSON
      *
-     * Metodo para detetar um grupo.
+     * Metodo para excluir um grupo.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
      *      "grnid" : "ID do grupo"

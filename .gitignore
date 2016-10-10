@@ -20,3 +20,4 @@ application/logs/*
 #OTHERS FILES
 #---------------------------------------
 **.bak
+**.temp

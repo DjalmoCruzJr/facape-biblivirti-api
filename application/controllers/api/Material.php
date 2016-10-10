@@ -296,8 +296,7 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public
-    function delete() {
+    public function delete() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -385,8 +384,7 @@ class Material extends CI_Controller {
      *      ]
      * }
      */
-    public
-    function search() {
+    public function search() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
