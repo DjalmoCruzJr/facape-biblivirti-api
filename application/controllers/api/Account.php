@@ -229,7 +229,7 @@ class Account extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de ativação de conta! Tente novamente.\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_NEW_REGISTER."! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {*/
@@ -326,7 +326,7 @@ class Account extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de recuperação de senha! Tente novamente.\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_PASSWORD_RECOVERY."! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {*/
@@ -417,7 +417,7 @@ class Account extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de recuperação de senha! Tente novamente.\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_ACCOUNT_ACTIVATED."! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {*/

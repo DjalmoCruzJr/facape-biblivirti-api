@@ -150,9 +150,33 @@ class Material extends CI_Controller {
                 $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material! Tente novamente.\n";
                 $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
             } else {
+                // Carrega os dados do administrador do grupo
+                /*$admin = $this->grupo_model->find_group_admin($data['manidgr']);
+                // Seta os dados para o envio do email de notificação de novo grupo
+                $from = EMAIL_SMTP_USER;
+                $to = $admin->uscmail;
+                $subject = EMAIL_SUBJECT_NEW_MATERIAL;
+                $message = EMAIL_MESSAGE_NEW_MATERIAL;
+                $datas = [
+                    EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                    EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                    EMAIL_KEY_MACDESC => $data['macdesc'],
+                    EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                    EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                ];
+
+                $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                if ($this->biblivirti_email->send() === false) {
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MATERIAL . "!\n";
+                    $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                    $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                } else {*/
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Material cadastrado com sucesso!";
                 $this->response['response_data'] = $manid;
+                //}
             }
         }
 
@@ -221,8 +245,31 @@ class Material extends CI_Controller {
                 } else {
                     unset($data['usnid']); // Remove o ID do usuairo do objeto a ser gravado.
                     $this->material_model->update($data);
+
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    /*$from = EMAIL_SMTP_USER;
+                    $to = $admin->uscmail;
+                    $subject = EMAIL_SUBJECT_EDIT_MATERIAL;
+                    $message = EMAIL_MESSAGE_EDIT_MATERIAL;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                        EMAIL_KEY_MACDESC => $data['macdesc'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_MATERIAL . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {*/
                     $response['response_message'] = "Material atualizado com sucesso!";
                     $response['response_data'] = ['manid' => $data['manid']];
+                    //}
                 }
             }
         }
@@ -249,7 +296,8 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function delete() {
+    public
+    function delete() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -274,8 +322,30 @@ class Material extends CI_Controller {
                     $response['response_message'] = "Houve um erro ao tentar excluir as informações do material!\nTente novamente!";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                 } else {
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    /*$from = EMAIL_SMTP_USER;
+                    $to = $admin->uscmail;
+                    $subject = EMAIL_SUBJECT_DELETE_MATERIAL;
+                    $message = EMAIL_MESSAGE_DELETE_MATERIAL;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                        EMAIL_KEY_MACDESC => $data['macdesc'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_DELETE_MATERIAL . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {*/
                     $response['response_code'] = RESPONSE_CODE_OK;
                     $response['response_message'] = "Material excluído com sucesso!";
+                    //}
                 }
             }
         }
@@ -315,7 +385,8 @@ class Material extends CI_Controller {
      *      ]
      * }
      */
-    public function search() {
+    public
+    function search() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
