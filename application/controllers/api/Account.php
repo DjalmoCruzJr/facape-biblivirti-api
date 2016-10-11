@@ -29,6 +29,8 @@ class Account extends CI_Controller {
         $this->load->model("usuario_model");
         $this->load->model("recuperarsenha_model");
         $this->load->model("confirmaremail_model");
+        $this->load->model("areainteresse_model");
+        $this->load->model("grupo_model");
 
         // Loading libraries
         $this->load->library('encryption/biblivirti_hash');
@@ -212,7 +214,7 @@ class Account extends CI_Controller {
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     // Seta os dados para o envio do email de ativação de conta
-                    /*$from = EMAIL_SMTP_USER;
+                    $from = EMAIL_SMTP_USER;
                     $to = $data['uscmail'];
                     $subject = EMAIL_SUBJECT_NEW_REGISTER;
                     $message = EMAIL_MESSAGE_NEW_REGISTER;
@@ -229,14 +231,14 @@ class Account extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_NEW_REGISTER."! Tente novamente.\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_REGISTER . "! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "Usuário cadastrado com sucesso!";
-                    $this->response['response_data'] = ['usnid' => $id];
-                    //}
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Usuário cadastrado com sucesso!";
+                        $this->response['response_data'] = ['usnid' => $id];
+                    }
                 }
             }
         }
@@ -309,7 +311,7 @@ class Account extends CI_Controller {
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     // Seta os dados para o envio do email de recuperação de senha
-                    /*$from = EMAIL_SMTP_USER;
+                    $from = EMAIL_SMTP_USER;
                     $to = $user->uscmail;
                     $subject = EMAIL_SUBJECT_PASSWORD_RECOVERY;
                     $message = EMAIL_MESSAGE_PASSWORD_RECOVERY;
@@ -326,16 +328,16 @@ class Account extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_PASSWORD_RECOVERY."! Tente novamente.\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_PASSWORD_RECOVERY . "! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    unset($user->uscsenh); // Remove a senha do objeto de retorno
-                    $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "E-email confirmado com sucesso!\n";
-                    $this->response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-email!";
-                    $this->response['response_data'] = $user;
-                    //}
+                    } else {
+                        unset($user->uscsenh); // Remove a senha do objeto de retorno
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "E-email confirmado com sucesso!\n";
+                        $this->response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-email!";
+                        $this->response['response_data'] = $user;
+                    }
                 }
             }
         }
@@ -402,7 +404,7 @@ class Account extends CI_Controller {
                     $this->confirmaremail_model->update($token2);
 
                     // Seta os dados para o envio do email de recuperação de senha
-                    /*$from = EMAIL_SMTP_USER;
+                    $from = EMAIL_SMTP_USER;
                     $to = $user->uscmail;
                     $subject = EMAIL_SUBJECT_ACCOUNT_ACTIVATED;
                     $message = EMAIL_MESSAGE_ACCOUNT_ACTIVATED;
@@ -417,15 +419,15 @@ class Account extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_ACCOUNT_ACTIVATED."! Tente novamente.\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_ACCOUNT_ACTIVATED . "! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    unset($user->uscsenh); // Remove a senha do obejeto de resposta
-                    $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "E-mail confirmado com cucesso!";
-                    $this->response['response_data'] = $user;
-                    //}
+                    } else {
+                        unset($user->uscsenh); // Remove a senha do obejeto de resposta
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "E-mail confirmado com cucesso!";
+                        $this->response['response_data'] = $user;
+                    }
                 }
             }
         }
@@ -497,6 +499,224 @@ class Account extends CI_Controller {
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Redefinição de senha autorizada com cucesso!";
                 $this->response['response_data'] = $data;
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/account/password/edit
+     * @return JSON
+     *
+     * Metodo para alterar a senha de acesso um usuario.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid" : "ID do usuario",
+     *      "uscsenh" : "Senha do usuario",
+     *      "uscsenh2" : "Confirmacao da senha"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : {
+     *          "usnid" : "ID do usuario"
+     *      }
+     * }
+     */
+    public function password_edit() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_password_edit() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
+            unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
+
+            $id = $this->usuario_model->update($data);
+            // verifica se houve falha na execucao do model
+            if (is_null($id)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Houve um erro ao tentar editar senha de acesso! Tente novamente.\n";
+                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            } else {
+                // Carrega os dados do usuario p/ enviar o email
+                $user = $this->usuario_model->find_by_usnid($data['usnid']);
+                // Seta os dados para o envio do email de ativação de conta
+                $from = EMAIL_SMTP_USER;
+                $to = $user->uscmail;
+                $subject = EMAIL_SUBJECT_PASSWORD_CHANGED;
+                $message = EMAIL_MESSAGE_PASSWORD_CHANGED;
+                $datas = [
+                    EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                    EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                    EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                    EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                ];
+
+                $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                if ($this->biblivirti_email->send() === false) {
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_PASSWORD_CHANGED . "! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                    $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                } else {
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Senha alterada com sucesso!";
+                    $this->response['response_data'] = ['usnid' => $id];
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/account/profile
+     * @return JSON
+     *
+     * Metodo para buscar as informacoes do perfil do usuario.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid" : "ID do usuario"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : {
+     *          "user" : {
+     *              "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E - email do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          },
+     *          "groups" : [
+     *              {
+     *                  "grnid": "ID do grupo",
+     *                  "grcnome" : "Nome do grupo",
+     *                  "grcfoto" : "Caminho da foto do grupo",
+     *                  "grctipo" : "Tipo do grupo",
+     *                  "grdcadt" : "Data de cadastro do grupo",
+     *                  "areaofinterest" : {
+     *                      "ainid" : "ID da area de interasse",
+     *                      "aicdesc" : "Descricao da area de interesse"
+     *                  },
+     *                  "admin" : {
+     *                      "usnid" : "ID do usuario",
+     *                      "uscfbid" : "FacebookID do usuario",
+     *                      "uscnome" : "Nome do usuario",
+     *                      "uscmail" : "E-email do usuario",
+     *                      "usclogn" : "Login do usuario",
+     *                      "uscfoto" : "Caminho da foto do usuario",
+     *                      "uscstat" : "Status do usuario",
+     *                      "usdcadt" : "Data de cadastro do usuario"
+     *                  }
+     *              }
+     *          ]
+     *      }
+     * }
+     */
+    public function profile() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_profile() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            $user = $this->usuario_model->find_by_usnid($data['usnid']);
+            if (is_null($user)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Houve um erro ao tentar carregar as informações do perfil do usuário! Tente novamente.\n";
+                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            } else {
+                $groups = $this->grupo_model->find_by_usnid($data['usnid']);
+                if (!is_null($groups)) {
+                    foreach ($groups as $group) {
+                        $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
+                        $group->admin = $this->grupo_model->find_group_admin($group->grnid);
+                        unset($group->grnidai);
+                        unset($group->grnid);
+                    }
+                }
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Senha alterada com sucesso!";
+                $this->response['response_data'] = ['user' => $user, 'groups' => $groups];
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/account/search
+     * @return JSON
+     *
+     * Metodo para buscar usuarios.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "reference" : "Referencia para a pesquisa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : [
+     *          {
+     *              "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E - email do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          },
+     *      ]
+     *
+     * }
+     */
+    public function search() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_search() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            $user = $this->usuario_model->find_by_reference($data['reference']);
+            if (is_null($user)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Houve um erro ao tentar carregar as informações do perfil do usuário! Tente novamente.\n";
+                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            } else {
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Senha alterada com sucesso!";
+                $this->response['response_data'] = $user;
             }
         }
 

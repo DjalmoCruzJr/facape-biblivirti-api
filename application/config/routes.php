@@ -66,6 +66,9 @@ $route['API/account/register']['post'] = 'api/account/register';
 $route['API/account/recovery']['post'] = 'api/account/recovery';
 $route['API/account/email/confirmation']['get'] = 'api/account/email_confirmation';
 $route['API/account/password/reset']['get'] = 'api/account/password_reset';
+$route['API/account/password/edit']['post'] = 'api/account/password_edit';
+$route['API/account/profile']['post'] = 'api/account/profile';
+$route['API/account/search']['post'] = 'api/account/search';
 
 /**
  * API AREA OF INTEREST ROUTES

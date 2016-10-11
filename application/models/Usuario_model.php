@@ -137,6 +137,37 @@ class Usuario_model extends CI_Model {
         return $query->num_rows() > 0 ? $query->result() : null;
     }
 
+
+    /**
+     * @param $erefrence
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela USUARIO pela REFERENCIA
+     * Se $like = TRUE a busca eh feita no formato: field LIKE value
+     * Se $like = FALSE a busca eh feita no formato: field = value
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_by_reference($erefrence, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($like === true) {
+            $this->db->or_like('uscnome', $erefrence);
+            $this->db->or_like('uscmail', $erefrence);
+            $this->db->or_like('usclogn', $erefrence);
+        } else {
+            $this->db->or_where('uscnome', $erefrence);
+            $this->db->or_where('uscmail', $erefrence);
+            $this->db->or_where('usclogn', $erefrence);
+        }
+        if ($active === true) {
+            $this->db->where('uscstat', USCSTAT_ATIVO);
+        }
+        $query = $this->db->get('usuario', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
     /**
      * @param $data
      * @return int

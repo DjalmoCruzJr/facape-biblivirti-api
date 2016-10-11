@@ -150,7 +150,7 @@ class Group extends CI_Controller {
                 $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
             } else {
                 // Carrega os dados do grupo cadastrado
-                /*$user = $this->usuario_model->find_by_usnid($data['usnid']);
+                $user = $this->usuario_model->find_by_usnid($data['usnid']);
                 if (is_null($user)) {
                     $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                     $response['response_message'] = "Houve um erro ao tentar carregar as informações do usuário! Tente novamente.\n";
@@ -173,20 +173,20 @@ class Group extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ". EMAIL_SUBJECT_NEW_GROUP ."!\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_GROUP . "!\n";
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                $response['response_code'] = RESPONSE_CODE_OK;
-                $response['response_message'] = "Grupo cadastrado com sucesso!";
-                $response['response_data'] = ['grnid' => $id];
-                //}
-            }
-            //}
-        }
+                    } else {
+                        $response['response_code'] = RESPONSE_CODE_OK;
+                        $response['response_message'] = "Grupo cadastrado com sucesso!";
+                        $response['response_data'] = ['grnid' => $id];
+                    }
+                }
 
-        $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($response, JSON_PRETTY_PRINT);
+                $this->output->set_content_type('application/json', 'UTF-8');
+                echo json_encode($response, JSON_PRETTY_PRINT);
+            }
+        }
     }
 
     /**
@@ -242,7 +242,7 @@ class Group extends CI_Controller {
                     $this->grupo_model->update($data);
 
                     // Seta os dados para o envio do email de notificação de novo grupo
-                    /*$from = EMAIL_SMTP_USER;
+                    $from = EMAIL_SMTP_USER;
                     $to = $group->admin->uscmail;
                     $subject = EMAIL_SUBJECT_EDIT_GROUP;
                     $message = EMAIL_MESSAGE_EDIT_GROUP;
@@ -258,13 +258,13 @@ class Group extends CI_Controller {
 
                     if ($this->biblivirti_email->send() === false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ". EMAIL_SUBJECT_EDIT_GROUP ."!\n";
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_GROUP . "!\n";
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    $response['response_message'] = "Grupo atualizado com sucesso!";
-                    $response['response_data'] = ['grnid' => $data['grnid']];
-                    //}
+                    } else {
+                        $response['response_message'] = "Grupo atualizado com sucesso!";
+                        $response['response_data'] = ['grnid' => $data['grnid']];
+                    }
                 }
             }
         }
@@ -323,7 +323,7 @@ class Group extends CI_Controller {
                         $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                     } else {
                         // Seta os dados para o envio do email de notificação de novo grupo
-                        /*$from = EMAIL_SMTP_USER;
+                        $from = EMAIL_SMTP_USER;
                         $to = $group->admin->uscmail;
                         $subject = EMAIL_SUBJECT_DELETE_GROUP;
                         $message = EMAIL_MESSAGE_DELETE_GROUP;
@@ -339,13 +339,13 @@ class Group extends CI_Controller {
 
                         if ($this->biblivirti_email->send() === false) {
                             $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                            $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de ".EMAIL_SUBJECT_DELETE_GROUP."!\n";
+                            $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_DELETE_GROUP . "!\n";
                             $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                             $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                        } else {*/
-                        $response['response_code'] = RESPONSE_CODE_OK;
-                        $response['response_message'] = "Grupo excluído com sucesso!";
-                        //}
+                        } else {
+                            $response['response_code'] = RESPONSE_CODE_OK;
+                            $response['response_message'] = "Grupo excluído com sucesso!";
+                        }
                     }
                 }
             }
