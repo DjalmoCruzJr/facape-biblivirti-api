@@ -93,6 +93,7 @@ $route['API/material/list']['post'] = 'api/material/list_all';
 $route['API/material/add']['post'] = 'api/material/add';
 $route['API/material/edit']['post'] = 'api/material/edit';
 $route['API/material/search']['post'] = 'api/material/search';
+$route['API/material/email']['post'] = 'api/material/email';
 
 /**
  * API CONTENT ROUTES

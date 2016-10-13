@@ -33,6 +33,7 @@ class Material extends CI_Controller {
         // Loading libraries
         $this->load->library('business/material_bo');
         $this->load->library('input/biblivirti_input');
+        $this->load->library('email/biblivirti_email');
     }
 
     /**
@@ -151,7 +152,7 @@ class Material extends CI_Controller {
                 $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
             } else {
                 // Carrega os dados do administrador do grupo
-                /*$admin = $this->grupo_model->find_group_admin($data['manidgr']);
+                $admin = $this->grupo_model->find_group_admin($data['manidgr']);
                 // Seta os dados para o envio do email de notificação de novo grupo
                 $from = EMAIL_SMTP_USER;
                 $to = $admin->uscmail;
@@ -172,11 +173,11 @@ class Material extends CI_Controller {
                     $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MATERIAL . "!\n";
                     $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                     $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                } else {*/
-                $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Material cadastrado com sucesso!";
-                $this->response['response_data'] = $manid;
-                //}
+                } else {
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Material cadastrado com sucesso!";
+                    $this->response['response_data'] = $manid;
+                }
             }
         }
 
@@ -247,7 +248,7 @@ class Material extends CI_Controller {
                     $this->material_model->update($data);
 
                     // Seta os dados para o envio do email de notificação de novo grupo
-                    /*$from = EMAIL_SMTP_USER;
+                    $from = EMAIL_SMTP_USER;
                     $to = $admin->uscmail;
                     $subject = EMAIL_SUBJECT_EDIT_MATERIAL;
                     $message = EMAIL_MESSAGE_EDIT_MATERIAL;
@@ -266,10 +267,10 @@ class Material extends CI_Controller {
                         $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_MATERIAL . "!\n";
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    $response['response_message'] = "Material atualizado com sucesso!";
-                    $response['response_data'] = ['manid' => $data['manid']];
-                    //}
+                    } else {
+                        $response['response_message'] = "Material atualizado com sucesso!";
+                        $response['response_data'] = ['manid' => $data['manid']];
+                    }
                 }
             }
         }
@@ -322,7 +323,7 @@ class Material extends CI_Controller {
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                 } else {
                     // Seta os dados para o envio do email de notificação de novo grupo
-                    /*$from = EMAIL_SMTP_USER;
+                    $from = EMAIL_SMTP_USER;
                     $to = $admin->uscmail;
                     $subject = EMAIL_SUBJECT_DELETE_MATERIAL;
                     $message = EMAIL_MESSAGE_DELETE_MATERIAL;
@@ -341,10 +342,10 @@ class Material extends CI_Controller {
                         $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_DELETE_MATERIAL . "!\n";
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    $response['response_code'] = RESPONSE_CODE_OK;
-                    $response['response_message'] = "Material excluído com sucesso!";
-                    //}
+                    } else {
+                        $response['response_code'] = RESPONSE_CODE_OK;
+                        $response['response_message'] = "Material excluído com sucesso!";
+                    }
                 }
             }
         }
@@ -412,4 +413,71 @@ class Material extends CI_Controller {
         echo json_encode($response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/material/email
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para buscar materiais.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "uscmail" : "E-mail do usuario emitente",
+     *      "uscmail2" : "E-mail do usuario destinatario",
+     *      "manid" : "ID do material"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "request_code" : "Codigo da requsicao",
+     *      "request_message" : "Mensagem da requsicao"
+     * }
+     */
+    public function email() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->material_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->material_bo->validate_email() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->material_bo->get_errors();
+        } else {
+            $data = $this->material_bo->get_data();
+            $emitente = $this->usuario_model->find_by_usnid($data['usnid']);
+            $destinatario = $this->usuario_model->find_by_uscmail($data['uscmail'])[0];
+            $material = $this->material_model->find_by_manid($data['manid']);
+
+            // Seta os dados para o envio do email de notificação de novo grupo
+            $this->load->library('helper/material_helper');
+            $from = EMAIL_SMTP_USER;
+            $to = $destinatario->uscmail;
+            $subject = EMAIL_SUBJECT_EMAIL_MATERIAL;
+            $message = EMAIL_MESSAGE_EMAIL_MATERIAL;
+            $datas = [
+                EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                EMAIL_KEY_USCNOME => (!is_null($destinatario->uscnome)) ? $destinatario->uscnome : $destinatario->usclogn,
+                EMAIL_KEY_EMITENTE => (!is_null($emitente->uscnome)) ? $emitente->uscnome : $emitente->usclogn,
+                EMAIL_KEY_MACTIPO => $this->material_helper->get_description($material->mactipo),
+                EMAIL_KEY_MACDESC => $material->macdesc,
+                EMAIL_KEY_MATERIAL_LINK => base_url('API/material/details/') . base64_encode($material->manid),
+                EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+            ];
+
+            $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+            if ($this->biblivirti_email->send() === false) {
+                $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EMAIL_MATERIAL . "!\n";
+                $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+            } else {
+                $response['response_code'] = RESPONSE_CODE_OK;
+                $response['response_message'] = "E-mail enviado com sucesso!";
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
 }

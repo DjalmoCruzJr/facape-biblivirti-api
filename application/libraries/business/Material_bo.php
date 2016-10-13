@@ -481,4 +481,56 @@ class Material_bo {
         return $status;
     }
 
+
+    public function validate_email() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo USNID (ID do usuario emitente)
+        if (!isset($this->data['usnid']) || empty($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCMAIL (email do destinatario)
+        if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
+            $this->errors['uscmail'] = 'O E-MAIL DO DESTINATÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!filter_var($this->data['uscmail'], FILTER_VALIDATE_EMAIL)) {
+            $this->errors['uscmail'] = 'Informe um E-MAIL válido!';
+            $status = FALSE;
+        } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
+            $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_uscmail($this->data['uscmail']))) {
+            $this->errors['uscmail'] = 'E-MAIL inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>MANID</i> (ID do material)
+        if (!isset($this->data['manid']) || empty($this->data['manid'])) {
+            $this->errors['manid'] = 'O ID DO MATERIAL é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['manid'])) {
+            $this->errors['manid'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
+            $this->errors['manid'] = 'ID DO MATERIAL inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
 }

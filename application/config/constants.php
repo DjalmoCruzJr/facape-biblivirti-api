@@ -323,6 +323,7 @@ define('EMAIL_SUBJECT_DELETE_GROUP', 'Exclusão de Grupo');
 define('EMAIL_SUBJECT_DELETE_MATERIAL', 'Exclusão de Material');
 define('EMAIL_SUBJECT_PASSWORD_RECOVERY', 'Recuperação de Senha');
 define('EMAIL_SUBJECT_PASSWORD_CHANGED', 'Alteração de Senha');
+define('EMAIL_SUBJECT_EMAIL_MATERIAL', 'Convite para Ver um Material');
 
 define('EMAIL_MESSAGE_EMAIL_CONFIRMATION', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p>Sua conta ainda não foi ativada.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativaçao: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
 define('EMAIL_MESSAGE_ACCOUNT_ACTIVATED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua conta foi ativada com sucesso!</p><p>Acesse agora mesmo sua conta no Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
@@ -336,15 +337,19 @@ define('EMAIL_MESSAGE_DELETE_GROUP', '<!doctype html><html lang="pt-br"><head><m
 define('EMAIL_MESSAGE_DELETE_MATERIAL', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>As informações do material <strong>{macdesc}</strong> foram excluidas com sucesso!</p><p>Caso não tenha sido você que realizou esta exclusão,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_PASSWORD_RECOVERY', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Para recuperar sua senha de acesso, você pode informar o código <strong>{rsctokn}</strong> na tela de confirmação de recuperação<br> ou clicar no link abaixo:</p><p>Link de recuperação: <a href="{recovery_link}" target="blank">{recovery_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_PASSWORD_CHANGED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua senha foi alterada com sucesso.</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_EMAIL_MATERIAL', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p><strong>{emitente}</strong> convidou você para ver o(a) {mactipo}: <strong>{macdesc}.</strong></p><p>Link: <a href="{material_link}" target="_blank">{material_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
 
 define('EMAIL_KEY_EMAIL_SMTP_USER_ALIAS', '{email_smtp_user_alias}');
 define('EMAIL_KEY_EMAIL_SMTP_USER', '{email_smtp_user}');
 define('EMAIL_KEY_USCNOME', '{uscnome}');
 define('EMAIL_KEY_GRCNOME', '{grcnome}');
 define('EMAIL_KEY_MACDESC', '{macdesc}');
+define('EMAIL_KEY_MACTIPO', '{mactipo}');
 define('EMAIL_KEY_CACTOKN', '{cactokn}');
 define('EMAIL_KEY_RSCTOKN', '{rsctokn}');
+define('EMAIL_KEY_EMITENTE', '{emitente}');
 define('EMAIL_KEY_NOTIFICATION_MESSAGE', '{notification_message}');
 define('EMAIL_KEY_RECOVERY_LINK', '{recovery_link}');
 define('EMAIL_KEY_CONFIRMATION_LINK', '{confirmation_link}');
+define('EMAIL_KEY_MATERIAL_LINK', '{material_link}');
 define('EMAIL_KEY_SEDING_DATE', '{sending_date}');
