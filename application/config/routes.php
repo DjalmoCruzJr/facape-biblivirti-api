@@ -86,6 +86,7 @@ $route['API/group/delete']['post'] = 'api/group/delete';
 $route['API/group/info']['post'] = 'api/group/info';
 $route['API/group/search']['post'] = 'api/group/search';
 $route['API/group/subscribe']['post'] = 'api/group/subscribe';
+$route['API/group/unsubscribe']['post'] = 'api/group/unsubscribe';
 
 
 /**

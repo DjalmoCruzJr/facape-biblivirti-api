@@ -562,7 +562,6 @@ class Group extends CI_Controller {
                 } else {
                     // carrega os dados para o envio do email
                     $group = $this->grupo_model->find_by_grnid($data['grnid']);
-                    $admin = $this->grupo_model->find_group_admin($data['grnid']);
                     $user = $this->usuario_model->find_by_usnid($data['usnid']);
                     // Seta os dados para o envio do email de notificação de novo grupo
                     $from = EMAIL_SMTP_USER;
@@ -572,7 +571,6 @@ class Group extends CI_Controller {
                     $datas = [
                         EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
                         EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
-                        EMAIL_KEY_GRADMIN => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
                         EMAIL_KEY_GRCNOME => $group->grcnome,
                         EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
                         EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
@@ -588,6 +586,105 @@ class Group extends CI_Controller {
                     } else {
                         $this->response['response_code'] = RESPONSE_CODE_OK;
                         $this->response['response_message'] = "Usuário adicionado com sucesso!";
+                    }
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/group/unsubscribe
+     * @return JSON
+     *
+     * Metodo para remover um usuario em um grupo.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid": "ID do grupo",
+     *      "usnid": "ID do usuario admin do grupo"
+     *      "usnid2": "ID do usuario a ser removido"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta"
+     * }
+     */
+    public function unsubscribe() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->group_bo->set_data($data);
+
+        // Verifica se os dados nao foram validados
+        if ($this->group_bo->validate_unsubscribe() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
+        } else {
+            $data = $this->group_bo->get_data();
+            $admin = $this->grupo_model->find_group_admin($data['grnid']);
+
+            // Verifica se o usuario logado eh admin do grupo
+            if ($admin->usnid != $data['usnid']) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar remover usuário do grupo!\n";
+                $this->response['response_message'] .= "Somente o administrador do grupo ou o próprio usuário têm permissão para removê-lo.";
+            } else if ($admin->usnid == $data['usnid2']) { // Verifica se o usuario a ser removido eh o admin do grupo
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Houve um erro ao tentar remover usuário no grupo. Tente novamente!\n";
+                $this->response['response_message'] .= "O administrador do grupo não pode ser removido.";
+            } else {
+                $users = $this->grupo_model->find_group_users($data['grnid']);
+
+                $is_member = false;
+                if (!is_null($users)) { // Percorre a lista de usuarios do grupo buscando o usuario a ser excluido
+                    foreach ($users as $user) {
+                        if ($user->usnid == $data['usnid2']) {
+                            $is_member = true;
+                            break;
+                        }
+                    }
+                }
+
+                if ($is_member === false) { // Verifica se o usuario a ser exlcuido nao eh membro do grupo
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Este usuário não é um membro do grupo!";
+                } else {
+                    // Verifica se o usuario foi removido do grupo
+                    if ($this->grupo_model->remove_member($data['grnid'], $data['usnid2']) === false) {
+                        $this->response['response_message'] = "Houve um erro ao tentar remover usuário no grupo. Tente novamente!\n";
+                        $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                    } else {
+                        // carrega os dados para o envio do email
+                        $group = $this->grupo_model->find_by_grnid($data['grnid']);
+                        $user = $this->usuario_model->find_by_usnid($data['usnid2']);
+                        // Seta os dados para o envio do email de notificação de novo grupo
+                        $from = EMAIL_SMTP_USER;
+                        $to = $user->uscmail;
+                        $subject = EMAIL_SUBJECT_DELETE_MEMBER;
+                        $message = EMAIL_MESSAGE_DELETE_MEMBER;
+                        $datas = [
+                            EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                            EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                            EMAIL_KEY_GRCNOME => $group->grcnome,
+                            EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                            EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                        ];
+
+                        $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                        if ($this->biblivirti_email->send() === false) {
+                            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                            $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_DELETE_MEMBER . "!\n";
+                            $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                            $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                        } else {
+                            $this->response['response_code'] = RESPONSE_CODE_OK;
+                            $this->response['response_message'] = "Usuário removido com sucesso!";
+                        }
                     }
                 }
             }

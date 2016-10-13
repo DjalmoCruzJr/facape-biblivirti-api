@@ -207,6 +207,20 @@ class Grupo_model extends CI_Model {
     }
 
     /**
+     * @param $grnid
+     * @param $usnid
+     * @param bool $admin
+     * @return bool
+     *
+     * Metoda remover a relacao de um USUARIO com um GRUPO
+     */
+    public function remove_member($grnid, $usnid) {
+        $this->db->where('gunidgr', $grnid);
+        $this->db->where('gunidus', $usnid);
+        return $this->db->delete('grupousuario') === true;
+    }
+
+    /**
      * @param $data
      * @return int
      *
