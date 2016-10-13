@@ -370,4 +370,92 @@ class Account_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>edit_profile</i> do controller <i>Account</i>.
+     */
+    public function validate_profile_edit() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo USNID (ID do uisuario)*
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCNOME (nome)
+        if (isset($this->data['uscnome'])) {
+            if (empty(trim($this->data['uscnome']))) {
+                $this->errors['uscnome'] = 'O NOME não pode ser vazio!';
+                $status = FALSE;
+            } else if (!is_string($this->data['uscnome'])) {
+                $this->errors['uscnome'] = 'O NOME deve ser um valor alfanuérico!';
+                $status = FALSE;
+            } else if (strlen($this->data['uscnome']) > USCNOME_MAX_LENGTH) {
+                $this->errors['uscnome'] = 'O NOME deve conter no máximo ' . USCNOME_MAX_LENGTH . ' caracter(es)!';
+                $status = FALSE;
+            }
+        }
+
+        // Validando o campo USCMAIL (email)
+        if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
+            $this->errors['uscmail'] = 'O E-MAILl é obrigatório!';
+            $status = FALSE;
+        } else if (!filter_var($this->data['uscmail'], FILTER_VALIDATE_EMAIL)) {
+            $this->errors['uscmail'] = 'Informe um E-MAIL válido!';
+            $status = FALSE;
+        } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
+            $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCLOGN (login)
+        if (!isset($this->data['usclogn']) || empty(trim($this->data['usclogn']))) {
+            $this->errors['usclogn'] = 'O LOGIN é obrigatório!';
+            $status = FALSE;
+        } else if (strpos($this->data['usclogn'], ' ') > 0) {
+            $this->errors['usclogn'] = 'O LOGIN não pode conter espaço(s) em branco(s)!';
+            $status = FALSE;
+        } else if (strlen($this->data['usclogn']) > USCLOGN_MAX_LENGTH) {
+            $this->errors['usclogn'] = 'O LOGIN deve conter no máximo ' . USCLOGN_MAX_LENGTH . ' caracter(es)!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCSENH (senha)
+        if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
+            $this->errors['uscsenh'] = 'A SENHA é obrigatório!';
+            $status = FALSE;
+        } else if (strpos($this->data['uscsenh'], ' ') > 0) {
+            $this->errors['uscsenh'] = 'A SENHA não pode conter espaço(s) em branco(s)!';
+            $status = FALSE;
+        } else if (strlen($this->data['uscsenh']) > USCSENH_MAX_LENGTH) {
+            $this->errors['uscsenh'] = 'A SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCSENH2 (Confirmacao da Senha)
+        if (!isset($this->data['uscsenh2']) || empty(trim($this->data['uscsenh2']))) {
+            $this->errors['uscsenh2'] = 'O campo CONFIRMAR SENHA é obrigatório!';
+            $status = FALSE;
+        } else if (strcmp($this->data['uscsenh'], $this->data['uscsenh2']) != 0) {
+            $this->errors['uscsenh2'] = 'As senhas não conferem!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
 }

@@ -723,4 +723,78 @@ class Account extends CI_Controller {
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
+
+    /**
+     * @url: API/account/profile/edit
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para editar os dados do perfil do usuario.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid": "ID do usuario",
+     *      "uscmail": "E-email do usuario",
+     *      "usclogn": "Login do usuario",
+     *      "uscsenh": "Senha do usuario",
+     *      "uscsenh2": "Confirmacao de senha"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : {
+     *          "usnid" : "ID do usuario atualizado"
+     *      }
+     * }
+     */
+    public function profile_edit() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_profile_edit() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
+            $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
+            $id = $this->usuario_model->update($data);
+            // verifica se houve falha na execucao do model
+            if (is_null($id)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Houve um erro ao tentar atualizar os dados do ususario! Tente novamente.\n";
+                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            } else {
+                $from = EMAIL_SMTP_USER;
+                $to = $data['uscmail'];
+                $subject = EMAIL_SUBJECT_EDIT_PROFILE;
+                $message = EMAIL_MESSAGE_EDIT_PROFILE;
+                $datas = [
+                    EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                    EMAIL_KEY_USCNOME => (!is_null($data['uscnome'])) ? $data['uscnome'] : $data['usclogn'],
+                    EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                    EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                ];
+
+                $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                if ($this->biblivirti_email->send() === false) {
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_PROFILE . "! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                    $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                } else {
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Perfil atualizado com sucesso!";
+                    $this->response['response_data'] = ['usnid' => $id];
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
 }

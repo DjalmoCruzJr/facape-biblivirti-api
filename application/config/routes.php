@@ -68,6 +68,7 @@ $route['API/account/email/confirmation']['get'] = 'api/account/email_confirmatio
 $route['API/account/password/reset']['get'] = 'api/account/password_reset';
 $route['API/account/password/edit']['post'] = 'api/account/password_edit';
 $route['API/account/profile']['post'] = 'api/account/profile';
+$route['API/account/profile/edit']['post'] = 'api/account/profile_edit';
 $route['API/account/search']['post'] = 'api/account/search';
 
 /**
