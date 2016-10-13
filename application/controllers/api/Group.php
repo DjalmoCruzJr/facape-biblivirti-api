@@ -82,30 +82,30 @@ class Group extends CI_Controller {
         $this->group_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_list_all() === FALSE) {
-            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $response['response_errors'] = $this->group_bo->get_errors();
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
             $groups = $this->grupo_model->find_by_usnid($data['usnid']);
             // verifica se houve falha na execucao do model
             if (is_null($groups)) {
-                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Nenhum grupo encontrado.";
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 foreach ($groups as $group) {
                     $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
                     unset($group->grnidai); // Remove o campo 'grnidai' do objeto de resposta
                     $group->admin = $this->grupo_model->find_group_admin($group->grnid);
                 }
-                $response['response_code'] = RESPONSE_CODE_OK;
-                $response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
-                $response['response_data'] = $groups;
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
+                $this->response['response_data'] = $groups;
             }
         }
 
         $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($response, JSON_PRETTY_PRINT);
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
     /**
@@ -137,56 +137,65 @@ class Group extends CI_Controller {
         $this->group_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_add() === FALSE) {
-            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $response['response_errors'] = $this->group_bo->get_errors();
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
-            $id = $this->grupo_model->save($data);
-            // verifica se houve falha na execucao do model
-            if ($id === 0) {
-                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Houve um erro ao tentar salvar as informações do grupo! Tente novamente.\n";
-                $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            $user = $this->usuario_model->find_by_usnid($data['usnid']);
+
+            // Verifica se a conta do usuario esta ativa
+            if ($user->uscstat === USCSTAT_INATIVO) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
+                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
-                // Carrega os dados do grupo cadastrado
-                $user = $this->usuario_model->find_by_usnid($data['usnid']);
-                if (is_null($user)) {
-                    $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $response['response_message'] = "Houve um erro ao tentar carregar as informações do usuário! Tente novamente.\n";
-                    $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                $id = $this->grupo_model->save($data);
+                // verifica se houve falha na execucao do model
+                if ($id === 0) {
+                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $this->response['response_message'] = "Houve um erro ao tentar salvar as informações do grupo! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-                    // Seta os dados para o envio do email de notificação de novo grupo
-                    $from = EMAIL_SMTP_USER;
-                    $to = $user->uscmail;
-                    $subject = EMAIL_SUBJECT_NEW_GROUP;
-                    $message = EMAIL_MESSAGE_NEW_GROUP;
-                    $datas = [
-                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-                        EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
-                        EMAIL_KEY_GRCNOME => $data['grcnome'],
-                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-                    ];
-
-                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
-
-                    if ($this->biblivirti_email->send() === false) {
-                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_GROUP . "!\n";
-                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
-                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    // Carrega os dados do grupo cadastrado
+                    $user = $this->usuario_model->find_by_usnid($data['usnid']);
+                    if (is_null($user)) {
+                        $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                        $this->response['response_message'] = "Houve um erro ao tentar carregar as informações do usuário! Tente novamente.\n";
+                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                     } else {
-                        $response['response_code'] = RESPONSE_CODE_OK;
-                        $response['response_message'] = "Grupo cadastrado com sucesso!";
-                        $response['response_data'] = ['grnid' => $id];
+                        // Seta os dados para o envio do email de notificação de novo grupo
+                        $from = EMAIL_SMTP_USER;
+                        $to = $user->uscmail;
+                        $subject = EMAIL_SUBJECT_NEW_GROUP;
+                        $message = EMAIL_MESSAGE_NEW_GROUP;
+                        $datas = [
+                            EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                            EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                            EMAIL_KEY_GRCNOME => $data['grcnome'],
+                            EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                            EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                        ];
+
+                        $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                        if ($this->biblivirti_email->send() === false) {
+                            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                            $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_GROUP . "!\n";
+                            $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                            $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                        } else {
+                            $this->response['response_code'] = RESPONSE_CODE_OK;
+                            $this->response['response_message'] = "Grupo cadastrado com sucesso!";
+                            $this->response['response_data'] = ['grnid' => $id];
+                        }
                     }
                 }
-
-                $this->output->set_content_type('application/json', 'UTF-8');
-                echo json_encode($response, JSON_PRETTY_PRINT);
             }
         }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
     /**
@@ -219,23 +228,23 @@ class Group extends CI_Controller {
         $this->group_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_edit() === FALSE) {
-            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $response['response_errors'] = $this->group_bo->get_errors();
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
             $group = $this->grupo_model->find_by_grnid($data['grnid']);
 
             // verifica se houve falha na execucao do model
             if (is_null($group)) {
-                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Nenhum grupo encontrado.";
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 $group->admin = $this->grupo_model->find_group_admin($group->grnid);
                 if ($group->admin->usnid != $data['usnid']) {
-                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
-                    $response['response_message'] = "Erro ao tentar editar o grupo!\n";
-                    $response['response_message'] .= "Somente o administrador tem permissão para editá-lo!";
+                    $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $this->response['response_message'] = "Erro ao tentar editar o grupo!\n";
+                    $this->response['response_message'] .= "Somente o administrador tem permissão para editá-lo!";
                 } else {
 
                     // Atualiza os dados do grupo
@@ -262,15 +271,15 @@ class Group extends CI_Controller {
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {
-                        $response['response_message'] = "Grupo atualizado com sucesso!";
-                        $response['response_data'] = ['grnid' => $data['grnid']];
+                        $this->response['response_message'] = "Grupo atualizado com sucesso!";
+                        $this->response['response_data'] = ['grnid' => $data['grnid']];
                     }
                 }
             }
         }
 
         $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($response, JSON_PRETTY_PRINT);
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
 
@@ -298,9 +307,9 @@ class Group extends CI_Controller {
         $this->group_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_delete() === FALSE) {
-            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $response['response_errors'] = $this->group_bo->get_errors();
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
             // Verifica o grupo foi encontrado
@@ -308,19 +317,19 @@ class Group extends CI_Controller {
             // Verifica se o usuario eh administrador do grupo
             // verifica se houve falha na execucao do model
             if (is_null($group)) {
-                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Nenhum grupo encontrado.";
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 $group->admin = $this->grupo_model->find_group_admin($group->grnid);
                 if ($group->admin->usnid != $data['usnid']) {
-                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
-                    $response['response_message'] = "Erro ao tentar excluir o grupo!\n";
-                    $response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
+                    $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $this->response['response_message'] = "Erro ao tentar excluir o grupo!\n";
+                    $this->response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
                 } else {
                     if (!$this->grupo_model->delete($data['grnid'])) { // Verifica se o grupo foi excluido com sucesso!
-                        $response['response_code'] = RESPONSE_CODE_OK;
-                        $response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
-                        $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
+                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                     } else {
                         // Seta os dados para o envio do email de notificação de novo grupo
                         $from = EMAIL_SMTP_USER;
@@ -343,8 +352,8 @@ class Group extends CI_Controller {
                             $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                             $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                         } else {
-                            $response['response_code'] = RESPONSE_CODE_OK;
-                            $response['response_message'] = "Grupo excluído com sucesso!";
+                            $this->response['response_code'] = RESPONSE_CODE_OK;
+                            $this->response['response_message'] = "Grupo excluído com sucesso!";
                         }
                     }
                 }
@@ -352,7 +361,7 @@ class Group extends CI_Controller {
         }
 
         $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($response, JSON_PRETTY_PRINT);
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
     /**
@@ -411,9 +420,9 @@ class Group extends CI_Controller {
         $this->group_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_info() === FALSE) {
-            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $response['response_errors'] = $this->group_bo->get_errors();
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
 
@@ -422,13 +431,13 @@ class Group extends CI_Controller {
             $group->admin = $this->grupo_model->find_group_admin($group->grnid);
             $group->users = $this->grupo_model->find_group_users($group->grnid);
 
-            $response['response_code'] = RESPONSE_CODE_OK;
-            $response['response_message'] = "Grupo encontado com sucesso!";
-            $response['response_data'] = $group;
+            $this->response['response_code'] = RESPONSE_CODE_OK;
+            $this->response['response_message'] = "Grupo encontado com sucesso!";
+            $this->response['response_data'] = $group;
         }
 
         $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($response, JSON_PRETTY_PRINT);
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
     /**
@@ -494,6 +503,71 @@ class Group extends CI_Controller {
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Senha alterada com sucesso!";
                 $this->response['response_data'] = $groups;
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/group/search
+     * @return JSON
+     *
+     * Metodo para buscar grupos.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "reference" : "Referencia para a pesquisa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : [
+     *          {
+     *              "grnid": "ID do grupo",
+     *              "grcnome" : "Nome do grupo",
+     *              "grcfoto" : "Caminho da foto do grupo",
+     *              "grctipo" : "Tipo do grupo",
+     *              "grdcadt" : "Data de cadastro do grupo",
+     *              "areaofinterest" : {
+     *                  "ainid" : "ID da area de interasse",
+     *                  "aicdesc" : "Descricao da area de interesse"
+     *              },
+     *              "admin" : {
+     *                  "usnid" : "ID do usuario",
+     *                  "uscfbid" : "FacebookID do usuario",
+     *                  "uscnome" : "Nome do usuario",
+     *                  "uscmail" : "E-email do usuario",
+     *                  "usclogn" : "Login do usuario",
+     *                  "uscfoto" : "Caminho da foto do usuario",
+     *                  "uscstat" : "Status do usuario",
+     *                  "usdcadt" : "Data de cadastro do usuario"
+     *              },
+     *          },
+     *      ]
+     * }
+     */
+    public function subscribe() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->group_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->group_bo->validate_subscribe() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
+        } else {
+            $data = $this->group_bo->get_data();
+
+            if (!$this->grupo_model->add_member($data['grnid'], $data['usnid'])) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Houve um erro ao tentar inscrever usuário no grupo. Tente novamente!\n";
+                $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            } else {
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Usuário adicionado com sucesso!";
             }
         }
 
