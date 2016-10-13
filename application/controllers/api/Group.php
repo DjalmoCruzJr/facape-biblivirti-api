@@ -511,41 +511,19 @@ class Group extends CI_Controller {
     }
 
     /**
-     * @url: API/group/search
+     * @url: API/group/subscribe
      * @return JSON
      *
-     * Metodo para buscar grupos.
+     * Metodo para adicionar um usuario em um grupo.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "reference" : "Referencia para a pesquisa"
+     *      "grnid": "ID do grupo",
+     *      "usnid": "ID od usuario"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
-     *      "response_message" : "Mensagem da resposta",
-     *      "response_data" : [
-     *          {
-     *              "grnid": "ID do grupo",
-     *              "grcnome" : "Nome do grupo",
-     *              "grcfoto" : "Caminho da foto do grupo",
-     *              "grctipo" : "Tipo do grupo",
-     *              "grdcadt" : "Data de cadastro do grupo",
-     *              "areaofinterest" : {
-     *                  "ainid" : "ID da area de interasse",
-     *                  "aicdesc" : "Descricao da area de interesse"
-     *              },
-     *              "admin" : {
-     *                  "usnid" : "ID do usuario",
-     *                  "uscfbid" : "FacebookID do usuario",
-     *                  "uscnome" : "Nome do usuario",
-     *                  "uscmail" : "E-email do usuario",
-     *                  "usclogn" : "Login do usuario",
-     *                  "uscfoto" : "Caminho da foto do usuario",
-     *                  "uscstat" : "Status do usuario",
-     *                  "usdcadt" : "Data de cadastro do usuario"
-     *              },
-     *          },
-     *      ]
+     *      "response_message" : "Mensagem da resposta"
      * }
      */
     public function subscribe() {
@@ -553,6 +531,7 @@ class Group extends CI_Controller {
 
         $this->response = [];
         $this->group_bo->set_data($data);
+
         // Verifica se os dados nao foram validados
         if ($this->group_bo->validate_subscribe() === FALSE) {
             $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
@@ -560,14 +539,57 @@ class Group extends CI_Controller {
             $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
+            $users = $this->grupo_model->find_group_users($data['grnid'], 0, 1000);
+            $is_member = false;
 
-            if (!$this->grupo_model->add_member($data['grnid'], $data['usnid'])) {
-                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Houve um erro ao tentar inscrever usuário no grupo. Tente novamente!\n";
-                $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            if (!is_null($users)) { // Percorre a lista de usuarios do grupo buscando o usuario a ser adicionado
+                foreach ($users as $user) {
+                    if ($user->usnid == $data['usnid']) {
+                        $is_member = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($is_member === true) { // Verifica se o usuario ja eh membro do grupo
+                $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                $this->response['response_message'] = "Este usuário já um membro do grupo!";
             } else {
-                $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Usuário adicionado com sucesso!";
+                if ($this->grupo_model->add_member($data['grnid'], $data['usnid']) === false) { // Verifica se o usuario foi adicionado do grupo
+                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $this->response['response_message'] = "Houve um erro ao tentar adicionar usuário no grupo. Tente novamente!\n";
+                    $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                } else {
+                    // carrega os dados para o envio do email
+                    $group = $this->grupo_model->find_by_grnid($data['grnid']);
+                    $admin = $this->grupo_model->find_group_admin($data['grnid']);
+                    $user = $this->usuario_model->find_by_usnid($data['usnid']);
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    $from = EMAIL_SMTP_USER;
+                    $to = $user->uscmail;
+                    $subject = EMAIL_SUBJECT_NEW_MEMBER;
+                    $message = EMAIL_MESSAGE_NEW_MEMBER;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                        EMAIL_KEY_GRADMIN => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                        EMAIL_KEY_GRCNOME => $group->grcnome,
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MEMBER . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Usuário adicionado com sucesso!";
+                    }
+                }
             }
         }
 
