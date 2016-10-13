@@ -318,7 +318,7 @@ class Account extends CI_Controller {
                     $datas = [
                         EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
                         EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
-                        EMAIL_KEY_CACTOKN => $token['rsctokn'],
+                        EMAIL_KEY_RSCTOKN => $token['rsctokn'],
                         EMAIL_KEY_RECOVERY_LINK => base_url('API/account/password/reset') . '?rsctokn=' . $token['rsctokn'],
                         EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
                         EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
@@ -759,37 +759,45 @@ class Account extends CI_Controller {
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
-            unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
-            $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
-            $id = $this->usuario_model->update($data);
-            // verifica se houve falha na execucao do model
-            if (is_null($id)) {
-                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Houve um erro ao tentar atualizar os dados do ususario! Tente novamente.\n";
-                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            $user = $this->usuario_model->find_by_usnid($data['usnid']);
+            if ($user->uscstat === USCSTAT_INATIVO) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
+                $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
-                $from = EMAIL_SMTP_USER;
-                $to = $data['uscmail'];
-                $subject = EMAIL_SUBJECT_EDIT_PROFILE;
-                $message = EMAIL_MESSAGE_EDIT_PROFILE;
-                $datas = [
-                    EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-                    EMAIL_KEY_USCNOME => (!is_null($data['uscnome'])) ? $data['uscnome'] : $data['usclogn'],
-                    EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-                    EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-                ];
-
-                $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
-
-                if ($this->biblivirti_email->send() === false) {
-                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                    $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_PROFILE . "! Tente novamente.\n";
+                unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
+                $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
+                $id = $this->usuario_model->update($data);
+                // verifica se houve falha na execucao do model
+                if (is_null($id)) {
+                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $this->response['response_message'] = "Houve um erro ao tentar atualizar os dados do ususario! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
-                    $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                 } else {
-                    $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "Perfil atualizado com sucesso!";
-                    $this->response['response_data'] = ['usnid' => $id];
+                    // Seta os dados para o envio de email.
+                    $from = EMAIL_SMTP_USER;
+                    $to = $data['uscmail'];
+                    $subject = EMAIL_SUBJECT_EDIT_PROFILE;
+                    $message = EMAIL_MESSAGE_EDIT_PROFILE;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($data['uscnome'])) ? $data['uscnome'] : $data['usclogn'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_PROFILE . "! Tente novamente.\n";
+                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Perfil atualizado com sucesso!";
+                        $this->response['response_data'] = ['usnid' => $id];
+                    }
                 }
             }
         }
