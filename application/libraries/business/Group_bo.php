@@ -85,7 +85,7 @@ class Group_bo {
         if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
             $this->errors['usnid'] = 'O ID do usuário é obrigatório!';
             $status = FALSE;
-        } else if(!is_numeric($this->data['usnid'])) {
+        } else if (!is_numeric($this->data['usnid'])) {
             $this->errors['usnid'] = 'O ID do usuário deve ser um valor inteiro!';
             $status = FALSE;
         }
@@ -123,7 +123,7 @@ class Group_bo {
         } else if (!is_numeric($this->data['grnidai'])) {
             $this->errors['grnidai'] = 'O ID DA ÁREA DE INTERESSE deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->areainteresse_model->find_by_ainid($this->data['grnidai']))) {
+        } else if (is_null($this->CI->areainteresse_model->find_by_ainid($this->data['grnidai']))) {
             $this->errors['grnidai'] = 'ID DA ÁREA DE INTERESSE inválido!';
             $status = FALSE;
         }
@@ -135,7 +135,7 @@ class Group_bo {
         } else if (!is_numeric($this->data['usnid'])) {
             $this->errors['usnid'] = 'O ID USUÁRIO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
             $this->errors['usnid'] = 'ID USUÁRIO inválido!';
             $status = FALSE;
         }
@@ -176,7 +176,7 @@ class Group_bo {
         } else if (!is_numeric($this->data['usnid'])) {
             $this->errors['usnid'] = 'O ID USUÁRIO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
             $this->errors['usnid'] = 'ID USUÁRIO inválido!';
             $status = FALSE;
         }
@@ -224,10 +224,10 @@ class Group_bo {
     }
 
     /**
- * @return bool
- *
- * Metodo para validar os dados inentes ao processo de <i>delete</i> do controller <i>Group</i>.
- */
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>delete</i> do controller <i>Group</i>.
+     */
     public function validate_delete() {
         $status = TRUE;
 
@@ -244,7 +244,7 @@ class Group_bo {
         } else if (!is_numeric($this->data['grnid'])) {
             $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
             $this->errors['grnid'] = 'ID DO GRUPO inválido!';
             $status = FALSE;
         }
@@ -256,7 +256,7 @@ class Group_bo {
         } else if (!is_numeric($this->data['grnid'])) {
             $this->errors['usnid'] = 'O ID DO USUÀRIO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
             $this->errors['usnid'] = 'ID DO USUÀRIO inválido!';
             $status = FALSE;
         }
@@ -285,8 +285,34 @@ class Group_bo {
         } else if (!is_numeric($this->data['grnid'])) {
             $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if(is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
             $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>search</i> do controller <i>Group</i>.
+     */
+    public function validate_search() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo REFERENCE (Referenca para pesquisa)*
+        if (!isset($this->data['reference']) || empty(trim($this->data['reference']))) {
+            $this->errors['reference'] = 'Informe uma referência para a pesquisa!';
+            $status = FALSE;
+        } else if (!is_string($this->data['reference'])) {
+            $this->errors['reference'] = 'A REFERÊNCIA deve ser um valor alfanumérico!';
             $status = FALSE;
         }
 

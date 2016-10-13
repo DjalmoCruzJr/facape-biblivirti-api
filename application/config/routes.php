@@ -84,6 +84,7 @@ $route['API/group/add']['post'] = 'api/group/add';
 $route['API/group/edit']['post'] = 'api/group/edit';
 $route['API/group/delete']['post'] = 'api/group/delete';
 $route['API/group/info']['post'] = 'api/group/info';
+$route['API/group/search']['post'] = 'api/group/search';
 
 /**
  * API MATERIAL ROUTES

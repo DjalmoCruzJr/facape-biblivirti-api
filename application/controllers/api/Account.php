@@ -711,8 +711,7 @@ class Account extends CI_Controller {
             $user = $this->usuario_model->find_by_reference($data['reference']);
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Houve um erro ao tentar carregar as informações do perfil do usuário! Tente novamente.\n";
-                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                $this->response['response_message'] = "Nenhum usuário encontrado!";
             } else {
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Senha alterada com sucesso!";

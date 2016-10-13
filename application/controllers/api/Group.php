@@ -431,4 +431,74 @@ class Group extends CI_Controller {
         echo json_encode($response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/group/search
+     * @return JSON
+     *
+     * Metodo para buscar grupos.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "reference" : "Referencia para a pesquisa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : [
+     *          {
+     *              "grnid": "ID do grupo",
+     *              "grcnome" : "Nome do grupo",
+     *              "grcfoto" : "Caminho da foto do grupo",
+     *              "grctipo" : "Tipo do grupo",
+     *              "grdcadt" : "Data de cadastro do grupo",
+     *              "areaofinterest" : {
+     *                  "ainid" : "ID da area de interasse",
+     *                  "aicdesc" : "Descricao da area de interesse"
+     *              },
+     *              "admin" : {
+     *                  "usnid" : "ID do usuario",
+     *                  "uscfbid" : "FacebookID do usuario",
+     *                  "uscnome" : "Nome do usuario",
+     *                  "uscmail" : "E-email do usuario",
+     *                  "usclogn" : "Login do usuario",
+     *                  "uscfoto" : "Caminho da foto do usuario",
+     *                  "uscstat" : "Status do usuario",
+     *                  "usdcadt" : "Data de cadastro do usuario"
+     *              },
+     *          },
+     *      ]
+     * }
+     */
+    public function search() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->group_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->group_bo->validate_search() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
+        } else {
+            $data = $this->group_bo->get_data();
+            $groups = $this->grupo_model->find_by_grcnome($data['reference']);
+            if (is_null($groups)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Nenhum grupo encontrado!";
+            } else {
+                foreach ($groups as $group) {
+                    $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
+                    $group->admin = $this->grupo_model->find_group_admin($group->grnid);
+                    unset($group->grnidai); // Remove o campo GRNIDAI do objetos de resposta
+                }
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Senha alterada com sucesso!";
+                $this->response['response_data'] = $groups;
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
 }
