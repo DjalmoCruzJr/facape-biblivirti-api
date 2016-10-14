@@ -105,6 +105,7 @@ class Material extends CI_Controller {
      * Metodo para cadastrar um novo material.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
+     *      "usnid" : "ID do usuario",
      *      "grnid" : "ID do grupo",
      *      "macdesc" : "Descricao do material",
      *      "mactipo" : "Tipo do material",
@@ -144,39 +145,48 @@ class Material extends CI_Controller {
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
             $data = $this->material_bo->get_data();
-            $manid = $this->material_model->save($data);
-            // Verifica se houve falha na execucao do model
-            if (is_null($manid)) {
-                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material! Tente novamente.\n";
-                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+            $admin = $this->grupo_model->find_group_admin($data['grnid']);
+
+            // Verifica se o usuario nao eh administrador do grupo
+            if ($admin->usnid != $data['usnid']) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material!\n";
+                $this->response['response_message'] .= "Somente o administrador do grupo tem permissão para adicionar um material.";
             } else {
-                // Carrega os dados do administrador do grupo
-                $admin = $this->grupo_model->find_group_admin($data['manidgr']);
-                // Seta os dados para o envio do email de notificação de novo grupo
-                $from = EMAIL_SMTP_USER;
-                $to = $admin->uscmail;
-                $subject = EMAIL_SUBJECT_NEW_MATERIAL;
-                $message = EMAIL_MESSAGE_NEW_MATERIAL;
-                $datas = [
-                    EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-                    EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
-                    EMAIL_KEY_MACDESC => $data['macdesc'],
-                    EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-                    EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-                ];
-
-                $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
-
-                if ($this->biblivirti_email->send() === false) {
-                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                    $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MATERIAL . "!\n";
-                    $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
-                    $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                $manid = $this->material_model->save($data);
+                // Verifica se houve falha na execucao do model
+                if (is_null($manid)) {
+                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-                    $this->response['response_code'] = RESPONSE_CODE_OK;
-                    $this->response['response_message'] = "Material cadastrado com sucesso!";
-                    $this->response['response_data'] = $manid;
+                    // Carrega os dados do administrador do grupo
+                    $admin = $this->grupo_model->find_group_admin($data['manidgr']);
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    $from = EMAIL_SMTP_USER;
+                    $to = $admin->uscmail;
+                    $subject = EMAIL_SUBJECT_NEW_MATERIAL;
+                    $message = EMAIL_MESSAGE_NEW_MATERIAL;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                        EMAIL_KEY_MACDESC => $data['macdesc'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MATERIAL . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Material cadastrado com sucesso!";
+                        $this->response['response_data'] = $manid;
+                    }
                 }
             }
         }
@@ -479,5 +489,107 @@ class Material extends CI_Controller {
 
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/material/share
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo compartilhar um material de um grupo com outro.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "manid" : "ID do material",
+     *      "grnid" : "ID do grupo",
+     *      "usnid" : "ID do usuario"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "request_code" : "Codigo da requsicao",
+     *      "request_message" : "Mensagem da requsicao"
+     * }
+     */
+    public function share() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->material_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->material_bo->validate_share() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->material_bo->get_errors();
+        } else {
+            $data = $this->material_bo->get_data();
+            $admin = $this->grupo_model->find_group_admin($data['grnid']);
+
+            if ($admin->usnid != $data['usnid']) { // Verifica se o usuario não eh o administrador do grupo
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar adicionar material no grupo!\n";
+                $this->response['response_message'] .= "Somente o administrador do grupo pode adicionar novos materiais.";
+            } else {
+                $group = $this->grupo_model->find_by_grnid($data['grnid']);
+                $material = $this->material_model->find_by_manid($data['manid']);
+                $contents = $this->material_model->find_material_contents($material->manid);
+                $questions = null;
+
+                // Seta os dados para compartilhar o material no grupo informado
+                $data = [];
+                $data['manidgr'] = $group->grnid;
+                $data['macdesc'] = $material->macdesc;
+                $data['mactipo'] = $material->mactipo;
+                $data['macurl'] = $material->macurl;
+                $data['macnivl'] = $material->macnivl;
+                $data['macstat'] = $material->macstat;
+                foreach ($contents as $content) {
+                    $data['contents'][] = ['conid' => $content->conid];
+                }
+                if ($material->mactipo === MACTIPO_SIMULADO) {
+                    $questions = $this->questao_model->find_material_questions($material->manid);
+                    foreach ($questions as $question) {
+                        $data['questions'][] = ['qenid' => $question->qenid];
+                    }
+                }
+
+                // Salva o material no novo grupo
+                $manid = $this->material_model->save($data);
+
+                if (is_null($manid)) { // Verifica se houve ao salvar o material
+                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $this->response['response_message'] = "Houve um erro ao tentar compartilhar o material! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                } else {
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    $from = EMAIL_SMTP_USER;
+                    $to = $admin->uscmail;
+                    $subject = EMAIL_SUBJECT_SHARE_MATERIAL;
+                    $message = EMAIL_MESSAGE_SHARE_MATERIAL;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                        EMAIL_KEY_MACDESC => $data['macdesc'],
+                        EMAIL_KEY_GRCNOME => $group->grcnome,
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_SHARE_MATERIAL . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Material cadastrado com sucesso!";
+                        $this->response['response_data'] = $manid;
+                    }
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 }

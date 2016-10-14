@@ -112,6 +112,18 @@ class Material_bo {
             return false;
         }
 
+        // Validando o campo USNID (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = false;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = false;
+        }
+
         // Validando o campo GRNID (ID do Grupo)
         if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
             $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
@@ -528,6 +540,59 @@ class Material_bo {
         } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
             $this->errors['manid'] = 'ID DO MATERIAL inválido!';
             $status = FALSE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>share</i> do controller <i>Material</i>.
+     */
+    public function validate_share() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo MANID (ID do Material)
+        if (!isset($this->data['manid']) || empty(trim($this->data['manid']))) {
+            $this->errors['manid'] = 'O ID DO MATERIAL obrigatório!';
+            $status = false;
+        } else if (!is_numeric($this->data['manid'])) {
+            $this->errors['manid'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
+            $this->errors['manid'] = 'ID DO MATERIAL inválido!';
+            $status = false;
+        }
+
+        // Validando o campo GRNID (ID do Grupo)
+        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
+            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+            $status = false;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = false;
+        }
+
+        // Validando o campo USNID (ID do Usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = false;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = false;
         }
 
         return $status;

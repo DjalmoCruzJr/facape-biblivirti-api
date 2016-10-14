@@ -266,6 +266,41 @@ class Material_model extends CI_Model {
 
     /**
      * @param $manid
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela CONTEUDO relaciondo com um MATERIAL.
+     */
+    public function find_material_contents($manid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT) {
+        $this->db->select('conid, conidgr, cocdesc, codcadt, codaldt');
+        $this->db->join('conteudomaterial', 'cmnidco = conid', 'inner');
+        $this->db->join('material', 'manid = cmnidma', 'inner');
+        $this->db->where('manid', $manid);
+        $query = $this->db->get('conteudo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $manid
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela QUESTAO relaciondo com um MATERIAL (Simulado).
+     */
+    public function find_material_questions($manid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT) {
+        $this->db->select('qenid, qecdesc, qectext, qecanex, qeecadt, qedaldt');
+        $this->db->join('questaosimulado', 'qsnidqe = qenid', 'inner');
+        $this->db->join('material', 'manid = cmnidma', 'inner');
+        $this->db->where('manid', $manid);
+        $query = $this->db->get('questao', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+
+    /**
+     * @param $manid
      * @param $conid
      * @return bool
      *
