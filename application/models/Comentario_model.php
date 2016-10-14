@@ -130,7 +130,7 @@ class Comentario_model extends CI_Model {
      * Metodo para buscar os registros da tabela COMENTARIO que sao RESPOSTAS de um determinado COMENTARIO
      * Se $ative = TRUE a busca trara somente registros com status ATIVO
      */
-    public function find_respostas_by_cenid($cenid, $limit = 10, $offset = 0, $active = false) {
+    public function find_answers_by_cenid($cenid, $limit = 10, $offset = 0, $active = false) {
         if ($active === true) {
             $this->db->where('cecstat', CECSTAT_ATIVO);
         }

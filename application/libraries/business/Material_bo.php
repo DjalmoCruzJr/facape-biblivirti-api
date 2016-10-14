@@ -598,4 +598,45 @@ class Material_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>details</i> do controller <i>Material</i>.
+     */
+    public function validate_details() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo USNID (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO obrigatório!';
+            $status = false;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = false;
+        }
+
+        // Validando o campo MANID (ID do Material)
+        if (!isset($this->data['manid']) || empty(trim($this->data['manid']))) {
+            $this->errors['manid'] = 'O ID DO MATERIAL obrigatório!';
+            $status = false;
+        } else if (!is_numeric($this->data['manid'])) {
+            $this->errors['manid'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
+            $status = false;
+        } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
+            $this->errors['manid'] = 'ID DO MATERIAL inválido!';
+            $status = false;
+        }
+
+        return $status;
+    }
+
 }

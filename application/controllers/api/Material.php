@@ -51,7 +51,8 @@ class Material extends CI_Controller {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem de resposta",
      *      "response_data" : [
-     *         {    "manid" : "ID do material",
+     *         {
+     *              "manid" : "ID do material",
      *              "macdesc" : "Descricao do usuario",
      *              "mactipo" : "Tipo de material",
      *              "macurl" : "URL do material",
@@ -594,6 +595,112 @@ class Material extends CI_Controller {
 
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/material/deteails/$manid
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo que mostra os detalhes de um materail.
+     * Recebe o arametro <em>manid</em> atraves de GET na URL
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "request_code" : "Codigo da requsicao",
+     *      "request_message" : "Mensagem da requsicao",
+     *      "request_data" : {
+     *          "manid" : "ID do material",
+     *          "macdesc" : "Descricao do usuario",
+     *          "mactipo" : "Tipo de material",
+     *          "macurl" : "URL do material",
+     *          "macnivl" : "Nivel do material",
+     *          "macstat" : "Status do material",
+     *          "madcadt" : "Data de cadastro do material",
+     *          "madaldt" : "Data de atualizacao do material"
+     *          "manqtdha" : "Qtd. de vizualizacoes do material"
+     *          "comments" : [
+     *              {
+     *                  "cenid"  :"ID do comentario",
+     *                  "cectext"  :"Texto do comentario",
+     *                  "cecanex"  :"Anexo do comentario",
+     *                  "cecstat"  :"Status do comentario",
+     *                  "cedcadt"  :"Data de cadastro",
+     *                  "cedaldt"  :"Data de alteracao"
+     *                  "cenqtdce"  :"Qtd.de Respostas"
+     *                  "user": {
+     *                      "usnid" : "ID do usuario",
+     *                      "uscfbid" : "FacebookID do usuario",
+     *                      "uscnome" : "Nome do usuario",
+     *                      "uscmail" : "E-email do usuario",
+     *                      "usclogn" : "Login do usuario",
+     *                      "uscfoto" : "Caminho da foto do usuario",
+     *                      "uscstat" : "Status do usuario",
+     *                      "tsdcadt" : "Data de cadastro do usuario",
+     *                      "usdaldt" : "Data de atualizacao do usuario"
+     *                  }
+     *              },
+     *          ]
+     *      }
+     * }
+     */
+    public function details() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->material_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->material_bo->validate_details() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->material_bo->get_errors();
+        } else {
+            $data = $this->material_bo->get_data();
+            $material = $this->material_model->find_by_manid($data['manid']);
+
+            if (is_null($material)) { // Verifica se o usuario não eh o administrador do grupo
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Material não encontrado! Tente novamente.\n";
+                $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            } else {
+                $users = $this->grupo_model->find_group_users($material->manidgr);
+                $is_member = false;
+                // Verifica se o grupo desse material tem membros.
+                if (!is_null($users)) {
+                    foreach ($users as $u) {
+                        if ($u->usnid == $data['usnid']) {
+                            $is_member = true;
+                            break;
+                        }
+                    }
+                }
+                // Verifica se o usuario nao eh um membro do grupo no qual o materal
+                if ($is_member === false) {
+                    $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $this->response['response_message'] = "Erro ao tentar carregar as informações do material.\n";
+                    $this->response['response_message'] .= "Somente os membros podem ter acesso aos materiais do grupo.";
+                } else {
+                    $material->manqtdha = $this->historicoacesso_model->count_by_hanidma($material->manid);
+                    $comments = $this->comentario_model->find_by_cenidma($material->manid);
+                    if (!is_null($comments)) {
+                        foreach ($comments as $comment) {
+                            $comment->cenqtdce = count($this->comentario_model->find_answers_by_cenid($comment->cenid));
+                            $comment->user = $this->usuario_model->find_by_usnid($comment->cenidus);
+                            unset($comment->cenidus);
+                            unset($comment->user->uscsenh);
+                        }
+                    }
+                    $material->comments = $comments;
+
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Material carregado com sucesso!";
+                    $this->response['response_data'] = $material;
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+
     }
 
 }
