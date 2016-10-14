@@ -290,9 +290,9 @@ class Material_model extends CI_Model {
      * Metodo para buscar os registros da tabela QUESTAO relaciondo com um MATERIAL (Simulado).
      */
     public function find_material_questions($manid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT) {
-        $this->db->select('qenid, qecdesc, qectext, qecanex, qeecadt, qedaldt');
+        $this->db->select('qenid, qecdesc, qectext, qecanex, qedcadt, qedaldt');
         $this->db->join('questaosimulado', 'qsnidqe = qenid', 'inner');
-        $this->db->join('material', 'manid = cmnidma', 'inner');
+        $this->db->join('material', 'manid = qsnidma', 'inner');
         $this->db->where('manid', $manid);
         $query = $this->db->get('questao', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;

@@ -145,7 +145,7 @@ class Material extends CI_Controller {
             $this->response['response_errors'] = $this->material_bo->get_errors();
         } else {
             $data = $this->material_bo->get_data();
-            $admin = $this->grupo_model->find_group_admin($data['grnid']);
+            $admin = $this->grupo_model->find_group_admin($data['manidgr']);
 
             // Verifica se o usuario nao eh administrador do grupo
             if ($admin->usnid != $data['usnid']) {
@@ -153,7 +153,9 @@ class Material extends CI_Controller {
                 $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material!\n";
                 $this->response['response_message'] .= "Somente o administrador do grupo tem permissão para adicionar um material.";
             } else {
+                unset($data['usnid']); // Remove o ID do usuario dos dados a serem persistidos.
                 $manid = $this->material_model->save($data);
+
                 // Verifica se houve falha na execucao do model
                 if (is_null($manid)) {
                     $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -161,7 +163,7 @@ class Material extends CI_Controller {
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
                     // Carrega os dados do administrador do grupo
-                    $admin = $this->grupo_model->find_group_admin($data['manidgr']);
+                    $group = $this->grupo_model->find_by_grnid($data['manidgr']);
                     // Seta os dados para o envio do email de notificação de novo grupo
                     $from = EMAIL_SMTP_USER;
                     $to = $admin->uscmail;
@@ -171,6 +173,7 @@ class Material extends CI_Controller {
                         EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
                         EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
                         EMAIL_KEY_MACDESC => $data['macdesc'],
+                        EMAIL_KEY_GRCNOME => $group->grcnome,
                         EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
                         EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
                     ];
@@ -545,7 +548,7 @@ class Material extends CI_Controller {
                     $data['contents'][] = ['conid' => $content->conid];
                 }
                 if ($material->mactipo === MACTIPO_SIMULADO) {
-                    $questions = $this->questao_model->find_material_questions($material->manid);
+                    $questions = $this->material_model->find_material_questions($material->manid);
                     foreach ($questions as $question) {
                         $data['questions'][] = ['qenid' => $question->qenid];
                     }
@@ -592,4 +595,5 @@ class Material extends CI_Controller {
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
+
 }
