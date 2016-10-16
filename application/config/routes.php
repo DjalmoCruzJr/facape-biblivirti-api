@@ -109,3 +109,4 @@ $route['API/content/list']['post'] = 'api/content/list_all';
  * API MESSAGE ROUTES
  */
 $route['API/message/list']['post'] = 'api/message/list_all';
+$route['API/message/add']['post'] = 'api/message/add';

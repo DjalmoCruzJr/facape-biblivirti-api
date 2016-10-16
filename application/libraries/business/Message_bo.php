@@ -107,4 +107,65 @@ class Message_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>add</i> do controller <i>Message</i>.
+     */
+    public function validate_add() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>msnidus</i> (ID do usuario da mensagem)
+        if (!isset($this->data['msnidus']) || empty(trim($this->data['msnidus']))) {
+            $this->errors['msnidus'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['msnidus'])) {
+            $this->errors['msnidus'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['msnidus']))) {
+            $this->errors['msnidus'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>msnidgr</i> (ID do grupo)
+        if (!isset($this->data['msnidgr']) || empty(trim($this->data['msnidgr']))) {
+            $this->errors['msnidgr'] = 'O ID DO GRUPO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['msnidgr'])) {
+            $this->errors['msnidgr'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['msnidgr']))) {
+            $this->errors['msnidgr'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>msctext</i> (Texto da mensagem)
+        if (!isset($this->data['msctext']) || empty(trim($this->data['msctext']))) {
+            $this->errors['msctext'] = 'O TEXTO DA MENSAGEM é obrigatório!';
+            $status = FALSE;
+        } else if (!is_string($this->data['msctext'])) {
+            $this->errors['msnidgr'] = 'O TEXTO DA MENSAGEM deve ser um valor alfanumérico!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>mscanex</i> (Anexo da mensagem)
+        if (isset($this->data['mscanex'])) { //  Se este campo for informado, sera validado
+            if (empty(trim($this->data['mscanex']))) {
+                $this->errors['mscanex'] = 'O ANEXO DA MENSAGEM é obrigatório!';
+                $status = FALSE;
+            } else if (!is_string($this->data['mscanex'])) {
+                $this->errors['mscanex'] = 'O ANEXO DA MENSAGEM deve ser um valor alfanumérico!';
+                $status = FALSE;
+            }
+        }
+
+        return $status;
+    }
+
 }
