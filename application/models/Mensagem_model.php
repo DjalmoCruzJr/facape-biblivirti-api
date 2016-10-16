@@ -39,14 +39,30 @@ class Mensagem_model extends CI_Model {
     }
 
     /**
-     * @param $alnid
+     * @param $msnid
      * @return mixed
      *
      * Metodo para buscar um registro da tabela MENSAGEN pelo ID
      */
-    public function find_by_alnid($alnid) {
-        $this->db->where('msnid', $alnid);
-        $query = $this->db->get('alternativa');
+    public function find_by_msnid($msnid) {
+        $this->db->where('msnid', $msnid);
+        $query = $this->db->get('mensagem');
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
+    }
+
+    /**
+     * @param $msnidus
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MENSAGEN relacionados com um USUARIO
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_msnidus($msnidus, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+        if ($active = true) {
+            $this->db->where('mscstat', MSCSTAT_ATIVO);
+        }
+        $this->db->where('msnidus', $msnidus);
+        $query = $this->db->get('mensagem', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
     }
 
@@ -57,12 +73,12 @@ class Mensagem_model extends CI_Model {
      * Metodo para buscar os registros da tabela MENSAGEN relacionados com um GRUPO
      * Se $active = TRUE a busca trara somente registros com status ATIVO
      */
-    public function find_by_msnidus($msnidgr, $active = false) {
+    public function find_by_msnidgr($msnidgr, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
         if ($active = true) {
             $this->db->where('mscstat', MSCSTAT_ATIVO);
         }
         $this->db->where('msnidgr', $msnidgr);
-        $query = $this->db->get('mensagem');
+        $query = $this->db->get('mensagem', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
     }
 
