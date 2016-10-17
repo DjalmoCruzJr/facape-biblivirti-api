@@ -181,7 +181,7 @@ class Message extends CI_Controller {
                     $this->response['response_message'] = "Houve um erro ao tentar enviar a mensagem! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
                 } else {
-                    /*// Carrega os dados para o envio do email de notificacao
+                    // Carrega os dados para o envio do email de notificacao
                     $user = $this->usuario_model->find_by_usnid($data['msnidus']);
                     $group = $this->grupo_model->find_by_grnid($data['msnidgr']);
                     // Seta os dados para o envio do email de notificação de novo grupo
@@ -205,11 +205,11 @@ class Message extends CI_Controller {
                         $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MESSAGE . "!\n";
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {*/
-                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $this->response['response_message'] = "Mensagem enviada com sucesso!";
-                    $this->response['response_data'] = ['msnid' => $id];
-                    //}
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                        $this->response['response_message'] = "Mensagem enviada com sucesso!";
+                        $this->response['response_data'] = ['msnid' => $id];
+                    }
                 }
             }
         }
