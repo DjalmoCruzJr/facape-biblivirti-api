@@ -598,12 +598,12 @@ class Material extends CI_Controller {
     }
 
     /**
-     * @url: API/material/deteails/$manid
+     * @url: API/material/deteails
      * @param string JSON
      * @return JSON
      *
      * Metodo que mostra os detalhes de um materail.
-     * Recebe o arametro <em>manid</em> atraves de GET na URL
+     * Recebe o arametro <em>manid</em> atraves de POST
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "request_code" : "Codigo da requsicao",

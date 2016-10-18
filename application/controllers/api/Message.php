@@ -204,7 +204,7 @@ class Message extends CI_Controller {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                         $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MESSAGE . "!\n";
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
-                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errors();
                     } else {
                         $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                         $this->response['response_message'] = "Mensagem enviada com sucesso!";
