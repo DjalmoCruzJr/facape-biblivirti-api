@@ -122,7 +122,7 @@ class Comment extends CI_Controller {
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {
-                        $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
                         $this->response['response_message'] = "Comentário adicionado com sucesso!";
                         $this->response['response_data'] = ['cenid' => $id];
                     }
