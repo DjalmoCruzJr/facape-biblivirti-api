@@ -116,3 +116,4 @@ $route['API/message/add']['post'] = 'api/message/add';
  */
 $route['API/comment/add']['post'] = 'api/comment/add';
 $route['API/comment/edit']['post'] = 'api/comment/edit';
+$route['API/comment/delete']['post'] = 'api/comment/delete';

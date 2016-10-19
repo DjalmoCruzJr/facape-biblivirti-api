@@ -240,4 +240,47 @@ class Comment_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>delete</i> do controller <i>Message</i>.
+     */
+    public function validate_delete() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>usnid</i> (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>cenid</i> (ID do comentario/resposta)
+        if (!isset($this->data['cenid']) || empty(trim($this->data['cenid']))) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cenid'] = 'O ID ' . $type . ' é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['cenid'])) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cenid'] = 'O ID ' . $type . ' deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->comentario_model->find_by_cenid($this->data['cenid']))) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cenid'] = 'ID ' . $type . ' inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
 }
