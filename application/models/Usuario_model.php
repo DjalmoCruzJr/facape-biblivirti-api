@@ -139,7 +139,7 @@ class Usuario_model extends CI_Model {
 
 
     /**
-     * @param $erefrence
+     * @param $reference
      * @param int $limit
      * @param int $offset
      * @param bool $like
@@ -151,15 +151,15 @@ class Usuario_model extends CI_Model {
      * Se $like = FALSE a busca eh feita no formato: field = value
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_by_reference($erefrence, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+    public function find_by_reference($reference, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
         if ($like === true) {
-            $this->db->or_like('uscnome', $erefrence);
-            $this->db->or_like('uscmail', $erefrence);
-            $this->db->or_like('usclogn', $erefrence);
+            $this->db->or_like('uscnome', $reference);
+            $this->db->or_like('uscmail', $reference);
+            $this->db->or_like('usclogn', $reference);
         } else {
-            $this->db->or_where('uscnome', $erefrence);
-            $this->db->or_where('uscmail', $erefrence);
-            $this->db->or_where('usclogn', $erefrence);
+            $this->db->or_where('uscnome', $reference);
+            $this->db->or_where('uscmail', $reference);
+            $this->db->or_where('usclogn', $reference);
         }
         if ($active === true) {
             $this->db->where('uscstat', USCSTAT_ATIVO);

@@ -291,7 +291,7 @@ class Account extends CI_Controller {
             // verifica se houve falha na execucao do model
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "E-email não encontrado . ";
+                $this->response['response_message'] = "E-email não encontrado.";
             } else if ($user->uscstat === USCSTAT_INATIVO) {
                 $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
@@ -495,7 +495,7 @@ class Account extends CI_Controller {
                 $data = [];
                 $data['user'] = $user;
                 $data['intent_category'] = INTENT_CATEGORY_ACCOUNT;
-                $data['intent_action'] = INTENT_ACTION_ACCOUNT_PASSWORD_RESET;
+                $data['intent_action'] = INTENT_ACTION_ACCOUNT_PASSWORD_EDIT;
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Redefinição de senha autorizada com cucesso!";
                 $this->response['response_data'] = $data;
@@ -574,6 +574,64 @@ class Account extends CI_Controller {
                     $this->response['response_message'] = "Senha alterada com sucesso!";
                     $this->response['response_data'] = ['usnid' => $id];
                 }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/account/search
+     * @return JSON
+     *
+     * Metodo para buscar usuarios.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "reference" : "Referencia para a pesquisa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : [
+     *          {
+     *              "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E - email do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          },
+     *      ]
+     *
+     * }
+     */
+    public function search() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_search() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
+            $this->response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            $users = $this->usuario_model->find_by_reference($data['reference']);
+            if (is_null($users)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Nenhum usuário encontrado!";
+            } else {
+                foreach ($users as $user) {
+                    unset($user->uscsenh); // Remove o campo senha dos objetos de resposta
+                }
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Senha alterada com sucesso!";
+                $this->response['response_data'] = $users;
             }
         }
 
@@ -661,61 +719,6 @@ class Account extends CI_Controller {
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Senha alterada com sucesso!";
                 $this->response['response_data'] = ['user' => $user, 'groups' => $groups];
-            }
-        }
-
-        $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($this->response, JSON_PRETTY_PRINT);
-    }
-
-    /**
-     * @url: API/account/search
-     * @return JSON
-     *
-     * Metodo para buscar usuarios.
-     * Recebe como parametro um <i>JSON</i> no seguinte formato:
-     * {
-     *      "reference" : "Referencia para a pesquisa"
-     * }
-     * e retorna um <i>JSON</i> no seguinte formato:
-     * {
-     *      "response_code" : "Codigo da resposta",
-     *      "response_message" : "Mensagem da resposta",
-     *      "response_data" : [
-     *          {
-     *              "usnid" : "ID do usuario",
-     *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E - email do usuario",
-     *              "usclogn" : "Login do usuario",
-     *              "uscfoto" : "Caminho da foto do usuario",
-     *              "uscstat" : "Status do usuario",
-     *              "tsdcadt" : "Data de cadastro do usuario",
-     *              "usdaldt" : "Data de atualizacao do usuario"
-     *          },
-     *      ]
-     *
-     * }
-     */
-    public function search() {
-        $data = $this->biblivirti_input->get_raw_input_data();
-
-        $this->response = [];
-        $this->account_bo->set_data($data);
-        // Verifica se os dados nao foram validados
-        if ($this->account_bo->validate_search() === FALSE) {
-            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $this->response['response_message'] = "Dados não informados e / ou inválidos . VERIFIQUE!";
-            $this->response['response_errors'] = $this->account_bo->get_errors();
-        } else {
-            $data = $this->account_bo->get_data();
-            $user = $this->usuario_model->find_by_reference($data['reference']);
-            if (is_null($user)) {
-                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Nenhum usuário encontrado!";
-            } else {
-                $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Senha alterada com sucesso!";
-                $this->response['response_data'] = $user;
             }
         }
 

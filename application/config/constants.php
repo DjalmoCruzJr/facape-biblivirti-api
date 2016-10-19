@@ -112,7 +112,7 @@ define('RESPONSE_CODE_NOT_FOUND', 404);
  * Constantes utilizadas para definir os valor padrao de limit e offset
  * dos metodos de busca dos models
  */
-define('LIMIT_DEFAULT', 10);
+define('LIMIT_DEFAULT', 1000);
 define('OFFSET_DEFAULT', 0);
 
 /**---------------------------------------
@@ -291,7 +291,7 @@ define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
  *
  */
 define('INTENT_CATEGORY_ACCOUNT', 'org.sysmob.biblivirti.intent.category.ACCOUNT');
-define('INTENT_ACTION_ACCOUNT_PASSWORD_RESET', 'org.sysmob.biblivirti.intent.action.ACCOUNT_PASSWORD_RESET');
+define('INTENT_ACTION_ACCOUNT_PASSWORD_EDIT', 'org.sysmob.biblivirti.intent.action.ACCOUNT_PASSWORD_EDIT');
 
 /**------------------------------------------------------------
  * EMAIl CONFIGURATION

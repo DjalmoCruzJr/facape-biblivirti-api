@@ -358,7 +358,7 @@ class Account_bo {
             return false;
         }
 
-        // Validando o campo REFERENCE (Referenca para pesquisa)*
+        // Validando o campo REFERENCE (Referenca para pesquisa)
         if (!isset($this->data['reference']) || empty(trim($this->data['reference']))) {
             $this->errors['reference'] = 'Informe uma referência para a pesquisa!';
             $status = FALSE;
