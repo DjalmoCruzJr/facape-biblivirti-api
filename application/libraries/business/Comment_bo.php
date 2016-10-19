@@ -107,20 +107,24 @@ class Comment_bo {
 
         // Validando o campo <i>cectext</i> (Texto da comentario)
         if (!isset($this->data['cectext']) || empty(trim($this->data['cectext']))) {
-            $this->errors['cectext'] = 'O TEXTO DO COMENTÁRIO é obrigatório!';
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cectext'] = 'O TEXTO ' . $type . ' é obrigatório!';
             $status = FALSE;
         } else if (!is_string($this->data['cectext'])) {
-            $this->errors['cectext'] = 'O TEXTO DO COMENTÁRIO deve ser um valor alfanumérico!';
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cectext'] = 'O TEXTO ' . $type . ' deve ser um valor alfanumérico!';
             $status = FALSE;
         }
 
         // Validando o campo <i>cecanex</i> (Anexo do comentario)
         if (isset($this->data['cecanex'])) { //  Se este campo for informado, sera validado
             if (empty(trim($this->data['cecanex']))) {
-                $this->errors['cecanex'] = 'O ANEXO DO COMENTÁRIO é obrigatório!';
+                $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+                $this->errors['cecanex'] = 'O ANEXO ' . $type . ' é obrigatório!';
                 $status = FALSE;
             } else if (!is_string($this->data['cecanex'])) {
-                $this->errors['cecanex'] = 'O ANEXO DO COMENTÁRIO deve ser um valor alfanumérico!';
+                $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+                $this->errors['cecanex'] = 'O NOME ANEXO ' . $type . ' deve ser um valor alfanumérico!';
                 $status = FALSE;
             }
         }
@@ -131,10 +135,104 @@ class Comment_bo {
                 $this->errors['cenidce'] = 'O ID DO COMENTÁRIO é obrigatório!';
                 $status = FALSE;
             } else if (!is_numeric($this->data['cenidce'])) {
-                $this->errors['cecanex'] = 'O ID DO COMENTÁRIO deve ser um valor inteiro!';
+                $this->errors['cenidce'] = 'O ID DO COMENTÁRIO deve ser um valor inteiro!';
                 $status = FALSE;
             } else if (is_null($this->CI->comentario_model->find_by_cenid($this->data['cenidce']))) {
-                $this->errors['cecanex'] = 'ID DO COMENTÁRIO inválido!';
+                $this->errors['cenidce'] = 'ID DO COMENTÁRIO inválido!';
+                $status = FALSE;
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>edit</i> do controller <i>Message</i>.
+     */
+    public function validate_edit() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>cenid</i> (ID do comentario/resposta)
+        if (!isset($this->data['cenid']) || empty(trim($this->data['cenid']))) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cenid'] = 'O ID ' . $type . ' é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['cenid'])) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cenid'] = 'O ID ' . $type . ' deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->comentario_model->find_by_cenid($this->data['cenid']))) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cenid'] = 'ID ' . $type . ' inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>cenidus</i> (ID do usuario)
+        if (!isset($this->data['cenidus']) || empty(trim($this->data['cenidus']))) {
+            $this->errors['cenidus'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['cenidus'])) {
+            $this->errors['cenidus'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['cenidus']))) {
+            $this->errors['cenidus'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>cenidma</i> (ID do material)
+        if (!isset($this->data['cenidma']) || empty(trim($this->data['cenidma']))) {
+            $this->errors['cenidma'] = 'O ID DO MATERIAL é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['cenidma'])) {
+            $this->errors['cenidma'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['cenidma']))) {
+            $this->errors['cenidma'] = 'ID DO MATERIAL inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>cectext</i> (Texto da comentario)
+        if (!isset($this->data['cectext']) || empty(trim($this->data['cectext']))) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cectext'] = 'O TEXTO ' . $type . ' é obrigatório!';
+            $status = FALSE;
+        } else if (!is_string($this->data['cectext'])) {
+            $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+            $this->errors['cectext'] = 'O TEXTO ' . $type . ' deve ser um valor alfanumérico!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>cecanex</i> (Anexo do comentario)
+        if (isset($this->data['cecanex'])) { //  Se este campo for informado, sera validado
+            if (empty(trim($this->data['cecanex']))) {
+                $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+                $this->errors['cecanex'] = 'O ANEXO ' . $type . ' é obrigatório!';
+                $status = FALSE;
+            } else if (!is_string($this->data['cecanex'])) {
+                $type = (!isset($this->data['cenidce'])) ? 'DO COMENTÁRIO' : 'DA RESPOSTA';
+                $this->errors['cecanex'] = 'O NOME ANEXO ' . $type . ' deve ser um valor alfanumérico!';
+                $status = FALSE;
+            }
+        }
+
+        // Validando o campo <i>cenidce</i> (ID do comentario - neste caso trata-se de uma resposta)
+        if (isset($this->data['cenidce'])) { //  Se este campo for informado, sera validado
+            if (empty(trim($this->data['cenidce']))) {
+                $this->errors['cenidce'] = 'O ID DO COMENTÁRIO é obrigatório!';
+                $status = FALSE;
+            } else if (!is_numeric($this->data['cenidce'])) {
+                $this->errors['cenidce'] = 'O ID DO COMENTÁRIO deve ser um valor inteiro!';
+                $status = FALSE;
+            } else if (is_null($this->CI->comentario_model->find_by_cenid($this->data['cenidce']))) {
+                $this->errors['cenidce'] = 'ID DO COMENTÁRIO inválido!';
                 $status = FALSE;
             }
         }

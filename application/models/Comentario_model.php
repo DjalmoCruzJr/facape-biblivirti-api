@@ -53,7 +53,7 @@ class Comentario_model extends CI_Model {
     public function find_by_cenid($cenid) {
         $this->db->where('cenid', $cenid);
         $query = $this->db->get('comentario');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
