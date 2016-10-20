@@ -256,6 +256,16 @@ define('MSCSTAT_ATIVO', 'A');
 define('MSCSTAT_INATIVO', 'I');
 define('MSCANEX_MAX_LENGHT', 255);
 
+/**---------------------------------------
+ * QUESTAO FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela QUESTAO
+ *
+ */
+define('QECDESC_MAX_LENGHT', 50);
+define('QECANEX_MAX_LENGHT', 255);
+
 
 /**---------------------------------------
  * ASSETS PATHS

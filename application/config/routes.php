@@ -115,8 +115,9 @@ $route['API/message/add']['post'] = 'api/message/add';
  */
 $route['API/comment/add']['post'] = 'api/comment/add';
 $route['API/comment/edit']['post'] = 'api/comment/edit';
-$route['API/comment/delete']['post'] = 'api/comment/delete';/**
-
+$route['API/comment/delete']['post'] = 'api/comment/delete';
+/**
  * API COMMENT ROUTES
  */
 $route['API/question/list']['post'] = 'api/question/list_all';
+$route['API/question/add']['post'] = 'api/question/add';
