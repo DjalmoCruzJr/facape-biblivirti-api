@@ -87,13 +87,13 @@ $route['API/group/search']['post'] = 'api/group/search';
 $route['API/group/subscribe']['post'] = 'api/group/subscribe';
 $route['API/group/unsubscribe']['post'] = 'api/group/unsubscribe';
 
-
 /**
  * API MATERIAL ROUTES
  */
 $route['API/material/list']['post'] = 'api/material/list_all';
 $route['API/material/add']['post'] = 'api/material/add';
 $route['API/material/edit']['post'] = 'api/material/edit';
+$route['API/material/delete']['post'] = 'api/material/delete';
 $route['API/material/search']['post'] = 'api/material/search';
 $route['API/material/email']['post'] = 'api/material/email';
 $route['API/material/share']['post'] = 'api/material/share';
@@ -103,14 +103,14 @@ $route['API/material/details']['post'] = 'api/material/details';
  * API CONTENT ROUTES
  */
 $route['API/content/list']['post'] = 'api/content/list_all';
+$route['API/content/add']['post'] = 'api/content/add';
+$route['API/content/edit']['post'] = 'api/content/edit';
 
 /**
  * API MESSAGE ROUTES
  */
 $route['API/message/list']['post'] = 'api/message/list_all';
 $route['API/message/add']['post'] = 'api/message/add';
-$route['API/message/edit']['post'] = 'api/message/edit';
-$route['API/message/delete']['post'] = 'api/message/delete';
 
 /**
  * API COMMENT ROUTES
@@ -118,8 +118,16 @@ $route['API/message/delete']['post'] = 'api/message/delete';
 $route['API/comment/add']['post'] = 'api/comment/add';
 $route['API/comment/edit']['post'] = 'api/comment/edit';
 $route['API/comment/delete']['post'] = 'api/comment/delete';
+
 /**
- * API COMMENT ROUTES
+ * API QUESTION ROUTES
  */
 $route['API/question/list']['post'] = 'api/question/list_all';
 $route['API/question/add']['post'] = 'api/question/add';
+$route['API/question/edit']['post'] = 'api/question/edit';
+$route['API/question/delete']['post'] = 'api/question/delete';
+
+/**
+ * API ALTERNATIVE ROUTES
+ */
+$route['API/alternative/add']['post'] = 'api/alternative/add';
