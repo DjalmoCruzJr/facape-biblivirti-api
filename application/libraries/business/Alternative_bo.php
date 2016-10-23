@@ -221,4 +221,57 @@ class Alternative_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>delete</i> do controller <i>Alternative</i>.
+     */
+    public function validate_delete() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>usnid</i> (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>grnid</i> (ID do grupo)
+        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
+            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>alnid</i> (ID da alternativa)
+        if (!isset($this->data['alnid']) || empty(trim($this->data['alnid']))) {
+            $this->errors['alnid'] = 'O ID DA ALTERNATIVA é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['alnid'])) {
+            $this->errors['alnid'] = 'O ID DA ALTERNATIVA deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->alternativa_model->find_by_alnid($this->data['alnid']))) {
+            $this->errors['alnid'] = 'ID DA ALTERNATIVA inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
 }

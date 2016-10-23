@@ -203,4 +203,60 @@ class Alternative extends CI_Controller {
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/alternative/delete
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para editar uma alternativa de uma questao.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid" : "ID do usuario",
+     *      "grnid" : "ID do grupo",
+     *      "alnid" : "ID do alternativa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta"
+     * }
+     */
+    public function delete() {
+
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->alternative_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->alternative_bo->validate_delete() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->alternative_bo->get_errors();
+        } else {
+            $data = $this->alternative_bo->get_data();
+            $alternative = $this->alternativa_model->find_by_alnid($data['alnid']);
+
+            $admin = $this->grupo_model->find_group_admin($data['grnid']);
+
+            if ($admin->usnid != $data['usnid']) { // Verifica se o usuario logado nao eh admin do grupo
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar excluir alternativa!\n";
+                $this->response['response_message'] .= "Somente o administrador do grupo têm permissão para excluí-la.";
+            } else {
+
+                if ($this->alternativa_model->delete($data['alnid']) === false) {
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar excluir alternativa! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                } else {
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Alternativa excluída com sucesso!";
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
 }

@@ -97,13 +97,13 @@ class Alternativa_model extends CI_Model {
     }
 
     /**
-     * @param $ainid
+     * @param $alnid
      * @return bool
      *
      * Metodo para excluir um registro da tabela ALTERNATIVA
      */
-    public function delete($ainid) {
-        $this->db->where('ainid', $ainid);
+    public function delete($alnid) {
+        $this->db->where('alnid', $alnid);
         return $this->db->delete('alternativa');
     }
 
