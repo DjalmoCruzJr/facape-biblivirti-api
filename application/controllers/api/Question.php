@@ -168,9 +168,6 @@ class Question extends CI_Controller {
                 unset($data['usnid']); // Remove o campo ID DO USUARIO do objeto a ser salvo no banco
                 unset($data['grnid']); // Remove o campo ID DO GRUPO do objeto a ser salvo no banco
 
-                var_dump($data);
-                exit;
-
                 $id = $this->questao_model->save($data);
 
                 if (is_null($id)) { // Verifica se as mensagens foram carregadas com sucesso
@@ -178,9 +175,9 @@ class Question extends CI_Controller {
                     $this->response['response_message'] = "Houve um erro ao tentar cadastrar a questão! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
                 } else {
-                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $this->response['response_message'] = "Mensagem enviada com sucesso!";
-                    $this->response['response_data'] = ['msnid' => $id];
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Questão adicionada com sucesso!";
+                    $this->response['response_data'] = ['qenid' => $id];
                 }
             }
         }
