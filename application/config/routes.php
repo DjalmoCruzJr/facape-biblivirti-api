@@ -131,3 +131,4 @@ $route['API/question/delete']['post'] = 'api/question/delete';
  * API ALTERNATIVE ROUTES
  */
 $route['API/alternative/add']['post'] = 'api/alternative/add';
+$route['API/alternative/edit']['post'] = 'api/alternative/edit';

@@ -90,10 +90,10 @@ class Alternativa_model extends CI_Model {
      * metodo para atualizar um registro da tabela ALTERNATIVA
      */
     public function update($data) {
-        $ainid = $data['ainid'];
-        unset($data['ainid']);
-        $this->db->where('ainid', $ainid);
-        return $this->db->update('alternativa', $data) === true ? $ainid : 0;
+        $alnid = $data['alnid'];
+        unset($data['alnid']);
+        $this->db->where('alnid', $alnid);
+        return $this->db->update('alternativa', $data) === true ? $alnid : 0;
     }
 
     /**
