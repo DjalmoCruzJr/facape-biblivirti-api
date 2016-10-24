@@ -47,7 +47,7 @@ class Avaliacao_model extends CI_Model {
     public function find_by_avnid($avnid) {
         $this->db->where('avnid', $avnid);
         $query = $this->db->get('avaliacao');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**

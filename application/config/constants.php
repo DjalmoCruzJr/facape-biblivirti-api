@@ -266,7 +266,6 @@ define('MSCANEX_MAX_LENGHT', 255);
 define('QECDESC_MAX_LENGHT', 50);
 define('QECANEX_MAX_LENGHT', 255);
 
-
 /**---------------------------------------
  * ASSETS PATHS
  * ---------------------------------------
@@ -303,6 +302,7 @@ define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
 define('INTENT_CATEGORY_ACCOUNT', 'org.sysmob.biblivirti.intent.category.ACCOUNT');
 define('INTENT_ACTION_ACCOUNT_PASSWORD_EDIT', 'org.sysmob.biblivirti.intent.action.ACCOUNT_PASSWORD_EDIT');
 
+
 /**------------------------------------------------------------
  * EMAIl CONFIGURATION
  * ------------------------------------------------------------
@@ -323,6 +323,9 @@ define('EMAIL_WORDWRAP', true);
 define('EMAIL_CHARTSET', 'utf-8');
 define('EMAIL_NEWLINE', "\r\n");
 
+/**
+ * EMAIL SUBJECTS
+ */
 define('EMAIL_SUBJECT_EMAIL_CONFIRMATION', '[' . EMAIL_SMTP_USER_ALIAS . '] Confirmação de E-mail');
 define('EMAIL_SUBJECT_ACCOUNT_ACTIVATED', '[' . EMAIL_SMTP_USER_ALIAS . '] Ativação de Conta');
 define('EMAIL_SUBJECT_NEW_REGISTER', '[' . EMAIL_SMTP_USER_ALIAS . '] Nova Conta');
@@ -332,6 +335,7 @@ define('EMAIL_SUBJECT_NEW_MESSAGE', '[' . EMAIL_SMTP_USER_ALIAS . '] Nova Mensag
 define('EMAIL_SUBJECT_NEW_COMMENT', '[' . EMAIL_SMTP_USER_ALIAS . '] Novo Comentário');
 define('EMAIL_SUBJECT_NEW_ANSWER', '[' . EMAIL_SMTP_USER_ALIAS . '] Nova Resposta');
 define('EMAIL_SUBJECT_NEW_MEMBER', '[' . EMAIL_SMTP_USER_ALIAS . '] Novo Membro');
+define('EMAIL_SUBJECT_NEW_TEST', '[' . EMAIL_SMTP_USER_ALIAS . '] Nova Avaliação');
 define('EMAIL_SUBJECT_SHARE_MATERIAL', '[' . EMAIL_SMTP_USER_ALIAS . '] Compartilhamento de Material');
 define('EMAIL_SUBJECT_EDIT_GROUP', '[' . EMAIL_SMTP_USER_ALIAS . '] Edição de Grupo');
 define('EMAIL_SUBJECT_EDIT_MATERIAL', '[' . EMAIL_SMTP_USER_ALIAS . '] Edição de Material');
@@ -347,6 +351,9 @@ define('EMAIL_SUBJECT_PASSWORD_RECOVERY', '[' . EMAIL_SMTP_USER_ALIAS . '] Recup
 define('EMAIL_SUBJECT_PASSWORD_CHANGED', '[' . EMAIL_SMTP_USER_ALIAS . '] Alteração de Senha');
 define('EMAIL_SUBJECT_EMAIL_MATERIAL', '[' . EMAIL_SMTP_USER_ALIAS . '] Convite para Ver um Material');
 
+/**
+ * EMAIL MESSAGES
+ */
 define('EMAIL_MESSAGE_EMAIL_CONFIRMATION', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p>Sua conta ainda não foi ativada.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativaçao: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
 define('EMAIL_MESSAGE_ACCOUNT_ACTIVATED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua conta foi ativada com sucesso!</p><p>Acesse agora mesmo sua conta no Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_NEW_REGISTER', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua conta foi criada com sucesso.</p><p>Para ativá-la, você pode informar o código <strong>{cactokn}</strong> na tela de confirmação de e-mail<br>ou clicar no link abaixo:</p><p>Link de ativação: <a href="{confirmation_link}" target="blank">{confirmation_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
@@ -356,6 +363,7 @@ define('EMAIL_MESSAGE_NEW_MATERIAL', '<!doctype html><html lang="pt-br"><head><m
 define('EMAIL_MESSAGE_NEW_MESSAGE', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua mensagem foi envida para o grupo <strong>{grcnome}</strong> com sucesso!</p><p>Mensagem: <strong>{msctext}.</strong></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_NEW_COMMENT', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Seu comentário foi adicionado no material <strong>{macdesc}</strong> do grupo <strong>{grcnome}</strong> com sucesso!</p><p>Comentário: <strong>{cectext}.</strong></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_NEW_ANSWER', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua resposta foi adicionado no material <strong>{macdesc}</strong> do grupo <strong>{grcnome}</strong> com sucesso!</p><p>Resposta: <strong>{cectext}.</strong></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
+define('EMAIL_MESSAGE_NEW_TEST', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Você acabou de iniciar uma avaliação do simulado <strong>{macdesc}</strong> no grupo <strong>{grcnome}</strong>.</p><p>Tente finalizá-la o mais breve possível, quanto mais rápido você terminar melhor será seu desempenho!</p><p>Número da Avaliação: <strong>{avnid}</strong><br/>Data de Ínicio: <em>{avdindt}</em></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_SHARE_MATERIAL', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Seu material <strong>{macdesc}</strong> foi compartilhado</p><p>com o grupo <strong>{grcnome}</strong> com sucesso!</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_EDIT_GROUP', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>As informações do grupo <strong>{grcnome}</strong> foram alteradas com sucesso!</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_EDIT_MATERIAL', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>As informações do material <strong>{macdesc}</strong> foram alteradas com sucesso!</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
@@ -371,6 +379,9 @@ define('EMAIL_MESSAGE_PASSWORD_RECOVERY', '<!doctype html><html lang="pt-br"><he
 define('EMAIL_MESSAGE_PASSWORD_CHANGED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua senha foi alterada com sucesso.</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_EMAIL_MATERIAL', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p><strong>{emitente}</strong> convidou você para ver o(a) {mactipo}: <strong>{macdesc}.</strong></p><p>Link: <a href="{material_link}" target="_blank">{material_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
 
+/**
+ * EMAIL MESSAGES KEYS
+ */
 define('EMAIL_KEY_EMAIL_SMTP_USER_ALIAS', '{email_smtp_user_alias}');
 define('EMAIL_KEY_EMAIL_SMTP_USER', '{email_smtp_user}');
 define('EMAIL_KEY_USCNOME', '{uscnome}');
@@ -381,6 +392,8 @@ define('EMAIL_KEY_MSCTEXT', '{msctext}');
 define('EMAIL_KEY_CECTEXT', '{cectext}');
 define('EMAIL_KEY_CACTOKN', '{cactokn}');
 define('EMAIL_KEY_RSCTOKN', '{rsctokn}');
+define('EMAIL_KEY_AVNID', '{avnid}');
+define('EMAIL_KEY_AVDINDT', '{avdindt}');
 define('EMAIL_KEY_EMITENTE', '{emitente}');
 define('EMAIL_KEY_NOTIFICATION_MESSAGE', '{notification_message}');
 define('EMAIL_KEY_RECOVERY_LINK', '{recovery_link}');
