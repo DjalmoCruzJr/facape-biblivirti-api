@@ -3,11 +3,11 @@
 /**
  * @author djalmocruzjr (djalmo.cruz@gmail.com)
  * @version 1.0
- * @since 24/10/2016
+ * @since 25/10/2016
  *
- * Classe para aplicar as regras de negocio inerentes as operacoes do controller <i>Test</i>.
+ * Classe para aplicar as regras de negocio inerentes as operacoes do controller <i>Answer</i>.
  */
-class Test_bo {
+class Answer_bo {
 
     protected $CI;
 
@@ -26,7 +26,7 @@ class Test_bo {
     private $errors;
 
     /**
-     * Test_bo constructor.
+     * Answer_bo constructor.
      */
     public function __construct() {
         // Loading variables
@@ -37,7 +37,6 @@ class Test_bo {
         // Loading model
         $this->CI->load->model('avaliacao_model');
         $this->CI->load->model('usuario_model');
-        $this->CI->load->model('material_model');
     }
 
     /**
@@ -70,9 +69,9 @@ class Test_bo {
     /**
      * @return bool
      *
-     * Metodo para validar os dados inentes ao processo de <i>start</i> do controller <i>Test</i>.
+     * Metodo para validar os dados inerentes ao processo de <i>list_all</i> do controller <i>Answer</i>.
      */
-    public function validate_start() {
+    public function validate_list_all() {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -81,48 +80,7 @@ class Test_bo {
             return false;
         }
 
-        // Validando o campo <i>avnidus</i> (ID do usuario)
-        if (!isset($this->data['avnidus']) || empty(trim($this->data['avnidus']))) {
-            $this->errors['avnidus'] = 'O ID DO USUÁRIO é obrigatório!';
-            $status = FALSE;
-        } else if (!is_numeric($this->data['avnidus'])) {
-            $this->errors['avnidus'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
-            $status = FALSE;
-        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['avnidus']))) {
-            $this->errors['avnidus'] = 'ID DO USUÁRIO inválido!';
-            $status = FALSE;
-        }
-
-        // Validando o campo <i>avnidma</i> (ID do material (simulado) )
-        if (!isset($this->data['avnidma']) || empty(trim($this->data['avnidma']))) {
-            $this->errors['avnidma'] = 'O ID DO MATERIAL é obrigatório!';
-            $status = FALSE;
-        } else if (!is_numeric($this->data['avnidma'])) {
-            $this->errors['avnidma'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
-            $status = FALSE;
-        } else if (is_null($this->CI->material_model->find_by_manid($this->data['avnidma']))) {
-            $this->errors['avnidma'] = 'ID DO MATERIAL inválido!';
-            $status = FALSE;
-        }
-
-        return $status;
-    }
-
-    /**
-     * @return bool
-     *
-     * Metodo para validar os dados inentes ao processo de <i>finalize</i> do controller <i>Test</i>.
-     */
-    public function validate_finalize() {
-        $status = TRUE;
-
-        // Verifica se o decode do JSON foi feito corretamente
-        if (is_null($this->data)) {
-            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
-            return false;
-        }
-
-        // Validando o campo <i>avnidus</i> (ID do usuario)
+        // Validando o campo <i>usnid</i> (ID do usuario)
         if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
             $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
             $status = FALSE;
