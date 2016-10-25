@@ -98,7 +98,11 @@ class Answer extends CI_Controller {
                 }
             } else {
                 $answers = $this->resposta_model->find_by_renidav($test->avnid);
-                if (is_null($answers)) {  // Verifica se as respostadas foram carregadas com sucesso
+
+                /**
+                 * VERIFICAR SE ESTE TESTE ESTA FUNCIONANDO CORRETAMENTE
+                 */
+                if (is_null($answers)) {  // Verifica se as respostadas nao foram carregadas com sucesso
                     $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                     $this->response['response_message'] = "Nenhuma resposta encontrada!";
                 } else {
@@ -118,5 +122,69 @@ class Answer extends CI_Controller {
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
+
+    /**
+     * @url: API/answer/add
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para slavar uma respostas de uma avaliacao.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid": "ID da usuario",
+     *      "renidav": "ID da avaliacao",
+     *      "renidal": "ID da alternativa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta",
+     *      "response_data" :  {
+     *          "renid" : "ID da resposta"
+     *      }
+     * }
+     */
+    public function add() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->answer_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->answer_bo->validate_add() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->answer_bo->get_errors();
+        } else {
+            $data = $this->answer_bo->get_data();
+            $test = $this->avaliacao_model->find_by_avnid($data['renidav']);
+
+            if (strval($test->avcstat) == AVCSTAT_FINALIZADA) { // Verifica se a avaliacao ja esta finalizada
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar adicionar resposta a avaliação!\n";
+                $this->response['response_message'] .= "Essa avaliação já foi finalizada!";
+            } else if ($test->avnidus != $data['usnid']) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar adicionar resposta a avaliação!\n";
+                $this->response['response_message'] .= "Somente o usuário que inicio a avaliação tem permissão para adicionar respostas.";
+            } else {
+                unset($data['usnid']); // Remove o campo ID DO USUARIO do objeto a ser salvo no banco
+                $id = $this->resposta_model->save($data);
+
+                if (is_null($id)) { // Verifica se houve falha ao salvar a resposta
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar salvar resposta! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                } else {
+                    $this->response['response_code'] = RESPONSE_CODE_OK;
+                    $this->response['response_message'] = "Resposta salva com sucesso!";
+                    $this->response['response_data'] = ['renid' => $id];
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
 
 }
