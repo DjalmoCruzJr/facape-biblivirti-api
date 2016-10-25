@@ -35,6 +35,7 @@ class Test_bo {
         $this->CI = &get_instance();
 
         // Loading model
+        $this->CI->load->model('avaliacao_model');
         $this->CI->load->model('usuario_model');
         $this->CI->load->model('material_model');
     }
@@ -107,5 +108,45 @@ class Test_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>finalize</i> do controller <i>Message</i>.
+     */
+    public function validate_finalize() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>avnidus</i> (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>avnid</i> (ID da avaliacao)
+        if (!isset($this->data['avnid']) || empty(trim($this->data['avnid']))) {
+            $this->errors['avnid'] = 'O ID DA AVALIAÇÃO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['avnid'])) {
+            $this->errors['avnid'] = 'O ID DA AVALIAÇÃO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->avaliacao_model->find_by_avnid($this->data['avnid']))) {
+            $this->errors['avnid'] = 'ID DA AVALIAÇÃO inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
 
 }

@@ -267,6 +267,16 @@ define('QECDESC_MAX_LENGHT', 50);
 define('QECANEX_MAX_LENGHT', 255);
 
 /**---------------------------------------
+ * RESPOSTA FIELDS RULES
+ * ---------------------------------------
+ *
+ * Constantes que definem as regras de negocio dos campos da tabela RESPOSTA
+ *
+ */
+define('RECSTAT_ABERTA', 'A');
+define('RECSTAT_FINALIZADA', 'F');
+
+/**---------------------------------------
  * ASSETS PATHS
  * ---------------------------------------
  *
@@ -350,6 +360,7 @@ define('EMAIL_SUBJECT_DELETE_MEMBER', '[' . EMAIL_SMTP_USER_ALIAS . '] Exclusão
 define('EMAIL_SUBJECT_PASSWORD_RECOVERY', '[' . EMAIL_SMTP_USER_ALIAS . '] Recuperação de Senha');
 define('EMAIL_SUBJECT_PASSWORD_CHANGED', '[' . EMAIL_SMTP_USER_ALIAS . '] Alteração de Senha');
 define('EMAIL_SUBJECT_EMAIL_MATERIAL', '[' . EMAIL_SMTP_USER_ALIAS . '] Convite para Ver um Material');
+define('EMAIL_SUBJECT_TEST_FINALIZED', '[' . EMAIL_SMTP_USER_ALIAS . '] Avaliação Finalizada');
 
 /**
  * EMAIL MESSAGES
@@ -378,6 +389,7 @@ define('EMAIL_MESSAGE_DELETE_MEMBER', '<!doctype html><html lang="pt-br"><head><
 define('EMAIL_MESSAGE_PASSWORD_RECOVERY', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Para recuperar sua senha de acesso, você pode informar o código <strong>{rsctokn}</strong> na tela de confirmação de recuperação<br> ou clicar no link abaixo:</p><p>Link de recuperação: <a href="{recovery_link}" target="blank">{recovery_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_PASSWORD_CHANGED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Sua senha foi alterada com sucesso.</p><p>Caso não tenha sido você que realizou esta alteração,<br>por favor, entre em contato com a equipe de suporte do Biblivirti AVAM.</p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 define('EMAIL_MESSAGE_EMAIL_MATERIAL', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><h3>Olá, {uscnome}</h3><p><strong>{emitente}</strong> convidou você para ver o(a) {mactipo}: <strong>{macdesc}.</strong></p><p>Link: <a href="{material_link}" target="_blank">{material_link}</a></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p><body></body></html>');
+define('EMAIL_MESSAGE_TEST_FINALIZED', '<!doctype html><html lang="pt-br"><head><meta charset="UTF-8"><title>{email_smtp_user_alias}</title></head><body><h3>Olá, {uscnome}</h3><p>Parabéns, você acabou de finalizar uma avaliação do simulado <strong>{macdesc}</strong> no grupo <strong>{grcnome}</strong>.</p><p>Número da Avaliação: <strong>{avnid}</strong><br/>Data de Ínicio: <em>{avdindt}</em><br/>Data de Término: <em>{avdtedt}</em><br/>Qtd. de Questões: <strong>{manqtdqe}</strong><br/>Qtd. de Repostas: <strong>{avnqtdre}</strong><br/>Qtd. de Acertos: <strong>{avnqtdace}</strong><br/>Qtd. de Erros: <strong>{avnqtderr}</strong></p><p>Obrigado(a) por utilizar os serviços da nossa plataforma!</p><p>Att,<br><strong>{email_smtp_user_alias}</strong><br><em><a href="mailto:{email_smtp_user}">{email_smtp_user}</a></em><br></p><p>Enviado em: <em>{sending_date}</em></p></body></html>');
 
 /**
  * EMAIL MESSAGES KEYS
@@ -388,12 +400,17 @@ define('EMAIL_KEY_USCNOME', '{uscnome}');
 define('EMAIL_KEY_GRCNOME', '{grcnome}');
 define('EMAIL_KEY_MACDESC', '{macdesc}');
 define('EMAIL_KEY_MACTIPO', '{mactipo}');
+define('EMAIL_KEY_MANQTDQE', '{manqtdqe}');
 define('EMAIL_KEY_MSCTEXT', '{msctext}');
 define('EMAIL_KEY_CECTEXT', '{cectext}');
 define('EMAIL_KEY_CACTOKN', '{cactokn}');
 define('EMAIL_KEY_RSCTOKN', '{rsctokn}');
 define('EMAIL_KEY_AVNID', '{avnid}');
 define('EMAIL_KEY_AVDINDT', '{avdindt}');
+define('EMAIL_KEY_AVDTEDT', '{avdtedt}');
+define('EMAIL_KEY_AVNQTDRE', '{avnqtdre}');
+define('EMAIL_KEY_AVNQTDACE', '{avnqtdace}');
+define('EMAIL_KEY_AVNQTDERR', '{avnqtderr}');
 define('EMAIL_KEY_EMITENTE', '{emitente}');
 define('EMAIL_KEY_NOTIFICATION_MESSAGE', '{notification_message}');
 define('EMAIL_KEY_RECOVERY_LINK', '{recovery_link}');
