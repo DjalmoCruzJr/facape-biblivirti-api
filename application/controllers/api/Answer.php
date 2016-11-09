@@ -186,5 +186,97 @@ class Answer extends CI_Controller {
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/answer/submit
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para submeter uma respostas para uma avaliacao.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid": "ID da usuario",
+     *      "renidav": "ID da avaliacao",
+     *      "renidal": "ID da alternativa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta",
+     *      "response_data" :  {
+     *          "renid" : "ID da resposta"
+     *      }
+     * }
+     */
+    public function submit() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->answer_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->answer_bo->validate_submit() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->answer_bo->get_errors();
+        } else {
+            $data = $this->answer_bo->get_data();
+            $test = $this->avaliacao_model->find_by_avnid($data['renidav']);
+
+            if (strval($test->avcstat) == AVCSTAT_FINALIZADA) { // Verifica se a avaliacao ja esta finalizada
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar submeter resposta a avaliação!\n";
+                $this->response['response_message'] .= "Essa avaliação já foi finalizada!";
+            } else if ($test->avnidus != $data['usnid']) {
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao tentar submeter resposta a avaliação!\n";
+                $this->response['response_message'] .= "Somente o usuário que inicio a avaliação tem permissão para submeter respostas.";
+            } else {
+                unset($data['usnid']); // Remove o campo ID DO USUARIO do objeto a ser salvo no banco
+                // Seta os dados para serem persistidos
+                date_default_timezone_set('America/Sao_Paulo');
+                $data['redendt'] = date('Y-m-d H:i:s');
+                $data['recstat'] = RECSTAT_FINALIZADA;
+
+                $id = null;
+                $answer = $this->resposta_model->find_by_renidav_and_renidal($data['renidav'], $data['renidal']);
+                if (is_null($answer)) { // Verifica se ja existe uma resposta com a alternativa informada para a avaliacao em questao
+                    $id = $this->resposta_model->save($data);
+
+                    if (is_null($id)) { // Verifica se houve falha ao salvar a resposta
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar submeter resposta! Tente novamente.\n";
+                        $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Resposta enviada com sucesso!";
+                        $this->response['response_data'] = ['renid' => $id];
+                    }
+                } else {
+                    // Verifica se a resposta ja foi submetida
+                    if (strval($answer->recstat) == RECSTAT_FINALIZADA) {
+                        $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                        $this->response['response_message'] = "Erro ao tentar submeter resposta a avaliação!\n";
+                        $this->response['response_message'] .= "Sua resposta para essa questão já foi submetida.";
+                    } else {
+                        $data['renid'] = $answer->renid;
+                        $data['redindt'] = $answer->redindt;
+                        $id = $this->resposta_model->update($data);
+
+                        if (is_null($id)) { // Verifica se houve falha ao salvar a resposta
+                            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                            $this->response['response_message'] = "Houve um erro ao tentar submeter resposta! Tente novamente.\n";
+                            $this->response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                        } else {
+                            $this->response['response_code'] = RESPONSE_CODE_OK;
+                            $this->response['response_message'] = "Resposta enviada com sucesso!";
+                            $this->response['response_data'] = ['renid' => $id];
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
 
 }

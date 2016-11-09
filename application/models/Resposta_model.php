@@ -99,7 +99,7 @@ class Resposta_model extends CI_Model {
         $this->db->where('renidav', $renidav);
         $this->db->where('renidal', $renidal);
         $query = $this->db->get('resposta', $limit, $offset);
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
@@ -149,7 +149,7 @@ class Resposta_model extends CI_Model {
         $this->db->where('renidal', $renidal);
         $this->db->where('recstat', $recstat);
         $query = $this->db->get('resposta', $limit, $offset);
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
