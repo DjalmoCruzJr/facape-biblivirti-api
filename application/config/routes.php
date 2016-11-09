@@ -146,3 +146,8 @@ $route['API/test/finalize']['post'] = 'api/test/finalize';
 $route['API/answer/list']['post'] = 'api/answer/list_all';
 $route['API/answer/add']['post'] = 'api/answer/add';
 $route['API/answer/submit']['post'] = 'api/answer/submit';
+
+/**
+ * API DOUBT ROUTES
+ */
+$route['API/doubt/list']['post'] = 'api/doubt/list_all';
