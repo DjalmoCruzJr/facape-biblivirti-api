@@ -81,11 +81,23 @@ class Doubt_bo {
             return false;
         }
 
+        // Validando o campo <i>usnid</i> (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO  deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
         // Validando o campo <i>dvnidgr</i> (ID do grupo)
         if (!isset($this->data['dvnidgr']) || empty(trim($this->data['dvnidgr']))) {
             $this->errors['dvnidgr'] = 'O ID DO GRUPO é obrigatório!';
             $status = FALSE;
-        } else if (!is_numeric($this->data['cenidus'])) {
+        } else if (!is_numeric($this->data['dvnidgr'])) {
             $this->errors['dvnidgr'] = 'O ID DO GRUPO  deve ser um valor inteiro!';
             $status = FALSE;
         } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['dvnidgr']))) {
