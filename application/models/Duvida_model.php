@@ -23,7 +23,16 @@ class Duvida_model extends CI_Model {
      * Metodo para salvar um registro na tabela DUVIDA
      */
     public function save($data) {
-        return $this->db->insert('duvida', $data) === true ? $this->db->insert_id() : 0;
+        $contents = $data['contents'];
+        unset($data['contents']);
+        $dvnid = $this->db->insert('duvida', $data) === true ? $this->db->insert_id() : 0;
+        if ($dvnid !== 0) {
+            foreach ($contents as $content) {
+                $this->add_content($dvnid, $content['conid']);
+            }
+            return $dvnid;
+        }
+        return 0;
     }
 
     /**
@@ -132,6 +141,18 @@ class Duvida_model extends CI_Model {
         }
         $query = $this->db->get('duvida', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $dvnid
+     * @param $conid
+     * @return bool
+     *
+     * Metodo para registar a relacao entre uma DUVIDA e um CONTEUDO.
+     */
+    public function add_content($dvnid, $conid) {
+        $data = ['dcniddv' => $dvnid, 'dcnidco' => $conid];
+        return $this->db->insert('duvidaconteudo', $data) === true;
     }
 
     /**

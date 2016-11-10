@@ -129,4 +129,100 @@ class Doubt extends CI_Controller {
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/doubt/add
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para adicionar uma duvida em um grupo.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "dvnidgr" : "ID do grupo da duvida",
+     *      "dvnidus" : "ID do usuario da duvida",
+     *      "dvctext" : "Texto da duvida",
+     *      "dvcanex" : "Anexo da duvida",
+     *      "dvlanon" : "Define se dúvida eh anonima ou nao"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta",
+     *      "response_data" : {
+     *              "dvnid" : "ID da duvida",
+     *      }
+     * }
+     */
+    public function add() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->doubt_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->doubt_bo->validate_add() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->doubt_bo->get_errors();
+        } else {
+            $data = $this->doubt_bo->get_data();
+            $users = $this->grupo_model->find_group_users($data['dvnidgr']);
+
+            $is_member = false;
+            foreach ($users as $user) {
+                if ($user->usnid == $data['dvnidus']) { // Verifica se o usuario logado eh esta na lista de usuaios do grupo
+                    $is_member = true;
+                    break;
+                }
+            }
+
+            if ($is_member === false) { // Verifica se o usuario da requisicao eh um membro do grupo
+                $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $this->response['response_message'] = "Erro ao adicionar dúvida ao grupo!\n";
+                $this->response['response_message'] .= "Somente membros do grupo têm permissão para adicioná-las.";
+            } else {
+                $dvnid = $this->duvida_model->save($data);
+
+                // Verifica se a duvida foi adicionada com sucesso
+                if (is_null($dvnid)) {
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material! Tente novamente.\n";
+                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+                } else {
+                    // Carrega os dados para p envio do email de notificacao
+                    $group = $this->grupo_model->find_by_grnid($data['dvnidgr']);
+                    $user = $this->usuario_model->find_by_usnid($data['dvnidus']);
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    $from = EMAIL_SMTP_USER;
+                    $to = $user->uscmail;
+                    $subject = EMAIL_SUBJECT_NEW_DOUBT;
+                    $message = EMAIL_MESSAGE_NEW_DOUBT;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                        EMAIL_KEY_GRCNOME => $group->grcnome,
+                        EMAIL_KEY_DVNID => $dvnid,
+                        EMAIL_KEY_DVCTEXT => $data['dvctext'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_DOUBT . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
+                        $this->response['response_message'] = "Dúvida adicionada com sucesso!";
+                        $this->response['response_data'] = $dvnid;
+                    }
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
 }
