@@ -249,8 +249,9 @@ class Material extends CI_Controller {
             $material = $this->material_model->find_by_manid($data['manid']);
             // verifica se houve falha na execucao do model
             if (is_null($material)) {
-                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $response['response_message'] = "Nenhum material encontrado.";
+                $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                $response['response_message'] = "Houve um erro ao tentar atualizar as informações do material! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
             } else {
                 $admin = $this->grupo_model->find_group_admin($material->manidgr);
                 if ($admin->usnid != $data['usnid']) {

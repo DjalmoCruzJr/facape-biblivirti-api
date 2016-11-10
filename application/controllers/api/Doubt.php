@@ -141,14 +141,19 @@ class Doubt extends CI_Controller {
      *      "dvnidus" : "ID do usuario da duvida",
      *      "dvctext" : "Texto da duvida",
      *      "dvcanex" : "Anexo da duvida",
-     *      "dvlanon" : "Define se dúvida eh anonima ou nao"
+     *      "dvlanon" : "Define se dúvida eh anonima ou nao",
+     *      "contents" : [
+     *          {
+     *              "conid" : "ID do conteudo relacionado"
+     *          },
+     *      ]
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem de resposta",
      *      "response_data" : {
-     *              "dvnid" : "ID da duvida",
+     *          "dvnid" : "ID da duvida",
      *      }
      * }
      */
@@ -223,6 +228,98 @@ class Doubt extends CI_Controller {
 
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/doubt/edit
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para atualizar as infomacoes de uma duvida.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "dvnid" : "ID do grupo da duvida",
+     *      "dvctext" : "Texto da duvida",
+     *      "dvcanex" : "Anexo da duvida",
+     *      "dvlanon" : "Define se dúvida eh anonima ou nao",
+     *      "contents" : [
+     *          {
+     *              "conid" : "ID do conteudo relacionado"
+     *          },
+     *      ]
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta",
+     *      "response_data" : {
+     *          "dvnid" : "ID da duvida",
+     *      }
+     * }
+     */
+    public function edit() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->doubt_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->doubt_bo->validate_edit() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->doubt_bo->get_errors();
+        } else {
+            $data = $this->doubt_bo->get_data();
+            $doubt = $this->duvida_model->find_by_dvnid($data['dvnid']);
+            // verifica se houve falha na execucao do model
+            if (is_null($doubt)) {
+                $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                $response['response_message'] = "Houve um erro ao tentar atualizar as informações da dúvida! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            } else {
+                $admin = $this->grupo_model->find_group_admin($doubt->dvnidgr);
+                if ($data['usnid'] != $admin->usnid && $data['usnid'] != $doubt->dvnidus) {
+                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $response['response_message'] = "Erro ao tentar editar dúvida!\n";
+                    $response['response_message'] .= "Somente o usuário que adicionou a dúvida ou o administrador do grupo têm permissões para editá-la!";
+                } else {
+                    unset($data['usnid']); // Remove o ID do usuairo do objeto a ser gravado.
+                    $this->duvida_model->update($data);
+
+                    // Carrega os dados para o envio do email de notificacao
+                    $user = $this->usuario_model->find_by_usnid($doubt->dvnidus);
+                    $group = $this->grupo_model->find_by_grnid($doubt->dvnidgr);
+                    // Seta os dados para o envio do email de notificação de novo grupo
+                    $from = EMAIL_SMTP_USER;
+                    $to = $user->uscmail;
+                    $subject = EMAIL_SUBJECT_EDIT_DOUBT;
+                    $message = EMAIL_MESSAGE_EDIT_DOUBT;
+                    $datas = [
+                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                        EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                        EMAIL_KEY_GRCNOME => $group->grcnome,
+                        EMAIL_KEY_DVNID => $data['dvnid'],
+                        EMAIL_KEY_DVCTEXT => $data['dvctext'],
+                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                    ];
+
+                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                    if ($this->biblivirti_email->send() === false) {
+                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_DOUBT . "!\n";
+                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    } else {
+                        $response['response_message'] = "Dúvida atualizada com sucesso!";
+                        $response['response_data'] = ['dvnid' => $doubt->dvnid];
+                    }
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
     }
 
 }

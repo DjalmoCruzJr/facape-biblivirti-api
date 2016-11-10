@@ -56,7 +56,7 @@ class Duvida_model extends CI_Model {
     public function find_by_dvnid($dvnid) {
         $this->db->where('dvnid', $dvnid);
         $query = $this->db->get('duvida');
-        return $query->num_rows() > 0 ? $query->result() : null;
+        return $query->num_rows() > 0 ? $query->result()[0] : null;
     }
 
     /**
@@ -163,9 +163,30 @@ class Duvida_model extends CI_Model {
      */
     public function update($data) {
         $dvnid = $data['dvnid'];
+        $contents = $data['contents'];
         unset($data['dvnid']);
+        unset($data['contents']);
         $this->db->where('dvnid', $dvnid);
-        return $this->db->update('duvida', $data) === true ? $dvnid : 0;
+        $dvnid = $this->db->update('duvida', $data) === true ? $dvnid : 0;
+        if ($dvnid !== 0) {
+            $this->remove_contents($dvnid);
+            foreach ($contents as $content) {
+                $this->add_content($dvnid, $content['conid']);
+            }
+            return $dvnid;
+        }
+        return 0;
+    }
+
+    /**
+     * @param $dvnid
+     * @return bool
+     *
+     * Metodo para remover todos os conteudos relacionados com uma DUVIDA
+     */
+    public function remove_contents($dvnid) {
+        $this->db->where('dcniddv', $dvnid);
+        return $this->db->delete('duvidaconteudo') === true;
     }
 
     /**
