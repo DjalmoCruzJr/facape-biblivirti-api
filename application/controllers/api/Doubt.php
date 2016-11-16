@@ -361,6 +361,9 @@ class Doubt extends CI_Controller {
                 $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                 $response['response_message'] = "Houve um erro ao tentar carregar as informações da dúvida! Tente novamente.\n";
                 $response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            } else if (strval($doubt->dvcstat) == DVCSTAT_INATIVO) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Dúvida não encontrada!";
             } else {
                 $admin = $this->grupo_model->find_group_admin($doubt->dvnidgr);
 
@@ -401,6 +404,126 @@ class Doubt extends CI_Controller {
                     } else {
                         $response['response_code'] = RESPONSE_CODE_OK;
                         $response['response_message'] = "Dúvida excluída com sucesso!";
+                    }
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @url: API/doubt/share
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para compartilhar uma duvida.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid" : "ID da usuario",
+     *      "grnid" : "ID do grupo",
+     *      "dvnid" : "ID da duvida"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta"
+     *      "response_data" : {
+     *          "dvnid"  : "ID da duvida"
+     *      }
+     * }
+     */
+    public function share() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->doubt_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->doubt_bo->validate_share() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->doubt_bo->get_errors();
+        } else {
+            $data = $this->doubt_bo->get_data();
+            $doubt = $this->duvida_model->find_by_dvnid($data['dvnid']);
+            // verifica se houve falha na execucao do model
+            if (is_null($doubt)) {
+                $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                $response['response_message'] = "Houve um erro ao tentar carregar as informações da dúvida! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            } else if (strval($doubt->dvcstat) == DVCSTAT_INATIVO) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Dúvida não encontrada!";
+            } else {
+                $users = $this->grupo_model->find_group_users($data['grnid']);
+                $is_member = false;
+
+                foreach ($users as $user) { // Percorre a lista de usuarios grupo informado
+                    // Verifica se o usuario logado nao eh membro do grupo no qual a duvida sera compartilhada
+                    if ($user->usnid == $data['usnid']) {
+                        $is_member = true;
+                        break;
+                    }
+                }
+
+                // Verifica se o usuario logado nao eh membro do grupo no qual a duvida sera compartilhada
+                if ($is_member == false) {
+                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $response['response_message'] = "Erro ao tentar compartilhar a dúvida!\n";
+                    $response['response_message'] .= "Somente membros do grupo têm permissão para adicionar dúvidas!";
+                } else {
+                    $user = $this->usuario_model->find_by_usnid($data['usnid']);
+                    $group = $this->grupo_model->find_by_grnid($data['grnid']);
+                    $contents = $this->duvida_model->find_doubt_contents($doubt->dvnid);
+
+                    $data = [];
+                    $data['dvnidgr'] = $group->grnid;
+                    $data['dvnidus'] = $user->usnid;
+                    $data['dvctext'] = $doubt->dvctext;
+                    $data['dvcanex'] = $doubt->dvcanex;
+                    $data['dvlanon'] = $doubt->dvlanon;
+                    foreach ($contents as $content) {
+                        $data['contents'][] = ['conid' => $content->conid];
+                    }
+                    unset($data['usnid']); // Remove o campo ID DO USUARIO do objeto a ser salvo
+                    unset($data['grnid']); // Remove o campo ID DO GRUPO do objeto a ser salvo
+                    unset($data['dvnid']); // Remove o campo ID DA DUVIDA do objeto a ser salvo
+
+                    $dvnid = $this->duvida_model->save($data);
+
+                    if (is_null($dvnid)) { // Verifica se a duvida foi salva com sucesso
+                        $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                        $response['response_message'] = "Houve um erro ao tentar compartilhar a dúvida! Tente novamente.\n";
+                        $response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+                    } else {
+                        // Seta os dados para o envio do email de notificação de novo grupo
+                        $from = EMAIL_SMTP_USER;
+                        $to = $user->uscmail;
+                        $subject = EMAIL_SUBJECT_SHARE_DOUBT;
+                        $message = EMAIL_MESSAGE_SHARE_DOUBT;
+                        $datas = [
+                            EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                            EMAIL_KEY_USCNOME => (!is_null($user->uscnome)) ? $user->uscnome : $user->usclogn,
+                            EMAIL_KEY_GRCNOME => $group->grcnome,
+                            EMAIL_KEY_DVNID => $dvnid,
+                            EMAIL_KEY_DVCTEXT => $data['dvctext'],
+                            EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                            EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                        ];
+
+                        $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                        if ($this->biblivirti_email->send() === false) {
+                            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                            $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_SHARE_DOUBT . "!\n";
+                            $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                            $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                        } else {
+                            $response['response_code'] = RESPONSE_CODE_OK;
+                            $response['response_message'] = "Dúvida compartilhada com sucesso!";
+                            $response['response_data'] = ['dvnid' => $dvnid];
+                        }
                     }
                 }
             }

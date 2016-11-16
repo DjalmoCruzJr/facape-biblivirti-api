@@ -332,4 +332,57 @@ class Doubt_bo {
         return $status;
     }
 
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>share</i> do controller <i>Doubt</i>.
+     */
+    public function validate_share() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>usnid</i> (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['usnid'])) {
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>grnid</i> (ID do grupo)
+        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
+            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo <i>dvnid</i> (ID da duvida)
+        if (!isset($this->data['dvnid']) || empty(trim($this->data['dvnid']))) {
+            $this->errors['dvnid'] = 'O ID DA DÚVIDA é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['dvnid'])) {
+            $this->errors['dvnid'] = 'O ID DA DÚVIDA deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->duvida_model->find_by_dvnid($this->data['dvnid']))) {
+            $this->errors['dvnid'] = 'ID DA DÚVIDA inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
 }

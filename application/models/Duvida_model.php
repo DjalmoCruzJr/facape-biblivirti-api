@@ -144,18 +144,6 @@ class Duvida_model extends CI_Model {
     }
 
     /**
-     * @param $dvnid
-     * @param $conid
-     * @return bool
-     *
-     * Metodo para registar a relacao entre uma DUVIDA e um CONTEUDO.
-     */
-    public function add_content($dvnid, $conid) {
-        $data = ['dcniddv' => $dvnid, 'dcnidco' => $conid];
-        return $this->db->insert('duvidaconteudo', $data) === true;
-    }
-
-    /**
      * @param $data
      * @return int
      *
@@ -176,6 +164,35 @@ class Duvida_model extends CI_Model {
             return $dvnid;
         }
         return 0;
+    }
+
+    /**
+     * @param $dvnid
+     * @param $conid
+     * @return bool
+     *
+     * Metodo para registar a relacao entre uma DUVIDA e um CONTEUDO.
+     */
+    public function add_content($dvnid, $conid) {
+        $data = ['dcniddv' => $dvnid, 'dcnidco' => $conid];
+        return $this->db->insert('duvidaconteudo', $data) === true;
+    }
+
+    /**
+     * @param $dvnid
+     * @param int $limit
+     * @param int $offset
+     * @return bool
+     *
+     * Metodo para buscar os registros da tabela CONTEUDO relaciondo com uma DUVIDA.
+     */
+    public function find_doubt_contents($dvnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT) {
+        $this->db->select('conid, conidgr, cocdesc, codcadt, codaldt');
+        $this->db->join('duvidaconteudo', 'dcnidco = conid', 'inner');
+        $this->db->join('duvida', 'dvnid = dcniddv', 'inner');
+        $this->db->where('dvnid', $dvnid);
+        $query = $this->db->get('conteudo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
     }
 
     /**
