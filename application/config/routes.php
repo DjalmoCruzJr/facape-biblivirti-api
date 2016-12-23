@@ -155,3 +155,4 @@ $route['API/doubt/add']['post'] = 'api/doubt/add';
 $route['API/doubt/edit']['post'] = 'api/doubt/edit';
 $route['API/doubt/delete']['post'] = 'api/doubt/delete';
 $route['API/doubt/share']['post'] = 'api/doubt/share';
+$route['API/doubt/details']['post'] = 'api/doubt/details';

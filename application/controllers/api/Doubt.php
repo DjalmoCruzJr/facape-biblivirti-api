@@ -45,7 +45,7 @@ class Doubt extends CI_Controller {
      * Metodo para listar as duvidades de um grupo.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "dvnidgr" : "ID do grupo"
+     *      "grnid" : "ID do grupo"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
@@ -89,7 +89,7 @@ class Doubt extends CI_Controller {
             $this->response['response_errors'] = $this->doubt_bo->get_errors();
         } else {
             $data = $this->doubt_bo->get_data();
-            $users = $this->grupo_model->find_group_users($data['dvnidgr']);
+            $users = $this->grupo_model->find_group_users($data['grnid']);
 
             $is_member = false;
             foreach ($users as $user) {
@@ -104,7 +104,7 @@ class Doubt extends CI_Controller {
                 $this->response['response_message'] = "Erro ao carregar informações de dúvidas!\n";
                 $this->response['response_message'] .= "Somente membros do grupo têm permissão para vê-las.";
             } else {
-                $doubts = $this->duvida_model->find_by_dvnidgr($data['dvnidgr']);
+                $doubts = $this->duvida_model->find_by_dvnidgr($data['grnid']);
 
                 if (is_null($doubts)) { // Verifica se as duvidas foram carregadas com sucesso
                     $this->response['response_code'] = RESPONSE_CODE_OK;
@@ -533,4 +533,209 @@ class Doubt extends CI_Controller {
         echo json_encode($response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/doubt/details
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo que mostra os detalhes de uma duvida.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usnid" : "ID da usuario",
+     *      "dvnid" : "ID da duvida"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem de resposta"
+     *      "response_data" : {
+     *          "dvnid"  : "ID da duvida",
+     *          "dvnidgr"  : "ID do grupo da duvida",
+     *          "dvctext"  : "Texto da duvida",
+     *          "dvcanex"  : "Anexo da duvida",
+     *          "dvcstat"  : "Status da duvida",
+     *          "dvlanon"  : "Define se a duvida eh anonima ounao",
+     *          "dvdcadt"  : "Data de Cadastro",
+     *          "dvdaldt"  : "Data de Aletracao",
+     *          "dvnatddr"  : "Qtd. de respostas",
+     *          "user"  : {
+     *              "usnid" : "ID do usuario",
+     *              "uscfbid" : "FacebookID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E-email do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "usdcadt" : "Data de cadastro do usuario",
+     *          },
+     *          "contents" : [
+     *              {
+     *                  "conid" : "ID do conteudo",
+     *                  "cocdesc" : "Descricao do conteudo",
+     *                  "codcadt" : "Data de Cadastro",
+     *                  "codaldt" : "Data de Alteracao"
+     *              },
+     *          ]
+     *      }
+     * }
+     */
+    public function details() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->doubt_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->doubt_bo->validate_details() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->doubt_bo->get_errors();
+        } else {
+            $data = $this->doubt_bo->get_data();
+            $doubt = $this->duvida_model->find_by_dvnid($data['dvnid']);
+            // verifica se houve falha na execucao do model
+            if (is_null($doubt)) {
+                $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                $response['response_message'] = "Houve um erro ao tentar carregar as informações da dúvida! Tente novamente.\n";
+                $response['response_message'] .= "Se o erro persistir entre em contato com a equipe de suporte do Biblivirti AVAM.";
+            } else if (strval($doubt->dvcstat) == DVCSTAT_INATIVO) {
+                $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $response['response_message'] = "Dúvida não encontrada!";
+            } else {
+                $users = $this->grupo_model->find_group_users($doubt->dvnidgr);
+                $is_member = false;
+
+                foreach ($users as $user) { // Percorre a lista de usuarios grupo informado
+                    // Verifica se o usuario logado nao eh membro do grupo no qual a duvida foi postada
+                    if ($user->usnid == $data['usnid']) {
+                        $is_member = true;
+                        break;
+                    }
+                }
+
+                // Verifica se o usuario logado nao eh membro do grupo no qual a duvida foi postada
+                if ($is_member == false) {
+                    $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                    $response['response_message'] = "Erro ao tentar carregas as informações da dúvida!\n";
+                    $response['response_message'] .= "Somente membros do grupo têm permissão para visualizá-las!";
+                } else {
+                    $doubt->dvnqtddr = count($this->duvidaresposta_model->find_by_drniddv($doubt->dvnid)); // Carrega a qtd. de respostas da duvida
+                    $doubt->user = $this->usuario_model->find_by_usnid($doubt->dvnidus); // Carrega o usuario da duvida
+                    $doubt->contents = $this->duvida_model->find_doubt_contents($doubt->dvnid); // Carrega os conteudos relacionados com a duvida
+                    unset($doubt->dvnidus); // Remove o campo "ID DO USUARIO" do objeto de resposta
+                    unset($doubt->user->uscsenh); // Remove a senha do usuario do objeto de resposta
+
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Dúvida carregada com sucesso!";
+                    $response['response_data'] = $doubt;
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
+
+
+    /**
+     * @url: API/doubt/search
+     * @param string JSON
+     * @return JSON
+     *
+     * Metodo para buscar duvidas.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "usndi" : "ID do usuario",
+     *      "grnid" : "ID do grupo",
+     *      "reference" : "Referencia da pesquisa"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : [
+     *          {
+     *              "dvnid"  : "ID da duvida",
+     *              "dvnidgr"  : "ID do grupo da duvida",
+     *              "dvctext"  : "Texto da duvida",
+     *              "dvcanex"  : "Anexo da duvida",
+     *              "dvcstat"  : "Status da duvida",
+     *              "dvlanon"  : "Define se a duvida eh anonima ounao",
+     *              "dvdcadt"  : "Data de Cadastro",
+     *              "dvdaldt"  : "Data de Aletracao",
+     *              "dvnatddr"  : "Qtd. de respostas",
+     *              "user"  : {
+     *                  "usnid" : "ID do usuario",
+     *                  "uscfbid" : "FacebookID do usuario",
+     *                  "uscnome" : "Nome do usuario",
+     *                  "uscmail" : "E-email do usuario",
+     *                  "usclogn" : "Login do usuario",
+     *                  "uscfoto" : "Caminho da foto do usuario",
+     *                  "uscstat" : "Status do usuario",
+     *                  "usdcadt" : "Data de cadastro do usuario",
+     *              },
+     *              "contents" : [
+     *                  {
+     *                      "conid" : "ID do conteudo",
+     *                      "cocdesc" : "Descricao do conteudo",
+     *                      "codcadt" : "Data de Cadastro",
+     *                      "codaldt" : "Data de Alteracao"
+     *                  },
+     *              ]
+     *          },
+     *      ]
+     * }
+     */
+    public function search() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->doubt_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->doubt_bo->validate_search() === FALSE) {
+            $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $response['response_errors'] = $this->doubt_bo->get_errors();
+        } else {
+            $data = $this->doubt_bo->get_data();
+
+            $users = $this->grupo_model->find_group_users($data['grnid']);
+            $is_member = false;
+
+            foreach ($users as $user) { // Percorre a lista de usuarios grupo informado
+                // Verifica se o usuario logado nao eh membro do grupo em questao
+                if ($user->usnid == $data['usnid']) {
+                    $is_member = true;
+                    break;
+                }
+            }
+
+            // Verifica se o usuario logado nao eh membro do grupo em questao
+            if ($is_member == false) {
+                $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
+                $response['response_message'] = "Erro ao tentar carregas as informações de dúvidas!\n";
+                $response['response_message'] .= "Somente membros do grupo têm permissão para visualizá-las!";
+            } else {
+                $doubts = $this->duvida_model->find_by_dvctext($data['reference']);
+                if (is_null($doubts)) {
+                    $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                    $response['response_message'] = "Nenhuma dúvida encontrada.";
+                } else {
+                    foreach ($doubts as $doubt) { // Percorre todas as duvidas encontradas
+                        $doubt->dvnqtddr = count($this->duvidaresposta_model->find_by_drniddv($doubt->dvnid)); // Carrega a qtd. de respostas da duvida
+                        $doubt->user = $this->usuario_model->find_by_usnid($doubt->dvnidus); // Carrega o usuario da duvida
+                        $doubt->contents = $this->duvida_model->find_doubt_contents($doubt->dvnid); // Carrega os conteudos relacionados com a duvida
+                        unset($doubt->dvnidus); // Remove o campo "ID DO USUARIO" do objeto de resposta
+                        unset($doubt->user->uscsenh); // Remove a senha do usuario do objeto de resposta
+                    }
+
+                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_message'] = "Dívida(s) encontrada(s) com sucesso!";
+                    $response['response_data'] = $doubts;
+                }
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($response, JSON_PRETTY_PRINT);
+    }
 }

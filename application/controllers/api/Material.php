@@ -599,7 +599,7 @@ class Material extends CI_Controller {
     }
 
     /**
-     * @url: API/material/deteails
+     * @url: API/material/details
      * @param string JSON
      * @return JSON
      *
