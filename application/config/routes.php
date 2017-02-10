@@ -79,6 +79,7 @@ $route['API/areaofinterest/add']['post'] = 'api/areaofinterest/add';
  * API GROUP ROUTES
  */
 $route['API/group/list']['post'] = 'api/group/list_all';
+$route['API/group/get']['post'] = 'api/group/get';
 $route['API/group/add']['post'] = 'api/group/add';
 $route['API/group/edit']['post'] = 'api/group/edit';
 $route['API/group/delete']['post'] = 'api/group/delete';

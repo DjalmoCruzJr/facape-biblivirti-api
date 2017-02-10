@@ -96,6 +96,35 @@ class Group_bo {
     /**
      * @return bool
      *
+     * Metodo para validar os dados inentes ao processo de <i>get</i> do controller <i>Group</i>.
+     */
+    public function validate_get() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo <i>grnid</i> (ID do Grupo)
+        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
+            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
      * Metodo para validar os dados inentes ao processo de <i>add</i> do controller <i>Group</i>.
      */
     public function validate_add() {

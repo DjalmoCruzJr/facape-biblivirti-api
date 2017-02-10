@@ -109,6 +109,60 @@ class Group extends CI_Controller {
     }
 
     /**
+     * @url: API/group/get
+     * @param int grnid
+     * @return JSON
+     *
+     * Metodo para mostrar as informacoes de um determinado grupo.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid" : "ID do grupo"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da requsicao",
+     *      "response_message" : "Mensagem da requsicao",
+     *      "response_data" : {
+     *          "grnid": "ID do grupo",
+     *          "grcnome" : "Nome do grupo",
+     *          "grcfoto" : "Caminho da foto do grupo",
+     *          "grctipo" : "Tipo do grupo",
+     *          "grdcadt" : "Data de cadastro do grupo",
+     *          "areaofinterest" : {
+     *              "ainid" : "ID da area de interasse",
+     *              "aicdesc" : "Descricao da area de interesse"
+     *          }
+     *      }
+     * }
+     */
+    public function get() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->group_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->group_bo->validate_get() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->group_bo->get_errors();
+        } else {
+            $data = $this->group_bo->get_data();
+
+            // Carrega as informacoes dados do grupo
+            $group = $this->grupo_model->find_by_grnid($data['grnid']);
+            $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
+            unset($group->grnidai);
+
+            $this->response['response_code'] = RESPONSE_CODE_OK;
+            $this->response['response_message'] = "Grupo encontado com sucesso!";
+            $this->response['response_data'] = $group;
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
+    /**
      * @url: API/group/add
      * @param string JSON
      * @return JSON
