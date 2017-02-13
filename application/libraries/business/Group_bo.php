@@ -138,11 +138,22 @@ class Group_bo {
 
         // Validando o campo <i>grcnome</i> (Nome do Grupo)
         if (!isset($this->data['grcnome']) || empty(trim($this->data['grcnome']))) {
-            $this->errors['grcnome'] = 'O NOME DO GRUPO do usuário é obrigatório!';
+            $this->errors['grcnome'] = 'O NOME DO GRUPO é obrigatório!';
             $status = FALSE;
         } else if (strlen($this->data['grcnome']) > GRCNOME_MAX_LENGTH) {
             $this->errors['grcnome'] = 'O NOME DO GRUPO deve conter no máximo ' . GRCNOME_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
+        }
+
+        // Validando o campo <i>grcfoto</i> (Foto do Grupo)
+        if (isset($this->data['grcfoto'])) {
+            if (empty(trim($this->data['grcfoto']))) {
+                $this->errors['grcfoto'] = 'A FOTO DO GRUPO é obrigatória!';
+                $status = FALSE;
+            } else if (is_string($this->data['grcfoto'])) {
+                $this->errors['grcfoto'] = 'A FOTO DO GRUPO com formato incorreto!';
+                $status = FALSE;
+            }
         }
 
         // Validando o campo <i>grnidai</i> (ID da Area de Interesse)
@@ -208,6 +219,17 @@ class Group_bo {
         } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
             $this->errors['usnid'] = 'ID USUÁRIO inválido!';
             $status = FALSE;
+        }
+
+        // Validando o campo <i>grcfoto</i> (Foto do Grupo)
+        if (isset($this->data['grcfoto'])) {
+            if (empty(trim($this->data['grcfoto']))) {
+                $this->errors['grcfoto'] = 'A FOTO DO GRUPO é obrigatória!';
+                $status = FALSE;
+            } else if (is_string($this->data['grcfoto'])) {
+                $this->errors['grcfoto'] = 'A FOTO DO GRUPO com formato incorreto!';
+                $status = FALSE;
+            }
         }
 
         // Validando o campo <i>grnid</i> (ID do Grupo)

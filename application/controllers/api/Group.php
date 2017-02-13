@@ -34,6 +34,7 @@ class Group extends CI_Controller {
         $this->load->library('business/group_bo');
         $this->load->library('input/biblivirti_input');
         $this->load->library('email/biblivirti_email');
+        $this->load->library('email/biblivirti_media');
     }
 
     /**
@@ -171,6 +172,7 @@ class Group extends CI_Controller {
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
      *      "grcnome": "Nome do grupo",
+     *      "grcfoto": "Foto do grupo (Formato BASE64)",
      *      "grnidai": "ID da area de interesse do grupo",
      *      "usnid": "ID do usuario (admin do grupo)",
      *      "grctipo": "Tipo do grupo"
@@ -204,6 +206,9 @@ class Group extends CI_Controller {
                 $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
                 $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
+                // Salva a imagem recebida no disco e devolve para o campo o caminho da imagem
+                $data['grcfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['grcfoto']);
+
                 $id = $this->grupo_model->save($data);
                 // verifica se houve falha na execucao do model
                 if ($id === 0) {
@@ -211,7 +216,9 @@ class Group extends CI_Controller {
                     $this->response['response_message'] = "Houve um erro ao tentar salvar as informações do grupo! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-                    // Carrega os dados do grupo cadastrado
+
+
+                    // Carrega os dados do usuario cadastrado
                     $user = $this->usuario_model->find_by_usnid($data['usnid']);
                     if (is_null($user)) {
                         $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;

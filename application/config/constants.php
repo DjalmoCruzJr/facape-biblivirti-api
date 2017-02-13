@@ -297,7 +297,7 @@ define('ASSETS_MEDIAS_PATH', ASSETS_PATH . 'medias/');
  * Constantes que definem o caminho do diretorio de armazenamento de upload de arquivos do sistema
  *
  */
-define('UPLOAD_PATH', ASSETS_CSS_PATH . 'upload/');
+define('UPLOAD_PATH', ASSETS_PATH . 'upload/');
 define('UPLOAD_FILES_PATH', UPLOAD_PATH . 'files/');
 define('UPLOAD_IMAGES_PATH', UPLOAD_PATH . 'images/');
 define('UPLOAD_VIDEOS_PATH', UPLOAD_PATH . 'videos/');
