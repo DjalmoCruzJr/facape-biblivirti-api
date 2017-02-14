@@ -34,7 +34,7 @@ class Group extends CI_Controller {
         $this->load->library('business/group_bo');
         $this->load->library('input/biblivirti_input');
         $this->load->library('email/biblivirti_email');
-        $this->load->library('email/biblivirti_media');
+        $this->load->library('media/biblivirti_media');
     }
 
     /**
