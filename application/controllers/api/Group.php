@@ -121,8 +121,8 @@ class Group extends CI_Controller {
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
-     *      "response_code" : "Codigo da requsicao",
-     *      "response_message" : "Mensagem da requsicao",
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
      *          "grnid": "ID do grupo",
      *          "grcnome" : "Nome do grupo",
@@ -332,6 +332,7 @@ class Group extends CI_Controller {
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {
+						$this->response['response_code'] = RESPONSE_CODE_OK;	
                         $this->response['response_message'] = "Grupo atualizado com sucesso!";
                         $this->response['response_data'] = ['grnid' => $data['grnid']];
                     }
