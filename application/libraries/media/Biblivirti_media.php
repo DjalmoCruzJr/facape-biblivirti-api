@@ -20,11 +20,11 @@ class Biblivirti_media {
     }
 
     public function save_image($user_id, $image) {
-        $data = explode('.', base64_decode($image));
-        $image_content = $data[0];
+        $data = explode('.', $image);
+        $image_content = base64_decode($data[0]);
         $image_mime = $data[1];
-        $filename = UPLOAD_IMAGES_PATH . 'image' . '-' . $user_id . '-' . date('d/m/Y H:i:s') . $image_mime;
-        file_put_contents($filename, $image_content);
+        $filename = 'image' . '-' . $user_id . '-' . date('d-m-Y', time()) . '-' . date('H-m-s', time()). '.' .$image_mime;
+        file_put_contents(base_url(UPLOAD_IMAGES_PATH . $filename), $image_content);
         return $filename;
     }
 

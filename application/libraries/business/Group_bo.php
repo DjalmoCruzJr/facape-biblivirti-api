@@ -150,9 +150,6 @@ class Group_bo {
             if (empty(trim($this->data['grcfoto']))) {
                 $this->errors['grcfoto'] = 'A FOTO DO GRUPO é obrigatória!';
                 $status = FALSE;
-            } else if (is_string($this->data['grcfoto'])) {
-                $this->errors['grcfoto'] = 'A FOTO DO GRUPO com formato incorreto!';
-                $status = FALSE;
             }
         }
 
@@ -225,9 +222,6 @@ class Group_bo {
         if (isset($this->data['grcfoto'])) {
             if (empty(trim($this->data['grcfoto']))) {
                 $this->errors['grcfoto'] = 'A FOTO DO GRUPO é obrigatória!';
-                $status = FALSE;
-            } else if (is_string($this->data['grcfoto'])) {
-                $this->errors['grcfoto'] = 'A FOTO DO GRUPO com formato incorreto!';
                 $status = FALSE;
             }
         }

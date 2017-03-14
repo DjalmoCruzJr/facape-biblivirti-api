@@ -17,7 +17,7 @@ class Material extends CI_Controller {
     private $response;
 
     /**
-     * Account constructor.
+     * Material constructor.
      */
     public function __construct() {
         parent::__construct();

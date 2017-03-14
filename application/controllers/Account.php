@@ -11,8 +11,10 @@ class Account extends CI_Controller {
     }
 
     public function index() {
-        $data['page_title'] = 'Biblivirti AVAM | Entre ou Cadastre-se!';
-        $this->load->view('account/login', $data);
+        $this->load->view('account/login');
+
+        $filename = 'img' . '-' . 123 . '-' . date('d-m-Y', time()) . '-' . date('H-m-s', time());
+        echo base_url(UPLOAD_IMAGES_PATH . $filename).'.jpg';
     }
 
 }

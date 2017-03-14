@@ -98,6 +98,7 @@ class Group extends CI_Controller {
                     $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
                     unset($group->grnidai); // Remove o campo 'grnidai' do objeto de resposta
                     $group->admin = $this->grupo_model->find_group_admin($group->grnid);
+                    $group->grcfoto = $group->grcfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $group->grcfoto);
                 }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
@@ -206,8 +207,14 @@ class Group extends CI_Controller {
                 $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
                 $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
-                // Salva a imagem recebida no disco e devolve para o campo o caminho da imagem
-                $data['grcfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['grcfoto']);
+                // Verifica se a imagem do grupo foi informada pelo usuario
+                if (isset($data['grcfoto'])) {
+                    // Salva a imagem recebida no disco e devolve para o campo o caminho da imagem
+                    $data['grcfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['grcfoto']);
+                }
+
+                $this->output->set_content_type('application/json', 'UTF-8');
+                echo json_encode($data, JSON_PRETTY_PRINT);
 
                 $id = $this->grupo_model->save($data);
                 // verifica se houve falha na execucao do model
@@ -216,8 +223,6 @@ class Group extends CI_Controller {
                     $this->response['response_message'] = "Houve um erro ao tentar salvar as informações do grupo! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-
-
                     // Carrega os dados do usuario cadastrado
                     $user = $this->usuario_model->find_by_usnid($data['usnid']);
                     if (is_null($user)) {
@@ -307,6 +312,11 @@ class Group extends CI_Controller {
                     $this->response['response_message'] = "Erro ao tentar editar o grupo!\n";
                     $this->response['response_message'] .= "Somente o administrador tem permissão para editá-lo!";
                 } else {
+                    // Verifica se a imagem do grupo foi informada pelo usuario
+                    if (isset($data['grcfoto'])) {
+                        // Salva a imagem recebida no disco e devolve para o campo o caminho da imagem
+                        $data['grcfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['grcfoto']);
+                    }
 
                     // Atualiza os dados do grupo
                     $this->grupo_model->update($data);
@@ -332,7 +342,7 @@ class Group extends CI_Controller {
                         $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {
-						$this->response['response_code'] = RESPONSE_CODE_OK;	
+                        $this->response['response_code'] = RESPONSE_CODE_OK;
                         $this->response['response_message'] = "Grupo atualizado com sucesso!";
                         $this->response['response_data'] = ['grnid' => $data['grnid']];
                     }

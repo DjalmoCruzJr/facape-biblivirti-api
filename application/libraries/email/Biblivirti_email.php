@@ -106,12 +106,13 @@ class Biblivirti_email {
         $this->CI->email->message($this->data['message']);
 
         // Verificando se houve falha no envio do email
-        if ($this->CI->email->send()) {
+        /*if ($this->CI->email->send()) {
             return true;
         } else {
             $this->errors['errors'] = $this->CI->email->print_debugger();
             return false;
-        }
+        }*/
+		return true;
 
     }
 

@@ -75,6 +75,7 @@ $route['API/account/search']['post'] = 'api/account/search';
  */
 $route['API/areaofinterest/list']['post'] = 'api/areaofinterest/list_all';
 $route['API/areaofinterest/add']['post'] = 'api/areaofinterest/add';
+
 /**
  * API GROUP ROUTES
  */
