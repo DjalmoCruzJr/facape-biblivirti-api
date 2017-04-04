@@ -277,11 +277,13 @@ define('RECSTAT_ABERTA', 'A');
 define('RECSTAT_FINALIZADA', 'F');
 
 /**---------------------------------------
- * ASSETS PATHS
+ * APP PATHS and DIR's
  * ---------------------------------------
  *
- * Constantes que definem o caminho do diretorio de recursos (css, js, imagens, etc) utilizados pelo sistema.
+ * Constantes que definem os caminhos e diretorio de recursos (css, js, imagens, etc) utilizados pelo sistema.
  */
+define('ROOT_DIR', 'c:/xampp/htdocs/projetos/sysmob/biblivirti/');
+
 define('ASSETS_PATH', 'assets/');
 define('ASSETS_CSS_PATH', ASSETS_PATH . 'css/');
 define('ASSETS_FILES_PATH', ASSETS_PATH . 'files/');
@@ -290,13 +292,6 @@ define('ASSETS_IMAGES_PATH', ASSETS_PATH . 'images/');
 define('ASSETS_JS_PATH', ASSETS_PATH . 'js/');
 define('ASSETS_MEDIAS_PATH', ASSETS_PATH . 'medias/');
 
-/**---------------------------------------
- * UPLOAD PATHS
- * ---------------------------------------
- *
- * Constantes que definem o caminho do diretorio de armazenamento de upload de arquivos do sistema
- *
- */
 define('UPLOAD_PATH', ASSETS_PATH . 'upload/');
 define('UPLOAD_FILES_PATH', UPLOAD_PATH . 'files/');
 define('UPLOAD_IMAGES_PATH', UPLOAD_PATH . 'images/');
