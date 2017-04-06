@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://localhost/projetos/sysmob/biblivirti/';
+$config['base_url'] = 'http://' . $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/projetos/sysmob/biblivirti/';
 
 /*
 |--------------------------------------------------------------------------

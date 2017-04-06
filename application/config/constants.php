@@ -112,7 +112,7 @@ define('RESPONSE_CODE_NOT_FOUND', 404);
  * Constantes utilizadas para definir os valor padrao de limit e offset
  * dos metodos de busca dos models
  */
-define('LIMIT_DEFAULT', 1000);
+define('LIMIT_DEFAULT', 10000);
 define('OFFSET_DEFAULT', 0);
 
 /**---------------------------------------

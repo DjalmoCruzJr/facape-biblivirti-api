@@ -17,8 +17,9 @@ application/logs/*
 #---------------------------------------
 /vendor
 
-#OTHERS FILES
+#OTHERS FILES/FOLDERS
 #---------------------------------------
 **.bak
 **.temp
 **.tmp
+/assets/upload/
