@@ -517,10 +517,10 @@ class Group extends CI_Controller {
 
             // Carrega as informacoes dados do grupo
             $group = $this->grupo_model->find_by_grnid($data['grnid']);
-            $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnid);
+            $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
             $group->admin = $this->grupo_model->find_group_admin($group->grnid);
             $group->users = $this->grupo_model->find_group_users($group->grnid);
-            unset($group->grnid); // Remove o campo 'grnidai' do objeto de resposta
+            unset($group->grnidai); // Remove o campo 'grnidai' do objeto de resposta
 
             $this->response['response_code'] = RESPONSE_CODE_OK;
             $this->response['response_message'] = "Grupo encontado com sucesso!";
