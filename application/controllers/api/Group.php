@@ -517,6 +517,7 @@ class Group extends CI_Controller {
 
             // Carrega as informacoes dados do grupo
             $group = $this->grupo_model->find_by_grnid($data['grnid']);
+            $group->grcfoto = $group->grcfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $group->grcfoto);
             $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
             $group->admin = $this->grupo_model->find_group_admin($group->grnid);
             $group->users = $this->grupo_model->find_group_users($group->grnid);
