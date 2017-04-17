@@ -11,7 +11,8 @@ class Account extends CI_Controller {
     }
 
     public function index() {
-        $this->load->view('account/login');
+        $data['page_title'] = 'Biblivirti AVAM';
+        $this->load->view('account/login', $data);
     }
 
 }
