@@ -218,14 +218,6 @@ class Group_bo {
             $status = FALSE;
         }
 
-        // Validando o campo <i>grcfoto</i> (Foto do Grupo)
-        if (isset($this->data['grcfoto'])) {
-            if (empty(trim($this->data['grcfoto']))) {
-                $this->errors['grcfoto'] = 'A FOTO DO GRUPO é obrigatória!';
-                $status = FALSE;
-            }
-        }
-
         // Validando o campo <i>grnid</i> (ID do Grupo)
         if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
             $this->errors['grnid'] = 'O ID GO GRUPO é obrigatório!';
@@ -242,6 +234,14 @@ class Group_bo {
         } else if (strlen($this->data['grcnome']) > GRCNOME_MAX_LENGTH) {
             $this->errors['grcnome'] = 'O NOME DO GRUPO deve conter no máximo ' . GRCNOME_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
+        }
+
+        // Validando o campo <i>grcfoto</i> (Foto do Grupo)
+        if (isset($this->data['grcfoto'])) {
+            if (empty(trim($this->data['grcfoto']))) {
+                $this->errors['grcfoto'] = 'A FOTO DO GRUPO é obrigatória!';
+                $status = FALSE;
+            }
         }
 
         // Validando o campo <i>grnidai</i> (ID da Area de Interesse)

@@ -215,7 +215,7 @@ class Group extends CI_Controller {
                     $data['grcfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['grcfoto']);
                 }
 
-                if ($data['grcfoto'] == null) {
+                if (isset($data['grcfoto']) && $data['grcfoto'] == null) {
                     $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                     $this->response['response_message'] = "Houve um erro ao tentar salvar a imagem do grupo! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
@@ -315,7 +315,7 @@ class Group extends CI_Controller {
                 $group->admin = $this->grupo_model->find_group_admin($group->grnid);
                 if ($group->admin->usnid != $data['usnid']) {
                     $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
-                    $this->response['response_message'] = "Erro ao tentar editar o grupo!\  n";
+                    $this->response['response_message'] = "Erro ao tentar editar o grupo!\n";
                     $this->response['response_message'] .= "Somente o administrador tem permissão para editá-lo!";
                 } else {
                     // Verifica se a imagem do grupo foi informada pelo usuario
@@ -324,7 +324,7 @@ class Group extends CI_Controller {
                         $data['grcfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['grcfoto']);
                     }
 
-                    if ($data['grcfoto'] == null) {
+                    if (isset($data['grcfoto']) && $data['grcfoto'] == null) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                         $this->response['response_message'] = "Houve um erro ao tentar salvar a imagem do grupo! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
