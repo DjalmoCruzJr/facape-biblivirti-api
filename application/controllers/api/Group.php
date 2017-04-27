@@ -407,44 +407,46 @@ class Group extends CI_Controller {
                     $this->response['response_message'] = "Erro ao tentar excluir o grupo!\n";
                     $this->response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
                 } else {
-                    // Verifica se foto do grupo foi excluida do disco com sucesso
-                    if ($this->biblivirti_media->delete_image($group->grcfoto) == false) {
-                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
-                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
-                    } else {
-                        // Verifica se o grupo foi excluido com sucesso do banco de dados
-                        if (!$this->grupo_model->delete($data['grnid'])) {
-                            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                            $this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
-                            $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
-                        } else {
-                            // Seta os dados para o envio do email de notificação de novo grupo
-                            $from = EMAIL_SMTP_USER;
-                            $to = $group->admin->uscmail;
-                            $subject = EMAIL_SUBJECT_DELETE_GROUP;
-                            $message = EMAIL_MESSAGE_DELETE_GROUP;
-                            $datas = [
-                                EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-                                EMAIL_KEY_USCNOME => (!is_null($group->admin->uscnome)) ? $group->admin->uscnome : $group->admin->usclogn,
-                                EMAIL_KEY_GRCNOME => $group->grcnome,
-                                EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-                                EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-                            ];
+//                    // Verifica se foto do grupo foi excluida do disco com sucesso
+//                    if ($this->biblivirti_media->delete_image($group->grcfoto) == false) {
+//                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+//                        $this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
+//                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
+//                    } else {
+					// Exclui a foto do grupo do disco
+					$this->biblivirti_media->delete_image($group->grcfoto);
+					// Verifica se o grupo foi excluido com sucesso do banco de dados
+					if (!$this->grupo_model->delete($data['grnid'])) {
+						$this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+						$this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
+						$this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
+					} else {
+						// Seta os dados para o envio do email de notificação de novo grupo
+						$from = EMAIL_SMTP_USER;
+						$to = $group->admin->uscmail;
+						$subject = EMAIL_SUBJECT_DELETE_GROUP;
+						$message = EMAIL_MESSAGE_DELETE_GROUP;
+						$datas = [
+							EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+							EMAIL_KEY_USCNOME => (!is_null($group->admin->uscnome)) ? $group->admin->uscnome : $group->admin->usclogn,
+							EMAIL_KEY_GRCNOME => $group->grcnome,
+							EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+							EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+						];
 
-                            $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+						$this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
 
-                            if ($this->biblivirti_email->send() === false) {
-                                $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                                $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_DELETE_GROUP . "!\n";
-                                $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
-                                $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                            } else {
-                                $this->response['response_code'] = RESPONSE_CODE_OK;
-                                $this->response['response_message'] = "Grupo excluído com sucesso!";
-                            }
-                        }
-                    }
+						if ($this->biblivirti_email->send() === false) {
+							$this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+							$this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_DELETE_GROUP . "!\n";
+							$this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+							$this->response['response_errors'] = $this->biblivirti_email->get_errros();
+						} else {
+							$this->response['response_code'] = RESPONSE_CODE_OK;
+							$this->response['response_message'] = "Grupo excluído com sucesso!";
+						}
+					}
+//                    }
                 }
             }
         }
