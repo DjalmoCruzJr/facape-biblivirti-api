@@ -22,4 +22,14 @@ application/logs/*
 **.bak
 **.temp
 **.tmp
-/assets/upload/
+
+assets/upload/files/*
+!assets/upload/files/index.html
+
+assets/upload/images/*
+!assets/upload/images/index.html
+
+assets/upload/videos/*
+!assets/upload/videos/index.html
+
+
