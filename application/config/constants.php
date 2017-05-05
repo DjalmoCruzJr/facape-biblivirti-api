@@ -282,7 +282,8 @@ define('RECSTAT_FINALIZADA', 'F');
  *
  * Constantes que definem os caminhos e diretorio de recursos (css, js, imagens, etc) utilizados pelo sistema.
  */
-define('ROOT_DIR', 'c:/xampp/htdocs/projetos/sysmob/biblivirti/');
+define('PROJECT_DIR', '/projetos/sysmob/biblivirti/');
+define('ROOT_DIR', $_SERVER['DOCUMENT_ROOT'] . PROJECT_DIR);
 
 define('ASSETS_PATH', 'assets/');
 define('ASSETS_CSS_PATH', ASSETS_PATH . 'css/');
