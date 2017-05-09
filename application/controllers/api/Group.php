@@ -726,8 +726,8 @@ class Group extends CI_Controller
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
-     *      "response_code" : "Codigo da resposta",
-     *      "response_message" : "Mensagem da resposta"
+         *      "response_code" : "Codigo da resposta",
+         *      "response_message" : "Mensagem da resposta"
      * }
      */
     public function unsubscribe()

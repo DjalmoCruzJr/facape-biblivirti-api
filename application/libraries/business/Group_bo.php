@@ -7,7 +7,8 @@
  *
  * Classe para aplicar as regras de negocio inerentes as operacoes do controller <i>Account</i>.
  */
-class Group_bo {
+class Group_bo
+{
 
     protected $CI;
 
@@ -28,7 +29,8 @@ class Group_bo {
     /**
      * Account_bo constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         // Loading variables
         $this->data = [];
         $this->errors = [];
@@ -45,7 +47,8 @@ class Group_bo {
      *
      * Metodo para setar os dados a serem validados.
      */
-    public function set_data($data) {
+    public function set_data($data)
+    {
         $this->data = $data;
     }
 
@@ -54,7 +57,8 @@ class Group_bo {
      *
      * Metodo para retornar os dados apos serem validados.
      */
-    public function get_data() {
+    public function get_data()
+    {
         return $this->data;
     }
 
@@ -63,7 +67,8 @@ class Group_bo {
      *
      * Metodo para retornar os erros inerentes ao processo de validacao.
      */
-    public function get_errors() {
+    public function get_errors()
+    {
         return $this->errors;
     }
 
@@ -72,7 +77,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>list_all</i> do controller <i>Group</i>.
      */
-    public function validate_list_all() {
+    public function validate_list_all()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -98,7 +104,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>get</i> do controller <i>Group</i>.
      */
-    public function validate_get() {
+    public function validate_get()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -127,7 +134,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>add</i> do controller <i>Group</i>.
      */
-    public function validate_add() {
+    public function validate_add()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -197,7 +205,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>edit</i> do controller <i>Group</i>.
      */
-    public function validate_edit() {
+    public function validate_edit()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -273,7 +282,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>delete</i> do controller <i>Group</i>.
      */
-    public function validate_delete() {
+    public function validate_delete()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -314,7 +324,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>info</i> do controller <i>Group</i>.
      */
-    public function validate_info() {
+    public function validate_info()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -343,7 +354,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>search</i> do controller <i>Group</i>.
      */
-    public function validate_search() {
+    public function validate_search()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -369,7 +381,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>subscribe</i> do controller <i>Group</i>.
      */
-    public function validate_subscribe() {
+    public function validate_subscribe()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -410,7 +423,8 @@ class Group_bo {
      *
      * Metodo para validar os dados inentes ao processo de <i>unsubscribe</i> do controller <i>Group</i>.
      */
-    public function validate_unsubscribe() {
+    public function validate_unsubscribe()
+    {
         $status = TRUE;
 
         // Verifica se o decode do JSON foi feito corretamente
@@ -433,25 +447,25 @@ class Group_bo {
 
         // Validando o campo <i>usnid</i> (ID do usuario admin do grupo)
         if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
-            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
+            $this->errors['usnid'] = 'O ID DO USUÁRIO ADMIN é obrigatório!';
             $status = FALSE;
         } else if (!is_numeric($this->data['usnid'])) {
-            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $this->errors['usnid'] = 'O ID DO USUÁRIO ADMIN deve ser um valor inteiro!';
             $status = FALSE;
         } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
-            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $this->errors['usnid'] = 'ID DO USUÁRIO ADMIN inválido!';
             $status = FALSE;
         }
 
         // Validando o campo <i>usnid2</i> (ID do usuario a ser removido)
         if (!isset($this->data['usnid2']) || empty(trim($this->data['usnid2']))) {
-            $this->errors['usnid2'] = 'O ID DO USUÁRIO é obrigatório!';
+            $this->errors['usnid2'] = 'O ID DO USUÁRIO A REMOVER é obrigatório!';
             $status = FALSE;
         } else if (!is_numeric($this->data['usnid'])) {
-            $this->errors['usnid2'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
+            $this->errors['usnid2'] = 'O ID DO USUÁRIO A REMOVER deve ser um valor inteiro!';
             $status = FALSE;
         } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid2']))) {
-            $this->errors['usnid2'] = 'ID DO USUÁRIO inválido!';
+            $this->errors['usnid2'] = 'ID DO USUÁRIO A REMOVER inválido!';
             $status = FALSE;
         }
 
