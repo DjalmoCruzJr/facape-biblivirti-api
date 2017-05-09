@@ -7,7 +7,8 @@
  *
  * Controller para gerenciar acesso aos dados de <b>Grupos</b>
  */
-class Group extends CI_Controller {
+class Group extends CI_Controller
+{
 
     /**
      * @var array
@@ -19,7 +20,8 @@ class Group extends CI_Controller {
     /**
      * Group constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Initing variables
@@ -76,7 +78,8 @@ class Group extends CI_Controller {
      *      ]
      * }
      */
-    public function list_all() {
+    public function list_all()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -138,7 +141,8 @@ class Group extends CI_Controller {
      *      }
      * }
      */
-    public function get() {
+    public function get()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -189,7 +193,8 @@ class Group extends CI_Controller {
      *      }
      * }
      */
-    public function add() {
+    public function add()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -293,7 +298,8 @@ class Group extends CI_Controller {
      *      }
      * }
      */
-    public function edit() {
+    public function edit()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -381,7 +387,8 @@ class Group extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function delete() {
+    public function delete()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -504,7 +511,8 @@ class Group extends CI_Controller {
      *      }
      * }
      */
-    public function info() {
+    public function info()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -584,7 +592,8 @@ class Group extends CI_Controller {
      *      ]
      * }
      */
-    public function search() {
+    public function search()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -596,7 +605,7 @@ class Group extends CI_Controller {
             $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
-            $groups = $this->grupo_model->find_by_grcnome_and_grctipo($data['reference']);
+            $groups = $this->grupo_model->find_by_grcnome($data['reference']);
             if (is_null($groups)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum grupo encontrado!";
@@ -605,6 +614,7 @@ class Group extends CI_Controller {
                     $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
                     $group->admin = $this->grupo_model->find_group_admin($group->grnid);
                     $group->users = $this->grupo_model->find_group_users($group->grnid);
+                    $group->grcfoto = $group->grcfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $group->grcfoto);
                     unset($group->grnidai); // Remove o campo GRNIDAI do objetos de resposta
                 }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
@@ -633,7 +643,8 @@ class Group extends CI_Controller {
      *      "response_message" : "Mensagem da resposta"
      * }
      */
-    public function subscribe() {
+    public function subscribe()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -719,7 +730,8 @@ class Group extends CI_Controller {
      *      "response_message" : "Mensagem da resposta"
      * }
      */
-    public function unsubscribe() {
+    public function unsubscribe()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
