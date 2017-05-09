@@ -618,7 +618,7 @@ class Group extends CI_Controller
                     unset($group->grnidai); // Remove o campo GRNIDAI do objetos de resposta
                 }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Senha alterada com sucesso!";
+                $this->response['response_message'] = "Grupo(s) encontrado(s) com sucesso!";
                 $this->response['response_data'] = $groups;
             }
         }
