@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+﻿<?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * @author djalmocruzjr (djalmo.cruz@gmail.com)
@@ -585,6 +585,8 @@ class Group extends CI_Controller {
      * }
      */
     public function search() {
+	// Ajustar implementacao deste servico para nao trazer os grupos que sejam privado (grcstat = 'F')
+
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
