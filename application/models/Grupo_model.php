@@ -7,12 +7,14 @@
  *
  * Model da tabela <b>GRUPO</b>
  */
-class Grupo_model extends CI_Model {
+class Grupo_model extends CI_Model
+{
 
     /**
      * Grupo_model constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -22,7 +24,8 @@ class Grupo_model extends CI_Model {
      *
      * Metodo para salvar um registro na tabela GRUPO
      */
-    public function save($data) {
+    public function save($data)
+    {
         $usnid = $data['usnid'];
         unset($data['usnid']);
         $grnid = $this->db->insert('grupo', $data) === true ? $this->db->insert_id() : 0;
@@ -40,7 +43,8 @@ class Grupo_model extends CI_Model {
      * Metodo para buscar todos os registros da tabela GRUPO
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_all($limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+    public function find_all($limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false)
+    {
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
         }
@@ -54,7 +58,8 @@ class Grupo_model extends CI_Model {
      *
      * Metodo para buscar um registro da tabela GRUPO pelo ID
      */
-    public function find_by_grnid($grnid) {
+    public function find_by_grnid($grnid)
+    {
         $this->db->where('grnid', $grnid);
         $query = $this->db->get('grupo');
         return $query->num_rows() > 0 ? $query->result()[0] : null;
@@ -72,11 +77,42 @@ class Grupo_model extends CI_Model {
      * Se $like = FALSE a busca eh feita no formato: field = value
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_by_grcnome($grcnome, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+    public function find_by_grcnome($grcnome, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false)
+    {
         if ($like === true) {
             $this->db->like('grcnome', $grcnome);
         } else {
             $this->db->where('grcnome', $grcnome);
+        }
+        if ($active === true) {
+            $this->db->where('grcstat', GRCSTAT_ATIVO);
+        }
+        $query = $this->db->get('grupo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
+     * @param $grcnome
+     * @param string $grctipo
+     * @param int $limit
+     * @param int $offset
+     * @param bool $like
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela GRUPO pela NOME e pelo TIPO
+     * Se $like = TRUE a busca eh feita no formato: field LIKE value
+     * Se $like = FALSE a busca eh feita no formato: field = value
+     * Se $active = TRUE a busca trara apenas registro com status ATIVO
+     */
+    public function find_by_grcnome_and_grctipo($grcnome, $grctipo = GRCTIPO_ABERTO, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false)
+    {
+        if ($like === true) {
+            $this->db->like('grcnome', $grcnome);
+            $this->db->like('grctipo', $grctipo);
+        } else {
+            $this->db->where('grcnome', $grcnome);
+            $this->db->where('grctipo', $grctipo);
         }
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
@@ -97,7 +133,8 @@ class Grupo_model extends CI_Model {
      * Se $like = FALSE a busca eh feita no formato: field = value
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_by_grnidai($grnidai, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+    public function find_by_grnidai($grnidai, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false)
+    {
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
         }
@@ -117,7 +154,8 @@ class Grupo_model extends CI_Model {
      * Metodo para buscar registros da tabela GRUPO pela TIPO
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_by_grctipo($grctipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+    public function find_by_grctipo($grctipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false)
+    {
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
         }
@@ -136,7 +174,8 @@ class Grupo_model extends CI_Model {
      * Metodo para buscar registros da tabela GRUPO relacionados com um USUARIO
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_by_usnid($usnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+    public function find_by_usnid($usnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false)
+    {
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
         }
@@ -158,7 +197,8 @@ class Grupo_model extends CI_Model {
      * Metodo para buscar o(s) administrador(es) de um determinado GRUPO
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_group_admin($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+    public function find_group_admin($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false)
+    {
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
         }
@@ -181,7 +221,8 @@ class Grupo_model extends CI_Model {
      * Metodo para buscar o(s) usuario(s) de um determinado GRUPO
      * Se $active = TRUE a busca trara apenas registro com status ATIVO
      */
-    public function find_group_users($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false) {
+    public function find_group_users($grnid, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $active = false)
+    {
         if ($active === true) {
             $this->db->where('grcstat', GRCSTAT_ATIVO);
         }
@@ -201,7 +242,8 @@ class Grupo_model extends CI_Model {
      *
      * Metoda associar um USUARIO a um GRUPO
      */
-    public function add_member($grnid, $usnid, $admin = false) {
+    public function add_member($grnid, $usnid, $admin = false)
+    {
         $data = ['gunidgr' => $grnid, 'gunidus' => $usnid, 'guladm' => $admin];
         return $this->db->insert('grupousuario', $data) === true;
     }
@@ -214,7 +256,8 @@ class Grupo_model extends CI_Model {
      *
      * Metoda remover a relacao de um USUARIO com um GRUPO
      */
-    public function remove_member($grnid, $usnid) {
+    public function remove_member($grnid, $usnid)
+    {
         $this->db->where('gunidgr', $grnid);
         $this->db->where('gunidus', $usnid);
         return $this->db->delete('grupousuario') === true;
@@ -226,7 +269,8 @@ class Grupo_model extends CI_Model {
      *
      * metodo para atualizar um registro da tabela GRUPO
      */
-    public function update($data) {
+    public function update($data)
+    {
         $usnid = $data['usnid'];
         $grnid = $data['grnid'];
         unset($data['usnid']);
@@ -241,7 +285,8 @@ class Grupo_model extends CI_Model {
      *
      * Metodo para excluir um registro da tabela GRUPO
      */
-    public function delete($grnid) {
+    public function delete($grnid)
+    {
         $this->db->where('grnid', $grnid);
         return $this->db->delete('grupo');
     }

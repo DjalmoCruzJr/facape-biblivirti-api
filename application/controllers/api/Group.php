@@ -585,8 +585,6 @@ class Group extends CI_Controller {
      * }
      */
     public function search() {
-	// Ajustar implementacao deste servico para nao trazer os grupos que sejam privado (grcstat = 'F')
-
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -598,7 +596,7 @@ class Group extends CI_Controller {
             $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
-            $groups = $this->grupo_model->find_by_grcnome($data['reference']);
+            $groups = $this->grupo_model->find_by_grcnome_and_grctipo($data['reference']);
             if (is_null($groups)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum grupo encontrado!";
