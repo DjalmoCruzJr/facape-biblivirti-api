@@ -7,7 +7,8 @@
  *
  * Controller da API para gerenciar o acesso aos dados de <b>Materiais</b>.
  */
-class Material extends CI_Controller {
+class Material extends CI_Controller
+{
 
     /**
      * @var array
@@ -19,7 +20,8 @@ class Material extends CI_Controller {
     /**
      * Material constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Initializing variables
@@ -66,7 +68,8 @@ class Material extends CI_Controller {
      *      ]
      * }
      */
-    public function list_all() {
+    public function list_all()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -134,7 +137,8 @@ class Material extends CI_Controller {
      *      }
      * }
      */
-    public function add() {
+    public function add()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -234,7 +238,8 @@ class Material extends CI_Controller {
      *      }
      * }
      */
-    public function edit() {
+    public function edit()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -312,7 +317,8 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function delete() {
+    public function delete()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -400,7 +406,8 @@ class Material extends CI_Controller {
      *      ]
      * }
      */
-    public function search() {
+    public function search()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -418,6 +425,11 @@ class Material extends CI_Controller {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "Nenhum material encontrado.";
             } else {
+                foreach ($materials as $material) {
+                    $material->manqtdce = count($this->comentario_model->find_by_cenidma($material->manid));
+                    $material->manqtdha = $this->historicoacesso_model->count_by_hanidma($material->manid);
+                }
+
                 $response['response_code'] = RESPONSE_CODE_OK;
                 $response['response_message'] = "Material(ais) encontrado(s) com sucesso!";
                 $response['response_data'] = $materials;
@@ -446,7 +458,8 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao"
      * }
      */
-    public function email() {
+    public function email()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -514,7 +527,8 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao"
      * }
      */
-    public function share() {
+    public function share()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -644,7 +658,8 @@ class Material extends CI_Controller {
      *      }
      * }
      */
-    public function details() {
+    public function details()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
