@@ -93,7 +93,7 @@ class Content extends CI_Controller {
      * Metodo para cadastrar um novo conteudo.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
-     *      "grnid" : "ID do grupo",
+     *      "conidgr" : "ID do grupo do conteudo",
      *      "cocdesc" : "Descricao do conteudo"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:

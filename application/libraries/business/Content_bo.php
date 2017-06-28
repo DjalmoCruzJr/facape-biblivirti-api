@@ -109,15 +109,15 @@ class Content_bo {
             return false;
         }
 
-        // Validando o campo GRNID (ID do grupo)
-        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
-            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+        // Validando o campo CONIDGR (ID do grupo do conteudo)
+        if (!isset($this->data['conidgr']) || empty(trim($this->data['conidgr']))) {
+            $this->errors['conidgr'] = 'O ID DO GRUPO é obrigatório!';
             $status = FALSE;
-        } else if (!is_numeric($this->data['grnid'])) {
-            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+        } else if (!is_numeric($this->data['conidgr'])) {
+            $this->errors['conidgr'] = 'O ID DO GRUPO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
-            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['conidgr']))) {
+            $this->errors['conidgr'] = 'ID DO GRUPO inválido!';
             $status = FALSE;
         }
 
@@ -150,15 +150,15 @@ class Content_bo {
             return false;
         }
 
-        // Validando o campo GRNID (ID do grupo)
-        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
-            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+        // Validando o campo CONIDGR (ID do grupo do conteudo)
+        if (!isset($this->data['condigr']) || empty(trim($this->data['condigr']))) {
+            $this->errors['condigr'] = 'O ID DO GRUPO é obrigatório!';
             $status = FALSE;
-        } else if (!is_numeric($this->data['grnid'])) {
-            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor inteiro!';
+        } else if (!is_numeric($this->data['condigr'])) {
+            $this->errors['condigr'] = 'O ID DO GRUPO deve ser um valor inteiro!';
             $status = FALSE;
-        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
-            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['condigr']))) {
+            $this->errors['condigr'] = 'ID DO GRUPO inválido!';
             $status = FALSE;
         }
 
