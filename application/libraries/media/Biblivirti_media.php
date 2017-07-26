@@ -45,10 +45,6 @@ class Biblivirti_media
         }
     }
 
-    public function save_video()
-    {
-    }
-
     /**
      * @param $user_id
      * @param $file
@@ -63,7 +59,7 @@ class Biblivirti_media
             $file_content = base64_decode($data[0]);
             $file_mime = $data[1];
             $filename = 'file' . '-' . $user_id . '-' . date('d-m-Y', time()) . '-' . date('H-m-s', time()) . '.' . $file_mime;
-            if (file_put_contents(ROOT_DIR . UPLOAD_FILES_PATH . $filename, $file_content) == false) {
+            if (file_put_contents(ROOT_DIR . UPLOAD_FILES_PATH . $filename, $file_content) === false) {
                 return null;
             }
             return $filename;

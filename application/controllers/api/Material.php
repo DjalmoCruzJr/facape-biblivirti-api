@@ -36,6 +36,7 @@ class Material extends CI_Controller
         $this->load->library('business/material_bo');
         $this->load->library('input/biblivirti_input');
         $this->load->library('email/biblivirti_email');
+        $this->load->library('media/biblivirti_media');
     }
 
     /**
@@ -158,42 +159,55 @@ class Material extends CI_Controller
                 $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material!\n";
                 $this->response['response_message'] .= "Somente o administrador do grupo tem permissão para adicionar um material.";
             } else {
-                unset($data['usnid']); // Remove o ID do usuario dos dados a serem persistidos.
-                $manid = $this->material_model->save($data);
+                // Verifica se material NAO EH do tipo LINK (JOGO e VIDEO) e se seu conteudo foi informado (MACURL)
+                if (isset($data['macurl']) && $data['mactipo'] != MACTIPO_JOGO && $data['mactipo'] != MACTIPO_VIDEO) {
+                    $data['macurl'] = $this->biblivirti_media->save_file($data['usnid'], $data['macurl']);
+                }
 
-                // Verifica se houve falha na execucao do model
-                if (is_null($manid)) {
-                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material! Tente novamente.\n";
+                // Verifica se o conteudo do arquivo NAO foi salvo corretamente no disco
+                if (isset($data['macurl']) && $data['macurl'] == null) {
+                    $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                    $this->response['response_message'] = "Houve um erro ao tentar salvar o anexo do material! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-                    // Carrega os dados do administrador do grupo
-                    $group = $this->grupo_model->find_by_grnid($data['manidgr']);
-                    // Seta os dados para o envio do email de notificação de novo grupo
-                    $from = EMAIL_SMTP_USER;
-                    $to = $admin->uscmail;
-                    $subject = EMAIL_SUBJECT_NEW_MATERIAL;
-                    $message = EMAIL_MESSAGE_NEW_MATERIAL;
-                    $datas = [
-                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-                        EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
-                        EMAIL_KEY_MACDESC => $data['macdesc'],
-                        EMAIL_KEY_GRCNOME => $group->grcnome,
-                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-                    ];
+                    unset($data['usnid']); // Remove o ID do usuario dos dados a serem persistidos.
 
-                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+                    $manid = $this->material_model->save($data); // Salva o material no banco de dados
 
-                    if ($this->biblivirti_email->send() === false) {
-                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MATERIAL . "!\n";
-                        $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
-                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                    // Verifica se houve falha na execucao do model
+                    if (is_null($manid)) {
+                        $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                        $this->response['response_message'] = "Houve um erro ao tentar cadastrar o material! Tente novamente.\n";
+                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                     } else {
-                        $this->response['response_code'] = RESPONSE_CODE_OK;
-                        $this->response['response_message'] = "Material cadastrado com sucesso!";
-                        $this->response['response_data'] = $manid;
+                        // Carrega os dados do administrador do grupo
+                        $group = $this->grupo_model->find_by_grnid($data['manidgr']);
+                        // Seta os dados para o envio do email de notificação de novo grupo
+                        $from = EMAIL_SMTP_USER;
+                        $to = $admin->uscmail;
+                        $subject = EMAIL_SUBJECT_NEW_MATERIAL;
+                        $message = EMAIL_MESSAGE_NEW_MATERIAL;
+                        $datas = [
+                            EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+                            EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
+                            EMAIL_KEY_MACDESC => $data['macdesc'],
+                            EMAIL_KEY_GRCNOME => $group->grcnome,
+                            EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+                            EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+                        ];
+
+                        $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+                        if ($this->biblivirti_email->send() === false) {
+                            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+                            $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_MATERIAL . "!\n";
+                            $this->response['response_message'] .= "Informe essa ocorrência a equipe de suporte do Biblivirti!";
+                            $this->response['response_errors'] = $this->biblivirti_email->get_errros();
+                        } else {
+                            $this->response['response_code'] = RESPONSE_CODE_OK;
+                            $this->response['response_message'] = "Material cadastrado com sucesso!";
+                            $this->response['response_data'] = $manid;
+                        }
                     }
                 }
             }
@@ -238,7 +252,8 @@ class Material extends CI_Controller
      *      }
      * }
      */
-    public function edit()
+    public
+    function edit()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -317,7 +332,8 @@ class Material extends CI_Controller
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function delete()
+    public
+    function delete()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -406,7 +422,8 @@ class Material extends CI_Controller
      *      ]
      * }
      */
-    public function search()
+    public
+    function search()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -458,7 +475,8 @@ class Material extends CI_Controller
      *      "request_message" : "Mensagem da requsicao"
      * }
      */
-    public function email()
+    public
+    function email()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -527,7 +545,8 @@ class Material extends CI_Controller
      *      "request_message" : "Mensagem da requsicao"
      * }
      */
-    public function share()
+    public
+    function share()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -658,7 +677,8 @@ class Material extends CI_Controller
      *      }
      * }
      */
-    public function details()
+    public
+    function details()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 

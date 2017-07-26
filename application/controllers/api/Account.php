@@ -7,7 +7,8 @@
  *
  * Controller da API para gerenciar o acesso aos dados da <b>Conta</b>.
  */
-class Account extends CI_Controller {
+class Account extends CI_Controller
+{
 
     /**
      * @var array
@@ -19,7 +20,8 @@ class Account extends CI_Controller {
     /**
      * Account constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Initializing variables
@@ -67,7 +69,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function login() {
+    public function login()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -127,7 +130,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function login_facebook() {
+    public function login_facebook()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -182,7 +186,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function register() {
+    public function register()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -274,7 +279,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function recovery() {
+    public function recovery()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -369,7 +375,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function email_confirmation() {
+    public function email_confirmation()
+    {
         $data['cactokn'] = $this->input->get('cactokn');
 
         $this->response = [];
@@ -463,7 +470,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function password_reset() {
+    public function password_reset()
+    {
         $data['rsctokn'] = $this->input->get('rsctokn');
 
         $this->response = [];
@@ -526,7 +534,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function password_edit() {
+    public function password_edit()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -609,7 +618,8 @@ class Account extends CI_Controller {
      *
      * }
      */
-    public function search() {
+    public function search()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -630,7 +640,7 @@ class Account extends CI_Controller {
                     unset($user->uscsenh); // Remove o campo senha dos objetos de resposta
                 }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Senha alterada com sucesso!";
+                $this->response['response_message'] = "Usuário(s) encontrado(s) com sucesso!";
                 $this->response['response_data'] = $users;
             }
         }
@@ -689,7 +699,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function profile() {
+    public function profile()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -749,7 +760,8 @@ class Account extends CI_Controller {
      *      }
      * }
      */
-    public function profile_edit() {
+    public function profile_edit()
+    {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
