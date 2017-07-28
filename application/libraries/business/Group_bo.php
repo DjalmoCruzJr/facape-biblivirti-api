@@ -270,7 +270,7 @@ class Group_bo
             !(strcmp($this->data['grctipo'], GRCTIPO_ABERTO) == 0 | strcmp($this->data['grctipo'], GRCTIPO_FECHADO) == 0)
         ) {
             $tipos = GRCTIPO_ABERTO . ',' . GRCTIPO_FECHADO;
-            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo String (' . $tipos . ')!';
+            $this->errors['grctipo'] = 'O TIPO DE GRUPO deve ser um valor do tipo caractere (' . $tipos . ')!';
             $status = FALSE;
         }
 
@@ -306,13 +306,13 @@ class Group_bo
 
         // Validando o campo <i>usnid</i> (ID do usuario)
         if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
-            $this->errors['usnid'] = 'O ID USUÀRIO é obrigatório!';
+            $this->errors['usnid'] = 'O ID USUÁRIO é obrigatório!';
             $status = FALSE;
         } else if (!is_numeric($this->data['grnid'])) {
-            $this->errors['usnid'] = 'O ID DO USUÀRIO deve ser um valor inteiro!';
+            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
             $status = FALSE;
         } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
-            $this->errors['usnid'] = 'ID DO USUÀRIO inválido!';
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
             $status = FALSE;
         }
 

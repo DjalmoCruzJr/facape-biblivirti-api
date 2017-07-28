@@ -81,7 +81,7 @@ class Areaofinterest_bo {
 
         // Validando o campo <i>aicdesc</i> (Descricao do area de interesse)
         if (!isset($this->data['aicdesc']) || empty(trim($this->data['aicdesc']))) {
-            $this->errors['aicdesc'] = 'A DESCRIÇÃO da área de interesse é obrigatório!';
+            $this->errors['aicdesc'] = 'A DESCRIÇÃO da área de interesse é obrigatória!';
             $status = FALSE;
         } else if (strlen($this->data['aicdesc']) > AICDESC_MAX_LENGHT) {
             $this->errors['aicdesc'] = 'A DESCRIÇÃO da área de interesse deve conter no máximo ' . AICDESC_MAX_LENGHT . ' caracter(es)!';
@@ -107,7 +107,7 @@ class Areaofinterest_bo {
 
         // Validando o campo AICDESC (Descricao)
         if (!isset($this->data['aicdesc']) || empty(trim($this->data['aicdesc']))) {
-            $this->errors['aicdesc'] = 'A DESCRIÇÃO é obrigatório!';
+            $this->errors['aicdesc'] = 'A DESCRIÇÃO é obrigatória!';
             $status = FALSE;
         } else if (strlen($this->data['aicdesc']) > AICDESC_MAX_LENGHT) {
             $this->errors['aicdesc'] = 'A DESCRIÇÃO deve conter no máximo ' . AICDESC_MAX_LENGHT . ' caracter(es)!';
