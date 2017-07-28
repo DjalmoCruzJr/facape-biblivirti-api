@@ -899,7 +899,6 @@ class Account extends CI_Controller
             }
         }
 
-
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
