@@ -93,13 +93,13 @@ class Account_bo {
 
         // Validando o campo USCSENH (senha)
         if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
-            $this->errors['uscsenh'] = 'O SENHA é obrigatório!';
+            $this->errors['uscsenh'] = 'A SENHA é obrigatória!';
             $status = FALSE;
         } else if (strpos($this->data['uscsenh'], ' ') > 0) {
-            $this->errors['uscsenh'] = 'O SENHA não pode conter espaço(s) em branco(s)!';
+            $this->errors['uscsenh'] = 'A SENHA não pode conter espaço(s) em branco(s)!';
             $status = FALSE;
         } else if (strlen($this->data['uscsenh']) > USCSENH_MAX_LENGTH) {
-            $this->errors['uscsenh'] = 'O SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
+            $this->errors['uscsenh'] = 'A SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 
@@ -181,7 +181,7 @@ class Account_bo {
 
         // Validando o campo USCSENH (senha)
         if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
-            $this->errors['uscsenh'] = 'A SENHA é obrigatório!';
+            $this->errors['uscsenh'] = 'A SENHA é obrigatória!';
             $status = FALSE;
         } else if (strpos($this->data['uscsenh'], ' ') > 0) {
             $this->errors['uscsenh'] = 'A SENHA não pode conter espaço(s) em branco(s)!';
@@ -293,7 +293,7 @@ class Account_bo {
 
         // Validando o campo USCSENH (senha)
         if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
-            $this->errors['uscsenh'] = 'A SENHA é obrigatório!';
+            $this->errors['uscsenh'] = 'A SENHA é obrigatória!';
             $status = FALSE;
         } else if (strpos($this->data['uscsenh'], ' ') > 0) {
             $this->errors['uscsenh'] = 'A SENHA não pode conter espaço(s) em branco(s)!';
@@ -402,7 +402,7 @@ class Account_bo {
                 $this->errors['uscnome'] = 'O NOME não pode ser vazio!';
                 $status = FALSE;
             } else if (!is_string($this->data['uscnome'])) {
-                $this->errors['uscnome'] = 'O NOME deve ser um valor alfanuérico!';
+                $this->errors['uscnome'] = 'O NOME deve ser um valor alfanumérico!';
                 $status = FALSE;
             } else if (strlen($this->data['uscnome']) > USCNOME_MAX_LENGTH) {
                 $this->errors['uscnome'] = 'O NOME deve conter no máximo ' . USCNOME_MAX_LENGTH . ' caracter(es)!';
@@ -436,7 +436,7 @@ class Account_bo {
 
         // Validando o campo USCSENH (senha)
         if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
-            $this->errors['uscsenh'] = 'A SENHA é obrigatório!';
+            $this->errors['uscsenh'] = 'A SENHA é obrigatória!';
             $status = FALSE;
         } else if (strpos($this->data['uscsenh'], ' ') > 0) {
             $this->errors['uscsenh'] = 'A SENHA não pode conter espaço(s) em branco(s)!';
