@@ -458,4 +458,50 @@ class Account_bo {
         return $status;
     }
 
+	/**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>password_update</i> do controller <i>Account</i>.
+     */
+    public function validate_password_update() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo USNID (ID do usuario)
+        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
+            $this->errors['usclogn'] = 'O ID DO USUÁRIO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
+            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCSENH (senha)
+        if (!isset($this->data['uscsenh']) || empty(trim($this->data['uscsenh']))) {
+            $this->errors['uscsenh'] = 'A NOVA SENHA é obrigatória!';
+            $status = FALSE;
+        } else if (strpos($this->data['uscsenh'], ' ') > 0) {
+            $this->errors['uscsenh'] = 'A NOVA SENHA não pode conter espaço(s) em branco(s)!';
+            $status = FALSE;
+        } else if (strlen($this->data['uscsenh']) > USCSENH_MAX_LENGTH) {
+            $this->errors['uscsenh'] = 'A NOVA SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
+            $status = FALSE;
+        }
+
+        // Validando o campo USCSENH2 (Confirmacao da Senha)
+        if (!isset($this->data['uscsenh2']) || empty(trim($this->data['uscsenh2']))) {
+            $this->errors['uscsenh2'] = 'O campo CONFIRMAR SENHA é obrigatório!';
+            $status = FALSE;
+        } else if (strcmp($this->data['uscsenh'], $this->data['uscsenh2']) != 0) {
+            $this->errors['uscsenh2'] = 'As senhas não conferem!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
 }
