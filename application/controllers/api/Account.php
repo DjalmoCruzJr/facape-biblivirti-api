@@ -848,7 +848,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function password_update()
+/*    public function password_update()
     {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -873,7 +873,7 @@ class Account extends CI_Controller
 				// Carrega os dados do usuario para envio do email de notificacao
 				$user = $this->usuario_model->find_by_usnid($id);
                 // Seta os dados para o envio do email de ativação de conta
-/*				$from = EMAIL_SMTP_USER;
+				$from = EMAIL_SMTP_USER;
 				$to = $user['uscmail'];
 				$subject = EMAIL_SUBJECT_PASSWORD_UPDATE;
 				$message = EMAIL_MESSAGE_PASSWORD_UPDATE;
@@ -891,15 +891,15 @@ class Account extends CI_Controller
 					$this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_REGISTER . "! Tente novamente.\n";
 					$this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
 					$this->response['response_errors'] = $this->biblivirti_email->get_errros();
-				} else {*/
+				} else {
 					$this->response['response_code'] = RESPONSE_CODE_OK;
 					$this->response['response_message'] = "Senha atualizada com sucesso!";
 					$this->response['response_data'] = $user;
-//				}                
+				}                
             }
         }
 
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
-    }
+    }*/
 }
