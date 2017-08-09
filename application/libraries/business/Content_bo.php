@@ -96,10 +96,10 @@ class Content_bo {
     }
 
     /**
- * @return bool
- *
- * Metodo para validar os dados inentes ao processo de <i>add</i> do controller <i>Content</i>.
- */
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>add</i> do controller <i>Content</i>.
+     */
     public function validate_add() {
         $status = TRUE;
 
@@ -128,8 +128,8 @@ class Content_bo {
         } else if (strlen($this->data['cocdesc']) > COCDESC_MAX_LENGTH) {
             $this->errors['cocdesc'] = 'A DESCRIÇÃO DO CONTEÚDO deve conter no máximo ' . COCDESC_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
-        } else if (!is_null($this->CI->conteudo_model->find_by_cocdesc($this->data['cocdesc'], true))) {
-            $this->errors['cocdesc'] = 'Já existe um conteúdo cadastrado com essa descrição!';
+        } else if (!is_null($this->CI->conteudo_model->find_by_conidgr_and_cocdesc($this->data['conidgr'], $this->data['cocdesc']))) {
+            $this->errors['cocdesc'] = 'Já existe um conteúdo cadastrado com essa descrição neste grupo!';
             $status = FALSE;
         }
 

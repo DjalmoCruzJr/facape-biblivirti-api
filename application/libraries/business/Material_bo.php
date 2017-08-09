@@ -461,6 +461,15 @@ class Material_bo {
             return false;
         }
 
+        // Verificando o campo MANIDGR (ID do grupo do material)
+        if (!isset($this->data['manidgr']) || empty(trim($this->data['manidgr']))) {
+            $this->errors['manidgr'] = 'O ID DO GRUPO DO MATERIAL é obrigatório!';
+            $status = false;
+        } else if (is_null($this->CI->material_model->find_by_manidgr($this->data['manidgr']))) {
+            $this->errors['manidgr'] = 'O ID DO GRUPO DO MATERIAL é inválido!';
+            $status = false;
+        }
+
         // Validando o campo MACDESC (Descricao do material)
         if (!isset($this->data['macdesc']) || empty(trim($this->data['macdesc']))) {
             $this->errors['macdesc'] = 'A DESCRIÇÃO DO MATERIAL é obrigatória!';

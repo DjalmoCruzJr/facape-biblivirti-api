@@ -84,6 +84,28 @@ class Conteudo_model extends CI_Model {
         $query = $this->db->get('conteudo', $limit, $offset);
         return $query->num_rows() > 0 ? $query->result() : null;
     }
+	
+	/**
+     * @param $conidgr
+	 * @param $cocdesc
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     *
+     * Metodo para buscar registros da tabela CONTEUDO pelo ID do grupo e pela descricao
+	 * Se $like = TRUE a busca eh feita no formato: field LIKE value
+     * Se $like = FALSE a busca eh feita no formato: field = value
+     */
+    public function find_by_conidgr_and_cocdesc($conidgr, $cocdesc, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT,  $like = true) {
+		if($like == true) {
+			$this->db->like('cocdesc', $cocdesc);
+		} else {
+			$this->db->where('cocdesc', $cocdesc);
+		}
+        $this->db->where('conidgr', $conidgr);
+        $query = $this->db->get('conteudo', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
 
     /**
      * @param $data

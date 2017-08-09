@@ -265,6 +265,37 @@ class Material_model extends CI_Model {
     }
 
     /**
+     * @param $manidgr
+     * @param $macdesc
+     * @param $mactipo
+     * @param int $limit
+     * @param int $offset
+     * @param bool $active
+     * @return mixed
+     *
+     * Metodo para buscar os registros da tabela MATERIAL relaciondo com um GRUPO, pela DESCRICAO e plo TIPO DO MATERIAL
+     * Se $like = TRUE a busca sera no formato: field LIKE value
+     * Se $like = FALSE a busca sera no formato: field = value
+     * Se $active = TRUE a busca trara somente registros com status ATIVO
+     */
+    public function find_by_manidgr_and_macdesc_and_mactipo($manidgr, $macdesc, $mactipo, $limit = LIMIT_DEFAULT, $offset = OFFSET_DEFAULT, $like = true, $active = false) {
+        if ($active === true) {
+            $this->db->where('macstat', MACSTAT_ATIVO);
+        }
+        if ($like === true) {
+            $this->db->like('macdesc', $macdesc);
+        } else {
+            $this->db->where('macdesc', $macdesc);
+        }
+        $this->db->where('manidgr', $manidgr);
+        if (!is_null($mactipo)) {
+            $this->db->where('mactipo', $mactipo);
+        }
+        $query = $this->db->get('material', $limit, $offset);
+        return $query->num_rows() > 0 ? $query->result() : null;
+    }
+
+    /**
      * @param $manid
      * @param int $limit
      * @param int $offset

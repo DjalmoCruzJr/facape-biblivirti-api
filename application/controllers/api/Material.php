@@ -7,8 +7,7 @@
  *
  * Controller da API para gerenciar o acesso aos dados de <b>Materiais</b>.
  */
-class Material extends CI_Controller
-{
+class Material extends CI_Controller {
 
     /**
      * @var array
@@ -20,8 +19,7 @@ class Material extends CI_Controller
     /**
      * Material constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
 
         // Initializing variables
@@ -69,8 +67,7 @@ class Material extends CI_Controller
      *      ]
      * }
      */
-    public function list_all()
-    {
+    public function list_all() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -138,8 +135,7 @@ class Material extends CI_Controller
      *      }
      * }
      */
-    public function add()
-    {
+    public function add() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -253,8 +249,7 @@ class Material extends CI_Controller
      * }
      */
     public
-    function edit()
-    {
+    function edit() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -333,8 +328,7 @@ class Material extends CI_Controller
      * }
      */
     public
-    function delete()
-    {
+    function delete() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -399,6 +393,7 @@ class Material extends CI_Controller
      * Metodo para buscar materiais.
      * Recebe como parametro um <i>JSON</i> no seguinte formato:
      * {
+     *      "manidgr" : "ID do grupo do material",
      *      "macdesc" : "Descricao do material",
      *      "mactipo" : "Tipo do material"
      * }
@@ -422,9 +417,8 @@ class Material extends CI_Controller
      *      ]
      * }
      */
-    public
-    function search()
-    {
+
+    public function search() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -437,7 +431,7 @@ class Material extends CI_Controller
         } else {
             $data = $this->material_bo->get_data();
 
-            $materials = $this->material_model->find_by_macdesc_and_mactipo($data['macdesc'], $data['mactipo']);
+            $materials = $this->material_model->find_by_manidgr_and_macdesc_and_mactipo($data['manidgr'], $data['macdesc'], $data['mactipo']);
             if (is_null($materials)) {
                 $response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $response['response_message'] = "Nenhum material encontrado.";
@@ -476,8 +470,7 @@ class Material extends CI_Controller
      * }
      */
     public
-    function email()
-    {
+    function email() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -546,8 +539,7 @@ class Material extends CI_Controller
      * }
      */
     public
-    function share()
-    {
+    function share() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -678,8 +670,7 @@ class Material extends CI_Controller
      * }
      */
     public
-    function details()
-    {
+    function details() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
