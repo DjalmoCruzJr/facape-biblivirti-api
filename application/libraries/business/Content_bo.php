@@ -37,6 +37,7 @@ class Content_bo {
         // Loading models
         $this->CI->load->model('conteudo_model');
         $this->CI->load->model('grupo_model');
+        $this->CI->load->model('material_model');
     }
 
     /**
@@ -188,5 +189,35 @@ class Content_bo {
 
         return $status;
     }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>material_contents_list</i> do controller <i>Content</i>.
+     */
+    public function validate_material_contents_list() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo MANID (ID do material)
+        if (!isset($this->data['manid']) || empty(trim($this->data['manid']))) {
+            $this->errors['manid'] = 'O ID DO MATERIAL é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['manid'])) {
+            $this->errors['manid'] = 'O ID DO MATERIAL deve ser um valor inteiro!';
+            $status = FALSE;
+        } else if (is_null($this->CI->material_model->find_by_manid($this->data['manid']))) {
+            $this->errors['manid'] = 'ID DO MATERIAL inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
 
 }

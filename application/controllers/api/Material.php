@@ -62,7 +62,7 @@ class Material extends CI_Controller {
      *              "madcadt" : "Data de cadastro do material",
      *              "madaldt" : "Data de atualizacao do material"
      *              "manqtdce" : "Qtd. de comentario do material"
-     *              "manqtdha" : "Qtd. de vizualizacoes do material"
+     *              "manqtdha" : "Qtd. de vizualizacoes do material",
      *          },
      *      ]
      * }
@@ -417,7 +417,6 @@ class Material extends CI_Controller {
      *      ]
      * }
      */
-
     public function search() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
@@ -469,8 +468,7 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao"
      * }
      */
-    public
-    function email() {
+    public function email() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -538,8 +536,7 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao"
      * }
      */
-    public
-    function share() {
+    public function share() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -669,8 +666,7 @@ class Material extends CI_Controller {
      *      }
      * }
      */
-    public
-    function details() {
+    public function details() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
