@@ -7,8 +7,7 @@
  *
  * Controller para gerenciar acesso aos dados de <b>Grupos</b>
  */
-class Group extends CI_Controller
-{
+class Group extends CI_Controller {
 
     /**
      * @var array
@@ -20,8 +19,7 @@ class Group extends CI_Controller
     /**
      * Group constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
 
         // Initing variables
@@ -78,8 +76,7 @@ class Group extends CI_Controller
      *      ]
      * }
      */
-    public function list_all()
-    {
+    public function list_all() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -141,8 +138,7 @@ class Group extends CI_Controller
      *      }
      * }
      */
-    public function get()
-    {
+    public function get() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -193,8 +189,7 @@ class Group extends CI_Controller
      *      }
      * }
      */
-    public function add()
-    {
+    public function add() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -298,8 +293,7 @@ class Group extends CI_Controller
      *      }
      * }
      */
-    public function edit()
-    {
+    public function edit() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -387,8 +381,7 @@ class Group extends CI_Controller
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public function delete()
-    {
+    public function delete() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -414,20 +407,15 @@ class Group extends CI_Controller
                     $this->response['response_message'] = "Erro ao tentar excluir o grupo!\n";
                     $this->response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
                 } else {
-//                    // Verifica se foto do grupo foi excluida do disco com sucesso
-//                    if ($this->biblivirti_media->delete_image($group->grcfoto) == false) {
-//                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-//                        $this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
-//                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
-//                    } else {
-                    // Exclui a foto do grupo do disco
-                    $this->biblivirti_media->delete_image($group->grcfoto);
                     // Verifica se o grupo foi excluido com sucesso do banco de dados
                     if (!$this->grupo_model->delete($data['grnid'])) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                         $this->response['response_message'] = "Houve um erro ao tentar excluir as informações do grupo!\nTente novamente!";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                     } else {
+                        // Exclui a foto do grupo do disco
+                        $this->biblivirti_media->delete_image($group->grcfoto);
+
                         // Seta os dados para o envio do email de notificação de novo grupo
                         $from = EMAIL_SMTP_USER;
                         $to = $group->admin->uscmail;
@@ -511,8 +499,7 @@ class Group extends CI_Controller
      *      }
      * }
      */
-    public function info()
-    {
+    public function info() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -592,8 +579,7 @@ class Group extends CI_Controller
      *      ]
      * }
      */
-    public function search()
-    {
+    public function search() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -643,8 +629,7 @@ class Group extends CI_Controller
      *      "response_message" : "Mensagem da resposta"
      * }
      */
-    public function subscribe()
-    {
+    public function subscribe() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -726,12 +711,11 @@ class Group extends CI_Controller
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
-         *      "response_code" : "Codigo da resposta",
-         *      "response_message" : "Mensagem da resposta"
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta"
      * }
      */
-    public function unsubscribe()
-    {
+    public function unsubscribe() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];

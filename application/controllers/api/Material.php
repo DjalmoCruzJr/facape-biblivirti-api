@@ -337,6 +337,7 @@ class Material extends CI_Controller {
 
         $this->response = [];
         $this->material_bo->set_data($data);
+
         // Verifica se os dados nao foram validados
         if ($this->material_bo->validate_delete() === FALSE) {
             $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
@@ -347,16 +348,24 @@ class Material extends CI_Controller {
 
             $material = $this->material_model->find_by_manid($data['manid']);
             $admin = $this->grupo_model->find_group_admin($material->manidgr);
+
+            // Verifica se o usuairo em questao NAO EH admin do grupo do material
             if ($admin->usnid != $data['usnid']) {
                 $response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $response['response_message'] = "Erro ao tentar excluir o material!\n";
                 $response['response_message'] .= "Somente o administrador tem permissão para excluí-lo!";
             } else {
                 if (!$this->material_model->delete($data['manid'])) {
-                    $response['response_code'] = RESPONSE_CODE_OK;
+                    $response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                     $response['response_message'] = "Houve um erro ao tentar excluir as informações do material!\nTente novamente!";
                     $response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti.";
                 } else {
+                    // Exclui do disco se o material eh do tipo ANEXO (APRESENTACAO, EXERCICIO, FORMULA e LIVRO)
+                    if ($material->mactipo == MACTIPO_APRESENTACAO || $material->mactipo == MACTIPO_EXERCICIO ||
+                        $material->mactipo == MACTIPO_FORMULA || $material->mactipo == MACTIPO_LIVRO) {
+                        $this->biblivirti_media->delete_file($material->macurl);
+                    }
+
                     // Seta os dados para o envio do email de notificação de novo grupo
                     $from = EMAIL_SMTP_USER;
                     $to = $admin->uscmail;
@@ -365,7 +374,7 @@ class Material extends CI_Controller {
                     $datas = [
                         EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
                         EMAIL_KEY_USCNOME => (!is_null($admin->uscnome)) ? $admin->uscnome : $admin->usclogn,
-                        EMAIL_KEY_MACDESC => $data['macdesc'],
+                        EMAIL_KEY_MACDESC => $material->macdesc,
                         EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
                         EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
                     ];
@@ -709,7 +718,7 @@ class Material extends CI_Controller {
                 // Verifica se o usuario nao eh um membro do grupo no qual o materal
                 if ($is_member === false) {
                     $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
-                    $this->response['response_message'] = "Erro ao tentar carregar as informações do material.\n";
+                    $this->response['response_message'] = "Erro ao tentar carregar asde informações do material.\n";
                     $this->response['response_message'] .= "Somente os membros podem ter acesso aos materiais do grupo.";
                 } else {
                     $material->manqtdha = $this->historicoacesso_model->count_by_hanidma($material->manid);
