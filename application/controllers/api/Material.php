@@ -88,6 +88,12 @@ class Material extends CI_Controller {
                 foreach ($materials as $material) {
                     $material->manqtdce = count($this->comentario_model->find_by_cenidma($material->manid));
                     $material->manqtdha = $this->historicoacesso_model->count_by_hanidma($material->manid);
+
+                    // Verifica se o tipo do material EH do tipo ANEXO para ajustar a URL do material
+                    if ($material->mactipo == MACTIPO_APRESENTACAO || $material->mactipo == MACTIPO_EXERCICIO ||
+                        $material->mactipo == MACTIPO_FORMULA || $material->mactipo == MACTIPO_LIVRO) {
+                        $material->macurl = $material->macurl == null ? null : base_url(UPLOAD_FILES_PATH . $material->macurl);
+                    }
                 }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Material(ais) encontrado(s) com sucesso!";
@@ -248,8 +254,7 @@ class Material extends CI_Controller {
      *      }
      * }
      */
-    public
-    function edit() {
+    public function edit() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -327,8 +332,7 @@ class Material extends CI_Controller {
      *      "request_message" : "Mensagem da requsicao",
      * }
      */
-    public
-    function delete() {
+    public function delete() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -438,6 +442,12 @@ class Material extends CI_Controller {
                 foreach ($materials as $material) {
                     $material->manqtdce = count($this->comentario_model->find_by_cenidma($material->manid));
                     $material->manqtdha = $this->historicoacesso_model->count_by_hanidma($material->manid);
+
+                    // Verifica se o tipo do material EH do tipo ANEXO para ajustar a URL do material
+                    if ($material->mactipo == MACTIPO_APRESENTACAO || $material->mactipo == MACTIPO_EXERCICIO ||
+                        $material->mactipo == MACTIPO_FORMULA || $material->mactipo == MACTIPO_LIVRO) {
+                        $material->macurl = $material->macurl == null ? null : base_url(UPLOAD_FILES_PATH . $material->macurl);
+                    }
                 }
 
                 $response['response_code'] = RESPONSE_CODE_OK;
@@ -713,6 +723,12 @@ class Material extends CI_Controller {
                         }
                     }
                     $material->comments = $comments;
+
+                    // Verifica se o tipo do material EH do tipo ANEXO para ajustar a URL do material
+                    if ($material->mactipo == MACTIPO_APRESENTACAO || $material->mactipo == MACTIPO_EXERCICIO ||
+                        $material->mactipo == MACTIPO_FORMULA || $material->mactipo == MACTIPO_LIVRO) {
+                        $material->macurl = $material->macurl == null ? null : base_url(UPLOAD_FILES_PATH . $material->macurl);
+                    }
 
                     $this->response['response_code'] = RESPONSE_CODE_OK;
                     $this->response['response_message'] = "Material carregado com sucesso!";
