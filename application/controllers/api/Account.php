@@ -7,8 +7,7 @@
  *
  * Controller da API para gerenciar o acesso aos dados da <b>Conta</b>.
  */
-class Account extends CI_Controller
-{
+class Account extends CI_Controller {
 
     /**
      * @var array
@@ -20,8 +19,7 @@ class Account extends CI_Controller
     /**
      * Account constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
 
         // Initializing variables
@@ -69,8 +67,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function login()
-    {
+    public function login() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -130,8 +127,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function login_facebook()
-    {
+    public function login_facebook() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -186,8 +182,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function register()
-    {
+    public function register() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -279,8 +274,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function recovery()
-    {
+    public function recovery() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -375,8 +369,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function email_confirmation()
-    {
+    public function email_confirmation() {
         $data['cactokn'] = $this->input->get('cactokn');
 
         $this->response = [];
@@ -470,10 +463,9 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function password_reset()
-    {
+    public function password_reset() {
         $data['rsctokn'] = $this->input->get('rsctokn');
-		
+
         $this->response = [];
         $this->account_bo->set_data($data);
         // Verifica se os dados nao foram validados
@@ -534,11 +526,10 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function password_edit()
-    {
+    public function password_edit() {
         $data = $this->biblivirti_input->get_raw_input_data();
-		
-		$this->response = [];
+
+        $this->response = [];
         $this->account_bo->set_data($data);
         // Verifica se os dados nao foram validados
         if ($this->account_bo->validate_password_edit() === FALSE) {
@@ -618,8 +609,7 @@ class Account extends CI_Controller
      *
      * }
      */
-    public function search()
-    {
+    public function search() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -699,8 +689,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function profile()
-    {
+    public function profile() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -760,8 +749,7 @@ class Account extends CI_Controller
      *      }
      * }
      */
-    public function profile_edit()
-    {
+    public function profile_edit() {
         $data = $this->biblivirti_input->get_raw_input_data();
 
         $this->response = [];
@@ -819,87 +807,5 @@ class Account extends CI_Controller
         $this->output->set_content_type('application/json', 'UTF-8');
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
-	
-	/**
-     * @url: API/account/password/update
-     * @param string JSON
-     * @return JSON
-     *
-     * Metodo para cadastrar um novo usuario.
-     * Recebe como parametro um <i>JSON</i> no seguinte formato:
-     * {
-     *      "usnid": "ID do usuario",      
-     *      "uscsenh": "Nova Senha do usuario",
-     *      "uscsenh2": "Confirmacao de nova senha"
-     * }
-     * e retorna um <i>JSON</i> no seguinte formato:
-     * {
-     *      "response_code" : "Codigo da resposta",
-     *      "response_message" : "Mensagem da resposta",
-     *      "response_data" : {
-     *			"usnid" : "ID do usuario",
-     *          "uscfbid" : "FacebookID do usuario",
-     *          "uscnome" : "Nome do usuario",
-     *          "uscmail" : "E-email do usuario",
-     *          "usclogn" : "Login do usuario",
-     *          "uscfoto" : "Nome da foto do usuario",
-     *          "uscstat" : "Status do usuario",
-     *          "usdcadt" : "Data de cadastro do usuario"        
-     *      }
-     * }
-     */
-/*    public function password_update()
-    {
-        $data = $this->biblivirti_input->get_raw_input_data();
 
-        $this->response = [];
-        $this->account_bo->set_data($data);
-        // Verifica se os dados nao foram validados
-        if ($this->account_bo->validate_password_update() === FALSE) {
-            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
-            $this->response['response_errors'] = $this->account_bo->get_errors();
-        } else {
-            $data = $this->account_bo->get_data();
-            unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
-            $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
-            $id = $this->usuario_model->update($data);
-            // verifica se houve falha na execucao do model
-            if (is_null($id)) {
-                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                $this->response['response_message'] = "Houve um erro ao tentar atualizar a senha do ususario! Tente novamente.\n";
-                $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
-            } else {
-				// Carrega os dados do usuario para envio do email de notificacao
-				$user = $this->usuario_model->find_by_usnid($id);
-                // Seta os dados para o envio do email de ativação de conta
-				$from = EMAIL_SMTP_USER;
-				$to = $user['uscmail'];
-				$subject = EMAIL_SUBJECT_PASSWORD_UPDATE;
-				$message = EMAIL_MESSAGE_PASSWORD_UPDATE;
-				$datas = [
-					EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-					EMAIL_KEY_USCNOME => $user['usclogn'],
-					EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-					EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-				];
-
-				$this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
-
-				if ($this->biblivirti_email->send() === false) {
-					$this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-					$this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_NEW_REGISTER . "! Tente novamente.\n";
-					$this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
-					$this->response['response_errors'] = $this->biblivirti_email->get_errros();
-				} else {
-					$this->response['response_code'] = RESPONSE_CODE_OK;
-					$this->response['response_message'] = "Senha atualizada com sucesso!";
-					$this->response['response_data'] = $user;
-				}                
-            }
-        }
-
-        $this->output->set_content_type('application/json', 'UTF-8');
-        echo json_encode($this->response, JSON_PRETTY_PRINT);
-    }*/
 }
