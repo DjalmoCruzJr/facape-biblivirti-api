@@ -105,15 +105,26 @@ class Biblivirti_email {
         $this->CI->email->subject($this->data['subject']);
         $this->CI->email->message($this->data['message']);
 
-        // Verificando se houve falha no envio do email
-        /*if ($this->CI->email->send()) {
+        /*// Verificando se houve falha no envio do email
+        if ($this->CI->email->send()) {
+            var_dump("aki");
+            exit;
             return true;
         } else {
             $this->errors['errors'] = $this->CI->email->print_debugger();
             return false;
-        }*/
-		return true;
+        }
+        return true;*/
 
+        $result = true;
+        try {
+            $this->CI->email->send();
+            $result = true;
+        } catch (Exception $e) {
+            $this->errors['errors'] = $this->CI->email->print_debugger();
+            $result = false;
+        }
+        return $result;
     }
 
     /**----------------------------------------------------------------------------
@@ -122,7 +133,8 @@ class Biblivirti_email {
     /**
      * Metodo para carregar as configuracoes de envio de email.
      */
-    private function _load_configs() {
+    private
+    function _load_configs() {
         $this->configs['useragent'] = EMAIL_USERAGENT;
         $this->configs['mailtype'] = EMAIL_MAILTYPE;
         $this->configs['protocol'] = EMAIL_PROTOCOL;
@@ -144,7 +156,8 @@ class Biblivirti_email {
      *
      * Metodo para realizar a troca das chaves da mensagem do email pelos seus respectivos valores.
      */
-    private function _replace_keys($message = null, $datas = null) {
+    private
+    function _replace_keys($message = null, $datas = null) {
         if (is_null($message) || is_null($datas)) {
             return null;
         }
@@ -160,7 +173,8 @@ class Biblivirti_email {
      *
      * Metodo para verificar se as informacoes a serem enviadas sao validas.
      */
-    private function _validate_data() {
+    private
+    function _validate_data() {
         $status = true;
 
         // Validando o parametro FROM (email de origem)

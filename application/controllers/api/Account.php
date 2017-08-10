@@ -80,6 +80,7 @@ class Account extends CI_Controller {
         } else {
             $data = $this->account_bo->get_data();
             $user = $this->usuario_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']))[0];
+
             // Verifica se o usuario foi encontrado com sucesso
             if (is_null($user)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
@@ -324,9 +325,10 @@ class Account extends CI_Controller {
                         EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
                     ];
 
+
                     $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
 
-                    if ($this->biblivirti_email->send() === false) {
+                    if ($this->biblivirti_email->send() == false) {
                         $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
                         $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_PASSWORD_RECOVERY . "! Tente novamente.\n";
                         $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
