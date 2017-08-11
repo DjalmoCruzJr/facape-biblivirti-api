@@ -810,4 +810,58 @@ class Account extends CI_Controller {
         echo json_encode($this->response, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @url: API/account/group/members/list
+     * @return JSON
+     *
+     * Metodo para buscar os membros de um determinado grupo.
+     * Recebe como parametro um <i>JSON</i> no seguinte formato:
+     * {
+     *      "grnid" : "ID do grupo"
+     * }
+     * e retorna um <i>JSON</i> no seguinte formato:
+     * {
+     *      "response_code" : "Codigo da resposta",
+     *      "response_message" : "Mensagem da resposta",
+     *      "response_data" : [
+     *          {
+     *              "usnid" : "ID do usuario",
+     *              "uscnome" : "Nome do usuario",
+     *              "uscmail" : "E - email do usuario",
+     *              "usclogn" : "Login do usuario",
+     *              "uscfoto" : "Caminho da foto do usuario",
+     *              "uscstat" : "Status do usuario",
+     *              "tsdcadt" : "Data de cadastro do usuario",
+     *              "usdaldt" : "Data de atualizacao do usuario"
+     *          },
+     *      ]
+     */
+    public function group_members_list() {
+        $data = $this->biblivirti_input->get_raw_input_data();
+
+        $this->response = [];
+        $this->account_bo->set_data($data);
+        // Verifica se os dados nao foram validados
+        if ($this->account_bo->validate_group_members_list() === FALSE) {
+            $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+            $this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+            $this->response['response_errors'] = $this->account_bo->get_errors();
+        } else {
+            $data = $this->account_bo->get_data();
+            $members = $this->grupo_model->find_group_users($data['grnid']);
+            // Verifica se os registros NAO foram encontrados
+            if (is_null($members)) {
+                $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+                $this->response['response_message'] = "Nenhum membro encontrado.";
+            } else {
+                $this->response['response_code'] = RESPONSE_CODE_OK;
+                $this->response['response_message'] = "Membro(s) encontrado(s) com sucesso!";
+                $this->response['response_data'] = $members;
+            }
+        }
+
+        $this->output->set_content_type('application/json', 'UTF-8');
+        echo json_encode($this->response, JSON_PRETTY_PRINT);
+    }
+
 }

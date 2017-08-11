@@ -393,6 +393,7 @@ class Group extends CI_Controller {
             $this->response['response_errors'] = $this->group_bo->get_errors();
         } else {
             $data = $this->group_bo->get_data();
+
             // Verifica o grupo foi encontrado
             $group = $this->grupo_model->find_by_grnid($data['grnid']);
             // Verifica se o usuario eh administrador do grupo
@@ -402,6 +403,7 @@ class Group extends CI_Controller {
                 $this->response['response_message'] = "Nenhum grupo encontrado.";
             } else {
                 $group->admin = $this->grupo_model->find_group_admin($group->grnid);
+
                 if ($group->admin->usnid != $data['usnid']) {
                     $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                     $this->response['response_message'] = "Erro ao tentar excluir o grupo!\n";

@@ -36,6 +36,7 @@ class Account_bo {
 
         // Loading models
         $this->CI->load->model('usuario_model');
+        $this->CI->load->model('grupo_model');
     }
 
     /**
@@ -458,7 +459,7 @@ class Account_bo {
         return $status;
     }
 
-	/**
+    /**
      * @return bool
      *
      * Metodo para validar os dados inentes ao processo de <i>password_update</i> do controller <i>Account</i>.
@@ -504,4 +505,34 @@ class Account_bo {
 
         return $status;
     }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>group_members_list</i> do controller <i>Account</i>.
+     */
+    public function validate_group_members_list() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo GRNID (ID do grupo)
+        if (!isset($this->data['grnid']) || empty(trim($this->data['grnid']))) {
+            $this->errors['grnid'] = 'O ID DO GRUPO é obrigatório!';
+            $status = FALSE;
+        } else if (!is_numeric($this->data['grnid'])) {
+            $this->errors['grnid'] = 'O ID DO GRUPO deve ser um valor numérico!';
+            $status = FALSE;
+        } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
+            $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
 }

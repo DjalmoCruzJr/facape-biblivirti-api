@@ -69,7 +69,7 @@ $route['API/account/password/edit']['post'] = 'api/account/password_edit';
 $route['API/account/profile']['post'] = 'api/account/profile';
 $route['API/account/profile/edit']['post'] = 'api/account/profile_edit';
 $route['API/account/search']['post'] = 'api/account/search';
-$route['API/account/password/update']['post'] = 'api/account/password_update';
+$route['API/account/group/members/list']['post'] = 'api/account/group_members_list';
 
 /**
  * API AREA OF INTEREST ROUTES
