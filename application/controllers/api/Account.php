@@ -655,16 +655,14 @@ class Account extends CI_Controller {
      *      "response_code" : "Codigo da resposta",
      *      "response_message" : "Mensagem da resposta",
      *      "response_data" : {
-     *          "user" : {
-     *              "usnid" : "ID do usuario",
-     *              "uscnome" : "Nome do usuario",
-     *              "uscmail" : "E - email do usuario",
-     *              "usclogn" : "Login do usuario",
-     *              "uscfoto" : "Caminho da foto do usuario",
-     *              "uscstat" : "Status do usuario",
-     *              "tsdcadt" : "Data de cadastro do usuario",
-     *              "usdaldt" : "Data de atualizacao do usuario"
-     *          },
+     *			"usnid" : "ID do usuario",
+     *          "uscnome" : "Nome do usuario",
+     *          "uscmail" : "E - email do usuario",
+     *          "usclogn" : "Login do usuario",
+     *          "uscfoto" : "Caminho da foto do usuario",
+     *          "uscstat" : "Status do usuario",
+     *          "usdcadt" : "Data de cadastro do usuario",
+     *          "usdaldt" : "Data de atualizacao do usuario",
      *          "groups" : [
      *              {
      *                  "grnid": "ID do grupo",
@@ -685,7 +683,19 @@ class Account extends CI_Controller {
      *                      "uscfoto" : "Caminho da foto do usuario",
      *                      "uscstat" : "Status do usuario",
      *                      "usdcadt" : "Data de cadastro do usuario"
-     *                  }
+     *                  },
+	 *					"users" : [
+	 *						{
+	 *                      	"usnid" : "ID do usuario",
+	 *                      	"uscfbid" : "FacebookID do usuario",
+	 *                      	"uscnome" : "Nome do usuario",
+	 *                      	"uscmail" : "E-email do usuario",
+	 *                      	"usclogn" : "Login do usuario",
+	 *                      	"uscfoto" : "Caminho da foto do usuario",
+	 *                      	"uscstat" : "Status do usuario",
+	 *                      	"usdcadt" : "Data de cadastro do usuario"
+     *                  	},	
+	 *					]
      *              }
      *          ]
      *      }
@@ -714,13 +724,14 @@ class Account extends CI_Controller {
                     foreach ($groups as $group) {
                         $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
                         $group->admin = $this->grupo_model->find_group_admin($group->grnid);
+						$group->users = $this->grupo_model->find_group_users($group->grnid);
                         unset($group->grnidai);
-                        unset($group->grnid);
                     }
                 }
+				$user->groups = $groups;
                 $this->response['response_code'] = RESPONSE_CODE_OK;
-                $this->response['response_message'] = "Senha alterada com sucesso!";
-                $this->response['response_data'] = ['user' => $user, 'groups' => $groups];
+                $this->response['response_message'] = "Perfil encontrado com sucesso!";
+                $this->response['response_data'] = $user;
             }
         }
 
