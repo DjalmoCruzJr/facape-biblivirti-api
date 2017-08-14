@@ -395,8 +395,8 @@ class Account_bo {
                 $status = FALSE;
             }
         }
-		
-		// Validando o campo USCFOTO (Foto do Grupo)
+
+        // Validando o campo USCFOTO (Foto do Grupo)
         if (isset($this->data['uscfoto'])) {
             if (empty(trim($this->data['uscfoto']))) {
                 $this->errors['uscfoto'] = 'A FOTO DO USUÁRIO é obrigatória!';
@@ -513,6 +513,35 @@ class Account_bo {
             $status = FALSE;
         } else if (is_null($this->CI->grupo_model->find_by_grnid($this->data['grnid']))) {
             $this->errors['grnid'] = 'ID DO GRUPO inválido!';
+            $status = FALSE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @return bool
+     *
+     * Metodo para validar os dados inentes ao processo de <i>group_members_list</i> do controller <i>Account</i>.
+     */
+    public function validate_activation_resend() {
+        $status = TRUE;
+
+        // Verifica se o decode do JSON foi feito corretamente
+        if (is_null($this->data)) {
+            $this->errors['json_decode'] = "Não foi possível realizar o decode dos dados. JSON inválido!";
+            return false;
+        }
+
+        // Validando o campo USCMAIL (email do usuario)
+        if (!isset($this->data['uscmail']) || empty(trim($this->data['uscmail']))) {
+            $this->errors['uscmail'] = 'O E-MAILl é obrigatório!';
+            $status = FALSE;
+        } else if (!filter_var($this->data['uscmail'], FILTER_VALIDATE_EMAIL)) {
+            $this->errors['uscmail'] = 'Informe um E-MAIL válido!';
+            $status = FALSE;
+        } else if (strlen($this->data['uscmail']) > USCMAIL_MAX_LENGTH) {
+            $this->errors['uscmail'] = 'O E-MAIL deve conter no máximo ' . USCMAIL_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
         }
 
