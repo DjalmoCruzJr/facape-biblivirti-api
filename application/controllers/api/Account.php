@@ -36,6 +36,7 @@ class Account extends CI_Controller {
         $this->load->library('encryption/biblivirti_hash');
         $this->load->library('business/account_bo');
         $this->load->library('input/biblivirti_input');
+        $this->load->library('media/biblivirti_media');
         $this->load->library('email/biblivirti_email');
     }
 
@@ -91,6 +92,7 @@ class Account extends CI_Controller {
                 $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
+				$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Usuário encontrado com sucesso!";
                 $this->response['response_data'] = $user;
@@ -151,6 +153,7 @@ class Account extends CI_Controller {
                 $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
                 unset($user->uscsenh); // Remove a senha do objeto de retorno
+				$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Usuário encontrado com sucesso!";
                 $this->response['response_data'] = $user;
@@ -335,6 +338,7 @@ class Account extends CI_Controller {
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {
                         unset($user->uscsenh); // Remove a senha do objeto de retorno
+						$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
                         $this->response['response_code'] = RESPONSE_CODE_OK;
                         $this->response['response_message'] = "E-email confirmado com sucesso!\n";
                         $this->response['response_message'] .= "Um link de redefinição de senha foi enviado para seu e-email!";
@@ -426,6 +430,7 @@ class Account extends CI_Controller {
                         $this->response['response_errors'] = $this->biblivirti_email->get_errros();
                     } else {
                         unset($user->uscsenh); // Remove a senha do obejeto de resposta
+						$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
                         $this->response['response_code'] = RESPONSE_CODE_OK;
                         $this->response['response_message'] = "E-mail confirmado com cucesso!";
                         $this->response['response_data'] = $user;
@@ -484,6 +489,7 @@ class Account extends CI_Controller {
             } else {
                 $user = $this->usuario_model->find_by_usnid($token->rsnidus);
                 unset($user->uscsenh); // Remove a senha do obeto de retorno
+				$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
 
                 // Muda o status do token
                 $token->rscstat = RSCSTAT_INATIVO;
@@ -630,6 +636,7 @@ class Account extends CI_Controller {
             } else {
                 foreach ($users as $user) {
                     unset($user->uscsenh); // Remove o campo senha dos objetos de resposta
+					$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
                 }
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Usuário(s) encontrado(s) com sucesso!";
@@ -729,6 +736,7 @@ class Account extends CI_Controller {
                     }
                 }
 				$user->groups = $groups;
+				$user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Perfil encontrado com sucesso!";
                 $this->response['response_data'] = $user;
@@ -751,7 +759,6 @@ class Account extends CI_Controller {
      *      "uscmail": "E-email do usuario",
      *      "usclogn": "Login do usuario",
      *      "uscsenh": "Senha do usuario",
-     *      "uscsenh2": "Confirmacao de senha"
      * }
      * e retorna um <i>JSON</i> no seguinte formato:
      * {
@@ -774,46 +781,77 @@ class Account extends CI_Controller {
             $this->response['response_errors'] = $this->account_bo->get_errors();
         } else {
             $data = $this->account_bo->get_data();
-            $user = $this->usuario_model->find_by_usnid($data['usnid']);
-            if ($user->uscstat === USCSTAT_INATIVO) {
+			$user = $this->usuario_model->find_by_uscmail_and_uscsenh($data['uscmail'], $this->biblivirti_hash->make($data['uscsenh']))[0];
+			
+			if(is_null($user)) {
+				$this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+				$this->response['response_message'] = "Perfil do usuário não encontrado!\n";		
+				$this->response['response_message'] .= "Por favor, verifique seu e-mail e senha.";		
+			} else if ($user->uscstat === USCSTAT_INATIVO) {
                 $this->response['response_code'] = RESPONSE_CODE_UNAUTHORIZED;
                 $this->response['response_message'] = "Essa conta ainda não foi ativada!\n";
                 $this->response['response_message'] .= "Acesse o link de confirmação no seu e-email para ativar sua conta.";
             } else {
-                unset($data['uscsenh2']); // Remove o campo USCSENH2 do array de dados
-                $data['uscsenh'] = $this->biblivirti_hash->make($data['uscsenh']); // Gera o hash da senha
-                $id = $this->usuario_model->update($data);
-                // verifica se houve falha na execucao do model
-                if (is_null($id)) {
-                    $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
-                    $this->response['response_message'] = "Houve um erro ao tentar atualizar os dados do ususario! Tente novamente.\n";
-                    $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
-                } else {
-                    // Seta os dados para o envio de email.
-                    $from = EMAIL_SMTP_USER;
-                    $to = $data['uscmail'];
-                    $subject = EMAIL_SUBJECT_EDIT_PROFILE;
-                    $message = EMAIL_MESSAGE_EDIT_PROFILE;
-                    $datas = [
-                        EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
-                        EMAIL_KEY_USCNOME => (!is_null($data['uscnome'])) ? $data['uscnome'] : $data['usclogn'],
-                        EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
-                        EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
-                    ];
+				// Verifica se o LOGIN passado EH DIFERENTE ao LOGIN do usuario encontrado e se ja nao esta sendo usado
+				if ($data['usclogn'] != $user->usclogn && !is_null($this->CI->usuario_model->find_by_usclogn($data['usclogn']))) {
+					$this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+					$this->response['response_message'] = "Dados não informados e/ou inválidos. VERIFIQUE!";
+					$this->response['response_errors'] = ['usclogn' => 'Já existe um usuário cadastrado com este login!'];
+				}  else {
+					// Verifica se LOGIN passado EH IGUAL ao LOGIN so usuario encontrado  
+					if($data['usclogn'] == $user->usclogn) {
+						unset($data['usclogn']); // Remove o campo LOGIN do array de dados a ser atualizado
+					}
 
-                    $this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+					unset($data['uscsenh']); // Remove o campo senha do array de dados a ser atualizado
+					$data['usnid'] = $user->usnid; // Adiciona o campo ID do usuario no objeto de atualizacao
 
-                    if ($this->biblivirti_email->send() === false) {
-                        $this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
-                        $this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_PROFILE . "! Tente novamente.\n";
-                        $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
-                        $this->response['response_errors'] = $this->biblivirti_email->get_errros();
-                    } else {
-                        $this->response['response_code'] = RESPONSE_CODE_OK;
-                        $this->response['response_message'] = "Perfil atualizado com sucesso!";
-                        $this->response['response_data'] = ['usnid' => $id];
-                    }
-                }
+					// Verifica se a imagem do grupo foi informada pelo usuario
+					if (isset($data['uscfoto'])) {
+						// Salva a imagem recebida no disco e devolve para o campo o caminho da imagem
+						$data['uscfoto'] = $this->biblivirti_media->save_image($data['usnid'], $data['uscfoto']);
+					}
+
+					if (isset($data['uscfoto']) && $data['uscfoto'] == null) {
+						$this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+						$this->response['response_message'] = "Houve um erro ao tentar salvar a imagem do usuário! Tente novamente.\n";
+						$this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+					} else {			
+						// Atualiza as informações do usuario no banco de dados
+						$id = $this->usuario_model->update($data);
+						// verifica se houve falha na execucao do model
+						if (is_null($id)) {
+							$this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
+							$this->response['response_message'] = "Houve um erro ao tentar atualizar os dados do ususario! Tente novamente.\n";
+							$this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+						} else {
+							// Seta os dados para o envio de email.
+							$from = EMAIL_SMTP_USER;
+							$to = $data['uscmail'];
+							$subject = EMAIL_SUBJECT_EDIT_PROFILE;
+							$message = EMAIL_MESSAGE_EDIT_PROFILE;
+							$datas = [
+								EMAIL_KEY_EMAIL_SMTP_USER_ALIAS => EMAIL_SMTP_USER_ALIAS,
+								EMAIL_KEY_USCNOME => (!is_null($data['uscnome'])) ? $data['uscnome'] : $data['usclogn'],
+								EMAIL_KEY_EMAIL_SMTP_USER => EMAIL_SMTP_USER,
+								EMAIL_KEY_SEDING_DATE => date('d/m/Y H:i:s')
+							];
+
+							$this->biblivirti_email->set_data($from, $to, $subject, $message, $datas);
+
+							if ($this->biblivirti_email->send() === false) {
+								$this->response['response_code'] = RESPONSE_CODE_BAD_REQUEST;
+								$this->response['response_message'] = "Houve um erro ao tentar enviar e-mail de notificação de " . EMAIL_SUBJECT_EDIT_PROFILE . "! Tente novamente.\n";
+								$this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
+								$this->response['response_errors'] = $this->biblivirti_email->get_errros();
+							} else {
+								$this->response['response_code'] = RESPONSE_CODE_OK;
+								$this->response['response_message'] = "Perfil atualizado com sucesso!";
+								$this->response['response_data'] = ['usnid' => $id];
+							}
+						}
+					}
+				}
             }
         }
 
@@ -865,6 +903,9 @@ class Account extends CI_Controller {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Nenhum membro encontrado.";
             } else {
+				foreach($members as $member) {
+					$member->uscfoto = $member->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $member->uscfoto);
+				}
                 $this->response['response_code'] = RESPONSE_CODE_OK;
                 $this->response['response_message'] = "Membro(s) encontrado(s) com sucesso!";
                 $this->response['response_data'] = $members;

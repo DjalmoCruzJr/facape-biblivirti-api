@@ -175,9 +175,6 @@ class Account_bo {
         } else if (strlen($this->data['usclogn']) > USCLOGN_MAX_LENGTH) {
             $this->errors['usclogn'] = 'O LOGIN deve conter no máximo ' . USCLOGN_MAX_LENGTH . ' caracter(es)!';
             $status = FALSE;
-        } else if (!is_null($this->CI->usuario_model->find_by_usclogn($this->data['usclogn']))) {
-            $this->errors['usclogn'] = 'Já existe um usuário cadastrado com esse login!';
-            $status = FALSE;
         }
 
         // Validando o campo USCSENH (senha)
@@ -385,18 +382,6 @@ class Account_bo {
             return false;
         }
 
-        // Validando o campo USNID (ID do uisuario)*
-        if (!isset($this->data['usnid']) || empty(trim($this->data['usnid']))) {
-            $this->errors['usnid'] = 'O ID DO USUÁRIO é obrigatório!';
-            $status = FALSE;
-        } else if (!is_numeric($this->data['usnid'])) {
-            $this->errors['usnid'] = 'O ID DO USUÁRIO deve ser um valor inteiro!';
-            $status = FALSE;
-        } else if (is_null($this->CI->usuario_model->find_by_usnid($this->data['usnid']))) {
-            $this->errors['usnid'] = 'ID DO USUÁRIO inválido!';
-            $status = FALSE;
-        }
-
         // Validando o campo USCNOME (nome)
         if (isset($this->data['uscnome'])) {
             if (empty(trim($this->data['uscnome']))) {
@@ -407,6 +392,14 @@ class Account_bo {
                 $status = FALSE;
             } else if (strlen($this->data['uscnome']) > USCNOME_MAX_LENGTH) {
                 $this->errors['uscnome'] = 'O NOME deve conter no máximo ' . USCNOME_MAX_LENGTH . ' caracter(es)!';
+                $status = FALSE;
+            }
+        }
+		
+		// Validando o campo USCFOTO (Foto do Grupo)
+        if (isset($this->data['uscfoto'])) {
+            if (empty(trim($this->data['uscfoto']))) {
+                $this->errors['uscfoto'] = 'A FOTO DO USUÁRIO é obrigatória!';
                 $status = FALSE;
             }
         }
@@ -444,15 +437,6 @@ class Account_bo {
             $status = FALSE;
         } else if (strlen($this->data['uscsenh']) > USCSENH_MAX_LENGTH) {
             $this->errors['uscsenh'] = 'A SENHA deve conter no máximo ' . USCSENH_MAX_LENGTH . ' caracter(es)!';
-            $status = FALSE;
-        }
-
-        // Validando o campo USCSENH2 (Confirmacao da Senha)
-        if (!isset($this->data['uscsenh2']) || empty(trim($this->data['uscsenh2']))) {
-            $this->errors['uscsenh2'] = 'O campo CONFIRMAR SENHA é obrigatório!';
-            $status = FALSE;
-        } else if (strcmp($this->data['uscsenh'], $this->data['uscsenh2']) != 0) {
-            $this->errors['uscsenh2'] = 'As senhas não conferem!';
             $status = FALSE;
         }
 
