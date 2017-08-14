@@ -389,6 +389,7 @@ class Account extends CI_Controller {
             $data = [];
             $data = $this->account_bo->get_data();
             $token = $this->confirmaremail_model->find_by_cactokn($data['cactokn']);
+
             if (is_null($token)) {
                 $this->response['response_code'] = RESPONSE_CODE_NOT_FOUND;
                 $this->response['response_message'] = "Token de confirmação inválido!";
@@ -954,6 +955,10 @@ class Account extends CI_Controller {
                 $this->response['response_message'] = "Conta não encontrada!.\n";
                 $this->response['response_message'] .= "Por favor, verifique se o e-mail está correto e tente novamente.";
             } else {
+                //Desabilita todos os outros tokens de ativacao para a conta em questao
+                $this->confirmaremail_model->disable_all_tokens_by_canidus($user->usnid);
+
+                // Seta os dados para salvar um novo token de ativacao
                 $token['canidus'] = $user->usnid;
                 $token['cactokn'] = $this->biblivirti_hash->token($user->uscmail);
                 $token['canid'] = $this->confirmaremail_model->save($token);
@@ -964,10 +969,6 @@ class Account extends CI_Controller {
                     $this->response['response_message'] = "Houve um erro ao tentar gerar token de ativação de e-email! Tente novamente.\n";
                     $this->response['response_message'] .= "Se o erro persistir, entre em contato com a equipe de suporte do Biblivirti!";
                 } else {
-
-                    //Desabilita todos os outros tokens de ativacao para a conta em questao
-                    $this->confirmaremail_model->disable_all_tokens_by_canidus($user->usnid);
-
                     // Seta os dados para o envio do email de ativação de conta
                     $from = EMAIL_SMTP_USER;
                     $to = $user->uscmail;
