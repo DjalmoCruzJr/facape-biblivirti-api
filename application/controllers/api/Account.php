@@ -733,6 +733,10 @@ class Account extends CI_Controller {
                         $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
                         $group->admin = $this->grupo_model->find_group_admin($group->grnid);
                         $group->users = $this->grupo_model->find_group_users($group->grnid);
+                        $group->grcfoto = $group->grcfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $group->grcfoto);
+                        foreach ($group->users as $u) {
+                            $u->uscfoto = $u->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $u->uscfoto);
+                        }
                         unset($group->grnidai);
                     }
                 }

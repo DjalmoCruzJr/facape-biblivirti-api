@@ -481,7 +481,7 @@ class Group extends CI_Controller {
      *                  "uscfbid" : "FacebookID do usuario",
      *                  "uscnome" : "Nome do usuario",
      *                  "uscmail" : "E-email do usuario",
-     *                  "usclogn" : "Login do usuario",
+     *                  "usclogn" : "unn do usuario",
      *                  "uscfoto" : "Caminho da foto do usuario",
      *                  "uscstat" : "Status do usuario",
      *                  "usdcadt" : "Data de cadastro do usuario"
@@ -520,6 +520,10 @@ class Group extends CI_Controller {
             $group->areaofinterest = $this->areainteresse_model->find_by_ainid($group->grnidai);
             $group->admin = $this->grupo_model->find_group_admin($group->grnid);
             $group->users = $this->grupo_model->find_group_users($group->grnid);
+
+            foreach ($group->users as $user) {
+                $user->uscfoto = $user->uscfoto == null ? null : base_url(UPLOAD_IMAGES_PATH . $user->uscfoto);
+            }
             unset($group->grnidai); // Remove o campo 'grnidai' do objeto de resposta
 
             $this->response['response_code'] = RESPONSE_CODE_OK;
