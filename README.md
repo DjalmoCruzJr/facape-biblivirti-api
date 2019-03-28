@@ -6,7 +6,7 @@
 
 <p>
   Este repositório destina-se somente ao projeto da API (Server) da plataforma.<br>
-  Para acessar o repositório do APP (Client) clique <a href="#" target="_blank">aqui...</a>
+  Para acessar o repositório do APP (Client) clique <a href="https://github.com/DjalmoCruzJr/sistema-facape-biblivirti-app" target="_blank">aqui...</a>
 <p>
 
 <h2>Fases do Projeto</h2>
