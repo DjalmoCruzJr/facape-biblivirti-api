@@ -44,9 +44,9 @@
 <h2>Participantes, Colaboradores e Banca Avaliadora</h2>
 <ul>
   <li><b>Djalmo Cruz Jr (Aluno - Graduando)</b></li>
-  <li>Prof. Ms. Cynara Lira de Carvalho (Orientadora - Professora Titular e Coordenadora do Curso de Ciência da Computação da FACAPE)</li>
-  <li>Prof. Ms. Jocélio Passos (Banca - Coordenador do NTI e Professor Titular do Curso de Ciência da Computação da FACAPE)</li>
-  <li>Carlos Alberto Teixeira (Banca - Professor Titular do Curso de Ciência da Computação da FACAPE)</li>
+  <li>Prof. Ms. Cynara Lira de Carvalho (Orientadora - Professora Titular e Coordenadora do Curso de Ciência da Computação)</li>
+  <li>Prof. Ms. Jocélio Passos (Banca - Coordenador do NTI e Professor Titular do Curso de Ciência da Computação)</li>
+  <li>Carlos Alberto Teixeira (Banca - Professor Titular do Curso de Ciência da Computação)</li>
   <li>Alyne Raquel (Aluna - Colaboradora)</li>
   <li>Luiz Mario Ferreira (Aluno - Colaborador)</li>
 </ul>
