@@ -22,8 +22,22 @@
   <li>Java Android (Client Side)</li>
   <li>MySQL Database</li>
   <li>Arquitetura MVC</li>
+  <li>Codeigniter Framework</li>
+  <li>Twitter Bootstrap CSS</li>
+  <li>Composer</li>
+  <li>Gradle</li>
   <li>Apache Server</li>
+  <li>PHP Storm</li>
+  <li>Android Studio</li>
+  <li>MySQL Workbench</li>
+  <li>Gimp</li>
+  <li>Postman</li>
+  <li>Genymotion</li>
+  <li>Trello</li>
+  <li>Astah Community</li>
   <li>Padrões de Projeto (Singleton, Facade, Builder, Factory, Observer, Adapter, etc)</li>
   <li>Reconhecimento de Padões</li>
   <li>Sistemas de Recomendação</li>
+  <li>Etc...</li>
 </ul>
+
