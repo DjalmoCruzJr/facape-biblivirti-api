@@ -11,7 +11,7 @@
 
 <h2>Fases do Projeto</h2>
 <ul>
-  <li><b>Fase 1 - Projeto API (Server Side)<b></li>
+  <li><b>Fase 1 - Projeto API (Server Side)</b></li>
   <li>Fase 2 - Projeto APP (Client Side)</li>
 </ul>
 
